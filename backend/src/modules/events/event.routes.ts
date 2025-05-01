@@ -12,5 +12,10 @@ router.post(
 );
 router.get('/', EventController.getEvents);
 router.get('/:id', EventController.getEventById);
+router.patch(
+  '/:id',
+  validateRequest(EventValidations.updateEventZodSchema),
+  EventController.updateEvent
+);
 
 export const EventRoutes = router;

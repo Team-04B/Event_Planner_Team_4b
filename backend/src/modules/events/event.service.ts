@@ -2,8 +2,8 @@ import { Event, Prisma } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 import { paginationHelper } from '../../app/helper/paginationHelper';
 import { IPaginationOptions } from '../../app/interface/pagination';
-import {  eventSearchableFields } from './event.constant';
-import { IEventFilterRequest } from './event.interface';
+import { eventSearchableFields } from './event.constant';
+import { IEventFilterRequest, IEventUpdate } from './event.interface';
 
 const createEventIntoDB = async (payload: Event) => {
   const result = await prisma.event.create({
@@ -81,8 +81,22 @@ const getEventByIdFromDB = async (id: string): Promise<Event | null> => {
   return result;
 };
 
+const updateEventIntoDB = async (id: string, data: Partial<Event>) => {
+  await prisma.event.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.event.update({
+    where: { id },
+    data,
+  });
+  return result;
+};
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
   getEventByIdFromDB,
+  updateEventIntoDB,
 };
