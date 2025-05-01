@@ -25,7 +25,7 @@ model User {
   participations  Participation[]
   invitations     Invitation[] @relation("InvitedUser")
   reviews         Review[]
-  payments         Payment[]
+  payments        Payment[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
