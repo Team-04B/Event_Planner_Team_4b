@@ -17,7 +17,7 @@ app.use(cookeParser())
 
 app.get('/',(req:Request,res:Response)=>{
     res.send({
-        message:"PH health care server"
+        message:"Event Planner server is Running"
     })
 })
 
