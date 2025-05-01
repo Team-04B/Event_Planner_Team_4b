@@ -90,7 +90,7 @@ model Payment {
   userId       String
   event        Event       @relation(fields: [eventId], references: [id])
   eventId      String
-  amount       Float
+  amount       Int
   status       PaymentStatus  @default(PENDING) // e.g., SUCCESS, FAILED, PENDING
   provider     String      // e.g., 'SSLCommerz', 'ShurjoPay'
   transactionId String     @unique  // From payment gateway
