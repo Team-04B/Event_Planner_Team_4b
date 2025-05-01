@@ -3,6 +3,8 @@ import { sendResponse } from '../../app/shared/sendResponse';
 import httpStatus from 'http-status';
 import { EventService } from './event.service';
 import pick from '../../app/shared/pick';
+import { eventFilterableFields } from './event.constant';
+import { IEventFilterRequest } from './event.interface';
 
 const createEvent = catchAsync(async (req, res) => {
   const eventData = req.body;
@@ -18,8 +20,40 @@ const createEvent = catchAsync(async (req, res) => {
 });
 
 const getEvents = catchAsync(async (req, res) => {
+  const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-  const result = await EventService.getEventsFromDB(options);
+
+  // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
+  const filters: IEventFilterRequest = {
+    isPublic:
+      rawFilters.isPublic === 'true'
+        ? true
+        : rawFilters.isPublic === 'false'
+          ? false
+          : undefined,
+    isPaid:
+      rawFilters.isPaid === 'true'
+        ? true
+        : rawFilters.isPaid === 'false'
+          ? false
+          : undefined,
+    searchTerm:
+      typeof rawFilters.searchTerm === 'string'
+        ? rawFilters.searchTerm
+        : undefined,
+  };
+
+  // If filters are empty, set them to undefined to fetch all events
+  if (
+    Object.keys(filters).length === 0 ||
+    Object.values(filters).every((value) => value === undefined)
+  ) {
+    filters.isPublic = undefined;
+    filters.isPaid = undefined;
+    filters.searchTerm = undefined;
+  }
+
+  const result = await EventService.getEventsFromDB(filters, options);
 
   sendResponse(res, {
     success: true,
@@ -29,7 +63,6 @@ const getEvents = catchAsync(async (req, res) => {
     data: result.data,
   });
 });
-
 
 export const EventController = {
   createEvent,
