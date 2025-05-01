@@ -64,7 +64,20 @@ const getEvents = catchAsync(async (req, res) => {
   });
 });
 
+const getEventById = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await EventService.getEventByIdFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Event retrieval successfully',
+    data: result,
+  });
+});
+
 export const EventController = {
   createEvent,
   getEvents,
+  getEventById,
 };

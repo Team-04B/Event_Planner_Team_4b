@@ -1,9 +1,16 @@
 import express from 'express';
 import { EventController } from './event.controller';
+import { validateRequest } from '../../app/middleWares/validationRequest';
+import { EventValidations } from './event.validation';
 
 const router = express.Router();
 
-router.post('/', EventController.createEvent);
+router.post(
+  '/',
+  validateRequest(EventValidations.createEventZodSchema),
+  EventController.createEvent
+);
 router.get('/', EventController.getEvents);
+router.get('/:id', EventController.getEventById);
 
 export const EventRoutes = router;
