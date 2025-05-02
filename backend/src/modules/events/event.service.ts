@@ -1,4 +1,4 @@
-import { Event, Prisma } from '@prisma/client';
+import { Event, Participation, Prisma } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 import { paginationHelper } from '../../app/helper/paginationHelper';
 import { IPaginationOptions } from '../../app/interface/pagination';
@@ -150,8 +150,12 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
   if (!event) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
   }
-  if (event.isPublic !== true || event.isPaid) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot join this event');
+
+  if (!event.isPublic || event.isPaid) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'This is not a public free event'
+    );
   }
 
   const alreadJoined = await prisma.participation.findFirst({
@@ -170,15 +174,12 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
       userId,
       eventId,
       status: 'APPROVED',
-      paid: false,
     },
   });
 
   return createParticipation;
 };
 
-
-// join to paid event
 const joinPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({
     where: {
@@ -189,8 +190,9 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
   if (!event) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
   }
-  if (event.isPaid !== true || event.isPublic) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot join this event');
+
+  if (!event.isPaid || !event.isPublic) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'This is not a paid event');
   }
 
   const alreadJoined = await prisma.participation.findFirst({
@@ -209,11 +211,24 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
       userId,
       eventId,
       status: 'PENDING',
-      paid: false,
     },
   });
 
   return createParticipation;
+};
+
+const approveParticipant = async (id: string, data: Partial<Participation>) => {
+  await prisma.participation.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.participation.update({
+    where: { id },
+    data,
+  });
+  return result;
 };
 
 export const EventService = {
@@ -224,4 +239,5 @@ export const EventService = {
   deleteEventFromDB,
   joinPublicEvent,
   joinPaidEvent,
+  approveParticipant,
 };

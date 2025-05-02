@@ -103,8 +103,7 @@ const deleteFromDB = catchAsync(async (req, res) => {
 
 const joinPublicEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  // console.log(req.params);
-  const userId = req.user?.id;
+  const userId = req.body.userId;
   const result = await EventService.joinPublicEvent(eventId, userId);
 
   sendResponse(res, {
@@ -115,17 +114,29 @@ const joinPublicEvent = catchAsync(async (req, res) => {
   });
 });
 
-
 const joinPaidEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
   // console.log(req.params);
-  const userId = req.user?.id;
-  const result = await EventService.joinPublicEvent(eventId, userId);
+  const userId = req.body.userId;
+  const result = await EventService.joinPaidEvent(eventId, userId);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Joined public event successfully',
+    message: 'Joined paid event successfully',
+    data: result,
+  });
+});
+
+const approveParticipant = catchAsync(async (req, res) => {
+  const { participantId } = req.params;
+
+  const result = await EventService.approveParticipant(participantId, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Participation approved successfully',
     data: result,
   });
 });
@@ -137,4 +148,6 @@ export const EventController = {
   updateEvent,
   deleteFromDB,
   joinPublicEvent,
+  joinPaidEvent,
+  approveParticipant,
 };
