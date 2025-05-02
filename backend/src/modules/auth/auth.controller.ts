@@ -27,8 +27,32 @@ const logingUser = catchAsync(async (req, res) => {
     },
   });
 });
+const refeshToken = catchAsync(async (req, res) => {
+  const { refeshToken } = req.cookies;
+  const result = await AuthService.refeshTokenInToForDb(refeshToken);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'refesh token Successfully get the access',
+    data: result,
+  });
+});
+const cheangePassword = catchAsync(async (req, res) => {
+  const user = req.user as any;
+  const result = await AuthService.chengePasswordForDb(user, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'refesh token Successfully get the access',
+    data: result,
+  });
+});
 
 export const AuthController = {
   registerUser,
   logingUser,
+  refeshToken,
+  cheangePassword,
 };

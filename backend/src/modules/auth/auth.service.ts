@@ -5,6 +5,7 @@ import { User } from '@prisma/client';
 import { createToken } from '../../app/shared/createToken';
 import bcrypt from 'bcryptjs';
 import config from '../../app/config';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 const authRegisterInToDB = async (payload: Partial<User>) => {
   const { name, email, password } = payload;
 
@@ -89,8 +90,69 @@ const authLogingInToDb = async (payload: Partial<User>) => {
   };
   return result;
 };
+const refeshTokenInToForDb = async (paylood: string) => {
+  const decode = jwt.verify(paylood, config.jwt.refresh_token_secret as string);
 
+  const { email, role } = decode as JwtPayload;
+  if (!decode) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'you ar not authorized');
+  }
+  const isExistUser = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (!isExistUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'you ar not authorized');
+  }
+  const jwtPayload = {
+    email: isExistUser.email,
+    role: isExistUser.role,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt.jwt_scret as string,
+    config.jwt.expires_in as string
+  );
+  return {
+    accessToken,
+  };
+};
+const chengePasswordForDb = async (
+  user: any,
+  paylood: { newPassword: string; oldPassword: string }
+) => {
+  const { email } = user;
+  const isExistUser = await prisma.user.findUnique({ where: { email: email } });
+
+  if (!isExistUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'you ar not authorized');
+  }
+
+  const checkPassword = await bcrypt.compare(
+    paylood?.oldPassword,
+    isExistUser?.password
+  );
+
+  if (!checkPassword) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Invilide old password please try agin'
+    );
+  }
+  const hasPassword = await bcrypt.hash(paylood.newPassword, 10);
+  if (!hasPassword) {
+    throw new Error('password solt generate problem ');
+  }
+  const result = await prisma.user.update({
+    where: { email: isExistUser.email },
+    data: { password: hasPassword },
+  });
+  return result;
+};
 export const AuthService = {
   authRegisterInToDB,
   authLogingInToDb,
+  refeshTokenInToForDb,
+  chengePasswordForDb,
 };

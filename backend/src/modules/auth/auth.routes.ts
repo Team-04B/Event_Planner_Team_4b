@@ -11,5 +11,7 @@ router.post(
   AuthController.registerUser
 );
 router.post('/login', AuthController.logingUser);
+router.post('/refesh-token', AuthController.refeshToken);
+router.post('/cheange-password', AuthController.cheangePassword);
 
 export const AuthRoutes = router;
