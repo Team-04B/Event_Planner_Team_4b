@@ -8,7 +8,7 @@ export const sendResponse = <T>(
     message: string;
     meta?: {
       page: number;
-      limite: number;
+      limit: number;
       total: number;
     };
     data?: T | null | undefined;
