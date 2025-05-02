@@ -5,6 +5,7 @@ import { EventService } from './event.service';
 import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
+import ApiError from '../../app/error/ApiError';
 
 const createEvent = catchAsync(async (req, res) => {
   const eventData = req.body;
@@ -88,11 +89,22 @@ const updateEvent = catchAsync(async (req, res) => {
   });
 });
 
+const deleteFromDB = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await EventService.deleteEventFromDB(id);
 
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Event deleted successfully',
+    data: result,
+  });
+});
 
 export const EventController = {
   createEvent,
   getEvents,
   getEventById,
   updateEvent,
+  deleteFromDB,
 };

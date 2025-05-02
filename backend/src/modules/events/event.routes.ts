@@ -18,6 +18,6 @@ router.patch(
   EventController.updateEvent
 );
 
-
+router.delete('/:id', EventController.deleteFromDB)
 
 export const EventRoutes = router;

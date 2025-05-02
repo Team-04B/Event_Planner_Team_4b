@@ -4,6 +4,8 @@ import { paginationHelper } from '../../app/helper/paginationHelper';
 import { IPaginationOptions } from '../../app/interface/pagination';
 import { eventSearchableFields } from './event.constant';
 import { IEventFilterRequest, IEventUpdate } from './event.interface';
+import ApiError from '../../app/error/ApiError';
+import httpStatus from 'http-status';
 
 const createEventIntoDB = async (payload: Event) => {
   const result = await prisma.event.create({
@@ -95,12 +97,53 @@ const updateEventIntoDB = async (id: string, data: Partial<Event>) => {
   return result;
 };
 
+const deleteEventFromDB = async (id: string): Promise<Event> => {
+  return await prisma.$transaction(async (transactionClient) => {
+    const isEventExists = await transactionClient.event.findUnique({
+      where: { id },
+    });
 
+    if (!isEventExists) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
+    }
 
+    await transactionClient.participation.deleteMany({
+      where: {
+        eventId: id,
+      },
+    });
+
+    await transactionClient.invitation.deleteMany({
+      where: {
+        eventId: id,
+      },
+    });
+    await transactionClient.review.deleteMany({
+      where: {
+        eventId: id,
+      },
+    });
+    await transactionClient.payment.deleteMany({
+      where: {
+        eventId: id,
+      },
+    });
+
+    // Finally delete the event
+    const deleteEvent = await transactionClient.event.delete({
+      where: {
+        id,
+      },
+    });
+
+    return deleteEvent;
+  });
+};
 
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
   getEventByIdFromDB,
   updateEventIntoDB,
+  deleteEventFromDB,
 };
