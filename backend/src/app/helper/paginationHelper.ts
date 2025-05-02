@@ -1,13 +1,13 @@
 interface IOptions {
     page?:number,
-    limite?:number,
+    limit?:number,
     sortBy?:string,
     sortOrder?:string
 }
 
 interface IOptionsResult {
     page:number,
-    limite:number,
+    limit:number,
     skip:number,
     sortBy:string,
     sortOrder:string
@@ -15,13 +15,13 @@ interface IOptionsResult {
 
 const calculatePagination = (options:IOptions):IOptionsResult => {
     const page:number = Number(options.page) || 1
-    const limite:number = Number(options.limite) || 10
+    const limit:number = Number(options.limit) || 10
 
-    const skip = (Number(page - 1) * limite);
+    const skip = (Number(page - 1) * limit);
     const sortBy  = options.sortBy || 'createdAt';
     const sortOrder = options.sortOrder || 'desc';
 
-    return {skip,sortBy,page,limite,sortOrder}
+    return {skip,sortBy,page,limit,sortOrder}
 }
 
 
