@@ -9,19 +9,43 @@ import { Role } from '@prisma/client';
 
 const router = express.Router();
 
+//create event
 router.post(
   '/',
   // auth(Role.USER),
   validateRequest(EventValidations.createEventZodSchema),
   EventController.createEvent
 );
+
+//get all events
 router.get('/', EventController.getEvents);
+
+// get event by id
 router.get('/:id', EventController.getEventById);
+
+// update event 
 router.patch(
   '/:id',
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
+
+// delete event from db
+router.delete('/:id', EventController.deleteFromDB);
+
+// updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
+router.patch(
+  '/:id/participants/:participantId/status',
+  EventController.updateParticipantStatus
+);
+
+//join free public event
+router.post('/:id/join',auth(Role.USER), EventController.joinPublicEvent);
+
+// Request to join private/paid event
+router.post('/:id/request', EventController.joinPaidEvent);
+
+
 router.post(
   '/:id/reviews',
   validateRequest(ReviewValidations.createReviewZodSchema),
@@ -29,24 +53,7 @@ router.post(
 );
 router.get('/:id/reviews', ReviewController.getAllReviews);
 
-router.delete('/:id', EventController.deleteFromDB);
 
-// approve participant
-router.patch(
-  '/:id/participants/:participantId/status',
-  EventController.updateParticipantStatus
-);
 
-// // reject participant
-// router.patch('/:id/participants/:participantId/reject');
-
-// // ban participant
-// router.patch('/:id/participants/:participantId/ban');
-
-//join free public event
-router.post('/:id/join', EventController.joinPublicEvent);
-
-// Request to join private/paid event
-router.post('/:id/request', EventController.joinPaidEvent);
 
 export const EventRoutes = router;

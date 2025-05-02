@@ -7,6 +7,7 @@ import { IEventFilterRequest, IEventUpdate } from './event.interface';
 import ApiError from '../../app/error/ApiError';
 import httpStatus from 'http-status';
 
+// create event into db
 const createEventIntoDB = async (payload: Event) => {
   const result = await prisma.event.create({
     data: payload,
@@ -14,6 +15,7 @@ const createEventIntoDB = async (payload: Event) => {
   return result;
 };
 
+// get all events from db
 const getEventsFromDB = async (
   filters: IEventFilterRequest,
   options: IPaginationOptions
@@ -74,6 +76,7 @@ const getEventsFromDB = async (
   };
 };
 
+// get event by id from db
 const getEventByIdFromDB = async (id: string): Promise<Event | null> => {
   const result = await prisma.event.findUnique({
     where: {
@@ -83,6 +86,7 @@ const getEventByIdFromDB = async (id: string): Promise<Event | null> => {
   return result;
 };
 
+// update event into db
 const updateEventIntoDB = async (id: string, data: Partial<Event>) => {
   await prisma.event.findUniqueOrThrow({
     where: {
@@ -97,6 +101,7 @@ const updateEventIntoDB = async (id: string, data: Partial<Event>) => {
   return result;
 };
 
+// delete event from db
 const deleteEventFromDB = async (id: string): Promise<Event> => {
   return await prisma.$transaction(async (transactionClient) => {
     const isEventExists = await transactionClient.event.findUnique({
@@ -140,6 +145,7 @@ const deleteEventFromDB = async (id: string): Promise<Event> => {
   });
 };
 
+// join public free event
 const joinPublicEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({
     where: {
@@ -180,6 +186,7 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
   return createParticipation;
 };
 
+// join public paid event
 const joinPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({
     where: {
@@ -217,6 +224,7 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
   return createParticipation;
 };
 
+// update Participant Status
 const updateParticipantStatus = async (
   id: string,
   data: Partial<Participation>

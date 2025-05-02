@@ -7,6 +7,7 @@ import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
 
+// create event
 const createEvent = catchAsync(async (req, res) => {
   const eventData = req.body;
   // console.log(eventData);
@@ -20,6 +21,7 @@ const createEvent = catchAsync(async (req, res) => {
   });
 });
 
+// get all event
 const getEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -65,6 +67,7 @@ const getEvents = catchAsync(async (req, res) => {
   });
 });
 
+// get event by id
 const getEventById = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await EventService.getEventByIdFromDB(id);
@@ -77,6 +80,7 @@ const getEventById = catchAsync(async (req, res) => {
   });
 });
 
+//update event
 const updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -89,6 +93,7 @@ const updateEvent = catchAsync(async (req, res) => {
   });
 });
 
+// delete event
 const deleteFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await EventService.deleteEventFromDB(id);
@@ -101,8 +106,11 @@ const deleteFromDB = catchAsync(async (req, res) => {
   });
 });
 
+// join free public event
 const joinPublicEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
+  // const userId = req.user;
+  // console.log(userId);
   const userId = req.body.userId;
   const result = await EventService.joinPublicEvent(eventId, userId);
 
@@ -114,6 +122,7 @@ const joinPublicEvent = catchAsync(async (req, res) => {
   });
 });
 
+// join public paid event
 const joinPaidEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
   // console.log(req.params);
@@ -128,15 +137,19 @@ const joinPaidEvent = catchAsync(async (req, res) => {
   });
 });
 
+// update Participant Status
 const updateParticipantStatus = catchAsync(async (req, res) => {
   const { participantId } = req.params;
-
-  const result = await EventService.updateParticipantStatus(participantId, req.body);
+  console.log(req.body);
+  const result = await EventService.updateParticipantStatus(
+    participantId,
+    req.body
+  );
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Participation approved successfully',
+    message: `Participation ${req.body.status.toLowerCase()} successfully`,
     data: result,
   });
 });
