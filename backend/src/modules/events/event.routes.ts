@@ -43,10 +43,10 @@ router.patch(
 );
 
 //join free public event
-router.post('/:id/join', EventController.joinPublicEvent);
+router.post('/:id/join',auth(Role.USER), EventController.joinPublicEvent);
 
 // Request to join private/paid event
-router.post('/:id/request', EventController.joinPaidEvent);
+router.post('/:id/request', auth(Role.USER), EventController.joinPaidEvent);
 
 // reviews routes
 router.post(

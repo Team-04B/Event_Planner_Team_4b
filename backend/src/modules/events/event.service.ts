@@ -187,7 +187,7 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
 };
 
 // join public paid event
-const joinPaidEvent = async (eventId: string, userId: string) => {
+const joinPublicPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({
     where: {
       id: eventId,
@@ -249,6 +249,6 @@ export const EventService = {
   updateEventIntoDB,
   deleteEventFromDB,
   joinPublicEvent,
-  joinPaidEvent,
+  joinPublicPaidEvent,
   updateParticipantStatus,
 };

@@ -123,8 +123,9 @@ const joinPublicEvent = catchAsync(async (req, res) => {
 // join public paid event
 const joinPaidEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  const userId = req.user.userId;
-  const result = await EventService.joinPaidEvent(eventId, userId);
+  const userId = req.user?.userId;
+ console.log(req.user, userId);
+  const result = await EventService.joinPublicPaidEvent(eventId, userId);
 
   sendResponse(res, {
     success: true,
