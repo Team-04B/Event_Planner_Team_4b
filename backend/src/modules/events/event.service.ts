@@ -217,7 +217,10 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
   return createParticipation;
 };
 
-const approveParticipant = async (id: string, data: Partial<Participation>) => {
+const updateParticipantStatus = async (
+  id: string,
+  data: Partial<Participation>
+) => {
   await prisma.participation.findUniqueOrThrow({
     where: {
       id,
@@ -239,5 +242,5 @@ export const EventService = {
   deleteEventFromDB,
   joinPublicEvent,
   joinPaidEvent,
-  approveParticipant,
+  updateParticipantStatus,
 };

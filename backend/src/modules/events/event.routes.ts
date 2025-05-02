@@ -33,8 +33,8 @@ router.delete('/:id', EventController.deleteFromDB);
 
 // approve participant
 router.patch(
-  '/:id/participants/:participantId/approve',
-  EventController.approveParticipant
+  '/:id/participants/:participantId/status',
+  EventController.updateParticipantStatus
 );
 
 // // reject participant
