@@ -6,5 +6,7 @@ const router = express.Router()
 
 router.get('/',
     InvitationController.getAllInvitaion)
+router.delete('/:id',
+    InvitationController.deleteInvitaion)
     
 export const InvitationRoutes = router

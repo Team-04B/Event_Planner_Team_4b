@@ -25,6 +25,23 @@ const createInvitaionDB =async (id:string,data:Invitation)=>{
     
     return result;
  }
+// delete  Invitaion 
+const deleteInvitaionDB =async (id:string)=>{
+ await prisma.invitation.findUniqueOrThrow({
+       where:{
+       id
+       }
+       })
+       
+       
+    const result =await prisma.invitation.delete({
+    where:{
+    id
+    }
+    })
+    
+    return result;
+ }
 // get all Invitaion 
 
 const getAllInvitaionDB = async (
@@ -90,5 +107,6 @@ const getAllInvitaionDB = async (
 
 export const InvitaionServices={
 createInvitaionDB,
-getAllInvitaionDB
+getAllInvitaionDB,
+deleteInvitaionDB
 }
