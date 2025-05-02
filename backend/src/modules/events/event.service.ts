@@ -150,8 +150,12 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
   if (!event) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
   }
-  if (event.isPublic !== true || event.isPaid) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot join this event');
+
+  if (!event.isPublic || event.isPaid) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'This is not a public free event'
+    );
   }
 
   const alreadJoined = await prisma.participation.findFirst({
@@ -170,13 +174,11 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
       userId,
       eventId,
       status: 'APPROVED',
-      paid: false,
     },
   });
 
   return createParticipation;
 };
-
 
 const joinPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({
@@ -188,8 +190,9 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
   if (!event) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
   }
-  if (event.isPaid !== true || event.isPublic) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot join this event');
+
+  if (!event.isPaid || !event.isPublic) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'This is not a paid event');
   }
 
   const alreadJoined = await prisma.participation.findFirst({
@@ -208,7 +211,6 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
       userId,
       eventId,
       status: 'PENDING',
-      paid: false,
     },
   });
 

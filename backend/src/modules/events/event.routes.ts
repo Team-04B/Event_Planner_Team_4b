@@ -23,13 +23,11 @@ router.patch(
   EventController.updateEvent
 );
 router.post(
-  '/:id/reviews',validateRequest(ReviewValidations.createReviewZodSchema),
+  '/:id/reviews',
+  validateRequest(ReviewValidations.createReviewZodSchema),
   ReviewController.createReview
 );
-router.get(
-  '/:id/reviews',
-  ReviewController.getAllReviews
-);
+router.get('/:id/reviews', ReviewController.getAllReviews);
 
 router.delete('/:id', EventController.deleteFromDB);
 
@@ -46,6 +44,6 @@ router.delete('/:id', EventController.deleteFromDB);
 router.post('/:id/join', EventController.joinPublicEvent);
 
 // Request to join private/paid event
-// router.post('/:id/request', EventController.requestToJoinEvent);
+router.post('/:id/request', EventController.joinPaidEvent);
 
 export const EventRoutes = router;
