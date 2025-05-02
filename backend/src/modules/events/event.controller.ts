@@ -133,6 +133,7 @@ const approveParticipant = catchAsync(async (req, res) => {
 
   const result = await EventService.approveParticipant(participantId, req.body);
 
+  
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
