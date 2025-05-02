@@ -8,11 +8,22 @@ const {id} = req.params
   sendResponse(res,{
       success:true,
       statusCode:httpStatus.CREATED,
-      message:'User Register Successfully',
+      message:'Review created Successfully',
+      data:result
+  })
+})
+const getAllReviews = catchAsync(async(req,res,next) => {
+const {id} = req.params
+  const result = await ReviewServices.getAllReviewFromDB(id);
+  sendResponse(res,{
+      success:true,
+      statusCode:httpStatus.CREATED,
+      message:'Reviews retrived Successfully',
       data:result
   })
 })
 
 export const ReviewController = {
-  createReview
+  createReview,
+  getAllReviews
 }

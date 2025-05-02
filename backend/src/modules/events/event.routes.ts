@@ -22,6 +22,10 @@ router.post(
   '/:id/reviews',
   ReviewController.createReview
 );
+router.get(
+  '/:id/reviews',
+  ReviewController.getAllReviews
+);
 
 
 

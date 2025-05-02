@@ -19,9 +19,13 @@ const createReviewIntoDB =async (id:string,data:Review)=>{
     return result;
  }
 
-const getAllReviewFromDB=async ()=>{
+const getAllReviewFromDB=async (id:string)=>{
    
-   const result = prisma.review.findMany()
+   const result = prisma.review.findMany({
+   where:{
+   eventId:id
+   }
+   })
    return result;
 }
 
