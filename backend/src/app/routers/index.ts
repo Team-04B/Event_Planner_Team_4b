@@ -36,7 +36,7 @@ const moduleRoutes = [
         route:PaymentRoutes
     },
     {
-        path:'/reviews',
+        path:'/events',
         route:ReviewsRoutes
     },
     {
