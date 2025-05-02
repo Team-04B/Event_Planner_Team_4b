@@ -94,6 +94,10 @@ const updateEventIntoDB = async (id: string, data: Partial<Event>) => {
   });
   return result;
 };
+
+
+
+
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,

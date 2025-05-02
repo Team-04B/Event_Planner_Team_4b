@@ -88,6 +88,8 @@ const updateEvent = catchAsync(async (req, res) => {
   });
 });
 
+
+
 export const EventController = {
   createEvent,
   getEvents,

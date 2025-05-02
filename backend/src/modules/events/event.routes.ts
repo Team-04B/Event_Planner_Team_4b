@@ -18,4 +18,6 @@ router.patch(
   EventController.updateEvent
 );
 
+
+
 export const EventRoutes = router;
