@@ -9,7 +9,7 @@ import ApiError from '../../app/error/ApiError';
 
 const createEvent = catchAsync(async (req, res) => {
   const eventData = req.body;
-  console.log(eventData);
+  // console.log(eventData);
   const result = await EventService.createEventIntoDB(eventData);
 
   sendResponse(res, {
@@ -101,10 +101,25 @@ const deleteFromDB = catchAsync(async (req, res) => {
   });
 });
 
+const joinPublicEvent = catchAsync(async (req, res) => {
+  const { id: eventId } = req.params;
+  console.log(req.params);
+  const userId = req.user?.id;
+  const result = await EventService.joinPublicEvent(eventId, userId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'Joined public event successfully',
+    data: result,
+  });
+});
+
 export const EventController = {
   createEvent,
   getEvents,
   getEventById,
   updateEvent,
   deleteFromDB,
+  joinPublicEvent,
 };

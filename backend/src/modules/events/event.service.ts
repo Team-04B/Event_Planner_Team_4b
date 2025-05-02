@@ -140,10 +140,48 @@ const deleteEventFromDB = async (id: string): Promise<Event> => {
   });
 };
 
+const joinPublicEvent = async (eventId: string, userId: string) => {
+  const event = await prisma.event.findUnique({
+    where: {
+      id: eventId,
+    },
+  });
+
+  if (!event) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
+  }
+  if (event.isPublic !== true || event.isPaid) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot join this event');
+  }
+
+  const alreadJoined = await prisma.participation.findFirst({
+    where: {
+      eventId,
+      userId,
+    },
+  });
+
+  if (alreadJoined) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Already joined');
+  }
+
+  const createParticipation = await prisma.participation.create({
+    data: {
+      userId,
+      eventId,
+      status: 'APPROVED',
+      paid: false,
+    },
+  });
+
+  return createParticipation;
+};
+
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
   getEventByIdFromDB,
   updateEventIntoDB,
   deleteEventFromDB,
+  joinPublicEvent,
 };

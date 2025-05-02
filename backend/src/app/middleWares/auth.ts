@@ -3,6 +3,7 @@ import { Jwthelper } from '../helper/jwtHelper';
 import config from '../config';
 import ApiError from '../error/ApiError';
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 
 const auth = (...roles: string[]) => {
   return async (
@@ -20,7 +21,7 @@ const auth = (...roles: string[]) => {
       const varifiedUser = Jwthelper.verifyToken(
         token as string,
         config.jwt.jwt_scret as string
-      );
+      ) as JwtPayload;
 
       if (roles.length && !roles.includes(varifiedUser.role)) {
         throw new ApiError(httpStatus.FORBIDDEN, 'You are Forbidden!!');
