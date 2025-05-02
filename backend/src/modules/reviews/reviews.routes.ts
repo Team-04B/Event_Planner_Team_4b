@@ -8,7 +8,8 @@ import { ReviewController } from "./reviews.controller"
 
 const router = express.Router()
 
-
+router.patch('/:id',
+    ReviewController.updateReview)
 
 
 export const ReviewsRoutes = router
