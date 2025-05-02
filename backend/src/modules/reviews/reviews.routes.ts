@@ -8,9 +8,7 @@ import { ReviewController } from "./reviews.controller"
 
 const router = express.Router()
 
-router.post('/:id/reviews',
-    validateRequest(AuthValidation.registerUserSchema),
-    ReviewController.createReview)
+
 
 
 export const ReviewsRoutes = router
