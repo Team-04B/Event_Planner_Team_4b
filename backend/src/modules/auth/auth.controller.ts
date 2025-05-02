@@ -1,3 +1,4 @@
+import { JwtPayload } from 'jsonwebtoken';
 import { catchAsync } from '../../app/helper/catchAsync';
 import { sendResponse } from '../../app/shared/sendResponse';
 import { AuthService } from './auth.service';
@@ -39,7 +40,7 @@ const refeshToken = catchAsync(async (req, res) => {
   });
 });
 const cheangePassword = catchAsync(async (req, res) => {
-  const user = req.user as any;
+  const user = req.user as JwtPayload;
   const result = await AuthService.chengePasswordForDb(user, req.body);
 
   sendResponse(res, {
