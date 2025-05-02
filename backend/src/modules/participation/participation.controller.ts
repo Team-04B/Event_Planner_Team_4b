@@ -3,9 +3,9 @@ import { catchAsync } from '../../app/helper/catchAsync';
 import { ParticipationService } from './participation.service';
 import { sendResponse } from '../../app/shared/sendResponse';
 
+// respond invitation
 const updateParticipantStatus = catchAsync(async (req, res) => {
   const { invitationId } = req.params;
-  console.log(req.body);
   const result = await ParticipationService.respondToInvitation(
     invitationId,
     req.body

@@ -109,9 +109,7 @@ const deleteFromDB = catchAsync(async (req, res) => {
 // join free public event
 const joinPublicEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  // const userId = req.user;
-  // console.log(userId);
-  const userId = req.body.userId;
+  const userId = req.user.userId;
   const result = await EventService.joinPublicEvent(eventId, userId);
 
   sendResponse(res, {
@@ -125,8 +123,7 @@ const joinPublicEvent = catchAsync(async (req, res) => {
 // join public paid event
 const joinPaidEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  // console.log(req.params);
-  const userId = req.body.userId;
+  const userId = req.user.userId;
   const result = await EventService.joinPaidEvent(eventId, userId);
 
   sendResponse(res, {
@@ -140,7 +137,7 @@ const joinPaidEvent = catchAsync(async (req, res) => {
 // update Participant Status
 const updateParticipantStatus = catchAsync(async (req, res) => {
   const { participantId } = req.params;
-  console.log(req.body);
+  // console.log(req.body);
   const result = await EventService.updateParticipantStatus(
     participantId,
     req.body
