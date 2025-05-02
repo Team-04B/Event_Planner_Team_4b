@@ -1,4 +1,4 @@
-import { Event, Prisma } from '@prisma/client';
+import { Event, Participation, Prisma } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 import { paginationHelper } from '../../app/helper/paginationHelper';
 import { IPaginationOptions } from '../../app/interface/pagination';
@@ -217,6 +217,20 @@ const joinPaidEvent = async (eventId: string, userId: string) => {
   return createParticipation;
 };
 
+const approveParticipant = async (id: string, data: Partial<Participation>) => {
+  await prisma.participation.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.participation.update({
+    where: { id },
+    data,
+  });
+  return result;
+};
+
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
@@ -225,4 +239,5 @@ export const EventService = {
   deleteEventFromDB,
   joinPublicEvent,
   joinPaidEvent,
+  approveParticipant,
 };

@@ -128,6 +128,19 @@ const joinPaidEvent = catchAsync(async (req, res) => {
   });
 });
 
+const approveParticipant = catchAsync(async (req, res) => {
+  const { participantId } = req.params;
+
+  const result = await EventService.approveParticipant(participantId, req.body);
+  
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Participation approved successfully',
+    data: result,
+  });
+});
+
 export const EventController = {
   createEvent,
   getEvents,
@@ -136,4 +149,5 @@ export const EventController = {
   deleteFromDB,
   joinPublicEvent,
   joinPaidEvent,
+  approveParticipant,
 };
