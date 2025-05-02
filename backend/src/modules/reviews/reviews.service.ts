@@ -23,7 +23,6 @@ const createReviewIntoDB =async (id:string,data:Review)=>{
  
 //  update reviews 
 const updateReviewIntoDB =async (id:string,data:Review)=>{
-console.log(id,data)
 await prisma.review.findUniqueOrThrow({
     where:{
     id
@@ -37,8 +36,23 @@ await prisma.review.findUniqueOrThrow({
  })
     return result;
  }
+//  Delete reviews 
+const deleteReviewIntoDB =async (id:string)=>{
+
+await prisma.review.findUniqueOrThrow({
+    where:{
+    id
+    }
+    })
+ const result = await prisma.review.delete({
+  where:{
+  id
+  },
+ })
+    return result;
+ }
  
-  //  get all reviews for each event 
+//  get all reviews for each event 
 const getAllReviewFromDB=async (id:string)=>{
    
    const result = prisma.review.findMany({
@@ -52,5 +66,6 @@ const getAllReviewFromDB=async (id:string)=>{
 export const ReviewServices={
 createReviewIntoDB,
 getAllReviewFromDB,
-updateReviewIntoDB
+updateReviewIntoDB,
+deleteReviewIntoDB
 }

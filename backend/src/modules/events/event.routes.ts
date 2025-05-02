@@ -3,6 +3,7 @@ import { EventController } from './event.controller';
 import { validateRequest } from '../../app/middleWares/validationRequest';
 import { EventValidations } from './event.validation';
 import { ReviewController } from '../reviews/reviews.controller';
+import { ReviewValidations } from '../reviews/reviews.validation';
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.patch(
   EventController.updateEvent
 );
 router.post(
-  '/:id/reviews',
+  '/:id/reviews',validateRequest(ReviewValidations.createReviewZodSchema),
   ReviewController.createReview
 );
 router.get(

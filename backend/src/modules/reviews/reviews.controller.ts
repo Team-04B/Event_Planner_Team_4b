@@ -26,6 +26,19 @@ const {id} = req.params
       data:result
   })
 })
+// delete reviews
+const deleteReview = catchAsync(async(req,res,next) => {
+const {id} = req.params
+  const result = await ReviewServices.deleteReviewIntoDB(id);
+  sendResponse(res,{
+      success:true,
+      statusCode:httpStatus.CREATED,
+      message:'Review deleted Successfully',
+      data:result
+  })
+})
+
+// get all Review 
 const getAllReviews = catchAsync(async(req,res,next) => {
 const {id} = req.params
   const result = await ReviewServices.getAllReviewFromDB(id);
@@ -40,5 +53,6 @@ const {id} = req.params
 export const ReviewController = {
   createReview,
   getAllReviews,
-  updateReview
+  updateReview,
+  deleteReview
 }
