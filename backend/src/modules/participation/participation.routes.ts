@@ -2,7 +2,7 @@ import express from "express"
 
 const router = express.Router()
 
-// //accept invitation
+//accept invitation
 // router.post('/:invitationId/accept');
 
 
