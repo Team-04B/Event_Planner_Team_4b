@@ -46,7 +46,7 @@ const deleteInvitaionDB =async (id:string)=>{
 
 const getAllInvitaionDB = async (
   filters: IInvitaionsFilterRequest,
-  options: IPaginationOptions
+  options: IPaginationOptions,id:string
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
@@ -80,7 +80,10 @@ const getAllInvitaionDB = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.invitation.findMany({
-    where: whereConditions,
+    where:{
+      ...whereConditions,
+      id, 
+    },
     skip,
     take: limit,
     orderBy:
@@ -89,7 +92,8 @@ const getAllInvitaionDB = async (
         : {
             createdAt: 'desc',
           },
-  });
+  },
+  );
 
   const total = await prisma.invitation.count({
     where: whereConditions,

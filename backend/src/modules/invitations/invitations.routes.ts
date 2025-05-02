@@ -5,7 +5,7 @@ import { InvitationController } from "./invitations.controller"
 const router = express.Router()
 
 router.get('/',
-    InvitationController.getAllInvitaion)
+    InvitationController.getMyAllnvitaions)
 router.delete('/:id',
     InvitationController.deleteInvitaion)
     

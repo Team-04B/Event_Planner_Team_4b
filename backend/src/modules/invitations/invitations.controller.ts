@@ -28,7 +28,8 @@ const deleteInvitaion = catchAsync(async(req,res,next) => {
     })
   })
 // get all reviews
-const getAllInvitaion = catchAsync(async (req, res) => {
+const getMyAllnvitaions = catchAsync(async (req, res) => {
+ const id = req.user;
   const rawFilters = pick(req.query, InvitaionFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
@@ -55,7 +56,7 @@ const getAllInvitaion = catchAsync(async (req, res) => {
     filters.searchTerm = undefined;
   }
 
-  const result = await InvitaionServices.getAllInvitaionDB(filters, options);
+  const result = await InvitaionServices.getAllInvitaionDB(filters, options,id);
 
   sendResponse(res, {
     success: true,
@@ -68,6 +69,6 @@ const getAllInvitaion = catchAsync(async (req, res) => {
   
   export const InvitationController = {
      createInvitaion,
-     getAllInvitaion,
+     getMyAllnvitaions,
      deleteInvitaion
   }
