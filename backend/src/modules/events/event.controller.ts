@@ -103,7 +103,22 @@ const deleteFromDB = catchAsync(async (req, res) => {
 
 const joinPublicEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  console.log(req.params);
+  // console.log(req.params);
+  const userId = req.user?.id;
+  const result = await EventService.joinPublicEvent(eventId, userId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'Joined public event successfully',
+    data: result,
+  });
+});
+
+
+const joinPaidEvent = catchAsync(async (req, res) => {
+  const { id: eventId } = req.params;
+  // console.log(req.params);
   const userId = req.user?.id;
   const result = await EventService.joinPublicEvent(eventId, userId);
 
