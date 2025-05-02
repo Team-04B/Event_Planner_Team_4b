@@ -71,6 +71,7 @@ const authLogingInToDb = async (payload: Partial<User>) => {
     );
   }
   const jwtPayload = {
+    id :isExistUser.id,
     email: isExistUser.email,
     role: isExistUser.role,
   };

@@ -1,13 +1,12 @@
-import express from "express"
+import express from 'express';
+import { ParticipationController } from './participation.controller';
 
-const router = express.Router()
+const router = express.Router();
 
 //accept invitation
-// router.post('/:invitationId/accept');
+router.post(
+  '/:invitationId/respond',
+  ParticipationController.updateParticipantStatus
+);
 
-
-// //decline invitation
-// router.post('/:invitationId/decline');
-
-
-export const ParticipationRoutes = router
+export const ParticipationRoutes = router;

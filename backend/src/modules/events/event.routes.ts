@@ -6,6 +6,7 @@ import { ReviewController } from '../reviews/reviews.controller';
 import { ReviewValidations } from '../reviews/reviews.validation';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
+import { InvitationController } from '../invitations/invitations.controller';
 
 const router = express.Router();
 
@@ -46,6 +47,7 @@ router.post('/:id/join',auth(Role.USER), EventController.joinPublicEvent);
 router.post('/:id/request', EventController.joinPaidEvent);
 
 
+// reviews routes 
 router.post(
   '/:id/reviews',
   validateRequest(ReviewValidations.createReviewZodSchema),
@@ -53,6 +55,14 @@ router.post(
 );
 router.get('/:id/reviews', ReviewController.getAllReviews);
 
+// invitaion routes 
+
+router.post(
+  '/:id/invite',auth(Role.USER),
+  InvitationController.createInvitaion
+);
+
+router.delete('/:id', EventController.deleteFromDB);
 
 
 
