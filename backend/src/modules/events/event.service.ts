@@ -178,6 +178,7 @@ const joinPublicEvent = async (eventId: string, userId: string) => {
 };
 
 
+// join to paid event
 const joinPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({
     where: {
