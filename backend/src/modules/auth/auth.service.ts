@@ -20,7 +20,6 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
   const isExistUser = await prisma.user.findFirst({
     where: { email: email },
   });
-  console.log(isExistUser);
 
   if (isExistUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
@@ -37,8 +36,20 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
       password: hasPassword,
     },
   });
-
-  return registeredUser;
+  if (!registeredUser.id) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'user create problem');
+  }
+  const jwtPayload = {
+    id: registeredUser.id,
+    email: registeredUser.email,
+    role: registeredUser.role,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt.jwt_scret as string,
+    config.jwt.expires_in as string
+  );
+  return accessToken;
 };
 const authLogingInToDb = async (payload: Partial<User>) => {
   if (!payload.email || !payload.password) {
@@ -70,7 +81,7 @@ const authLogingInToDb = async (payload: Partial<User>) => {
     );
   }
   const jwtPayload = {
-    id :isExistUser.id,
+    id: isExistUser.id,
     email: isExistUser.email,
     role: isExistUser.role,
   };
@@ -107,6 +118,7 @@ const refeshTokenInToForDb = async (paylood: string) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'you ar not authorized');
   }
   const jwtPayload = {
+    id: isExistUser.id,
     email: isExistUser.email,
     role: isExistUser.role,
   };
