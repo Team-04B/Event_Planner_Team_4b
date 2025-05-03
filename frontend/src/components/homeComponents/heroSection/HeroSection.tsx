@@ -18,18 +18,19 @@ const HeroSection = () => {
         Manage Your Event.
         <br />
         From Start
-        <span className="inline-block px-2 py-1 mx-1 bg-yellow-200 rounded-lg">
-          <FaRegLightbulb className="inline text-yellow-600" />
-        </span>
+        {/* <div className="inline-block w-[80px] h-[80px] mx-1 bg-yellow-200 rounded-lg">
+          <FaRegLightbulb size={30} className="inline text-yellow-600" />
+        </div> */}
         To End
-        <span className="inline-block px-2 py-1 mx-1 bg-blue-100 rounded-lg">
+        <span className="inline-block px-2 py-1 mx-1 bg- rounded-lg">
 
-<Image
-  src="/icons/promotion.png"
+{/* <Image
+  src="/icons/horn.png"
   alt="Promotion Icon"
   width={100}
   height={100}
-/>
+  className=""
+/> */}
 
         </span>
       </h1>

@@ -2,6 +2,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import { HiOutlineBell, HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import { Button } from "../ui/button";
+import Link from "next/link";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Event", href: "/event" },
@@ -71,7 +73,7 @@ const Navbar = () => {
                 className="flex items-center focus:outline-none"
                 aria-label="Toggle profile dropdown"
               >
-                <div className="w-8 h-8 overflow-hidden border-2 border-gray-400 rounded-full">
+                {/* <div className="w-8 h-8 overflow-hidden border-2 border-gray-400 rounded-full">
                   <Image
                     src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=334&q=80"
                     alt="Profile"
@@ -79,6 +81,11 @@ const Navbar = () => {
                     height={40}
                     className="object-cover w-full h-full rounded-full"
                   />
+                </div> */}
+                
+                <div className=" flex justify-center items-center gap-4">
+               <Link className=" px-[12px] py-[6px] bg-[#0000000D] rounded-md" href={'/login'}>Login</Link>
+                <Link className=" px-[12px] py-[6px] text-white bg-[#000] rounded-md" href={'/register'}>Sign Up</Link>
                 </div>
 
                 <h3 className="mx-2 text-gray-700 lg:hidden">Khatab wedaa</h3>
