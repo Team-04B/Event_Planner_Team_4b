@@ -107,6 +107,7 @@ const refeshTokenInToForDb = async (paylood: string) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'you ar not authorized');
   }
   const jwtPayload = {
+    id:isExistUser.id,
     email: isExistUser.email,
     role: isExistUser.role,
   };

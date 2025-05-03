@@ -1,13 +1,18 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload ,SignOptions } from 'jsonwebtoken';
 
-const generateToken = (payload:any,secret:string,expiresIn:string) => {
+
+const generateToken = (payload:any,secret:string,expiresIn:number) => {
+    
+    const options: SignOptions = {
+      algorithm: 'HS256',
+      expiresIn,
+    };
+
     const token = jwt.sign(
         payload,
         secret,
-    {
-        algorithm:'HS256',
-        expiresIn:expiresIn
-    })
+        options
+    )
     return token
 }
 
