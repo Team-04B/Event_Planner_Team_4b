@@ -1,35 +1,33 @@
-import { Invitation } from "@prisma/client";
-import prisma from "../../app/shared/prisma"
-import { IPaginationOptions } from "../../app/interface/pagination";
-import { paginationHelper } from "../../app/helper/paginationHelper";
+import { Invitation } from '@prisma/client';
+import prisma from '../../app/shared/prisma';
+import { IPaginationOptions } from '../../app/interface/pagination';
+import { paginationHelper } from '../../app/helper/paginationHelper';
 
+// create Invitaion
+const createInvitaionDB = async (id: string, data: Invitation) => {
+  console.log(id, data.userId);
+  await prisma.event.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
 
-// create Invitaion 
-const createInvitaionDB =async (id:string,data:Invitation)=>{
-console.log(id,data.userId)
- await prisma.event.findUniqueOrThrow({
-       where:{
-       id
-       }
-       })
-       
-       
-    const result =await prisma.invitation.create({
-    data:{
-      userId:data?.userId,
-      eventId:id
-    }
-    })
-    
-    return result;
- }
+  const result = await prisma.invitation.create({
+    data: {
+      userId: data?.userId,
+      eventId: id,
+    },
+  });
+
+  return result;
+};
 //  const getMyAllnvitaionsFromDB =async (id:string)=>{
 //      const result = await prisma.invitation.findMany({
 //      where:{
 //      userId:id
 //      }
 //      })
-     
+
 //      return result;
 //  }
 const getMyAllnvitaionsFromDB = async (
@@ -40,7 +38,7 @@ const getMyAllnvitaionsFromDB = async (
 
   const result = await prisma.invitation.findMany({
     where: {
-      userId:id,
+      userId: id,
     },
     skip,
     take: limit,
@@ -54,7 +52,7 @@ const getMyAllnvitaionsFromDB = async (
 
   const total = await prisma.invitation.count({
     where: {
-      userId:id
+      userId: id,
     },
   });
 
@@ -68,8 +66,7 @@ const getMyAllnvitaionsFromDB = async (
   };
 };
 
-
-export const InvitaionServices={
-createInvitaionDB,
-getMyAllnvitaionsFromDB
-}
+export const InvitaionServices = {
+  createInvitaionDB,
+  getMyAllnvitaionsFromDB,
+};
