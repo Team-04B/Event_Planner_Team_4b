@@ -1,0 +1,1 @@
+export type TReactChildrenType ={children:React.ReactNode}  
