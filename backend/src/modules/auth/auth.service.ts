@@ -6,6 +6,7 @@ import { createToken } from '../../app/shared/createToken';
 import bcrypt from 'bcryptjs';
 import config from '../../app/config';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+
 const authRegisterInToDB = async (payload: Partial<User>) => {
   const { name, email, password } = payload;
 
