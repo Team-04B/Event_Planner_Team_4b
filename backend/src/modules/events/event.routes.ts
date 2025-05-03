@@ -4,27 +4,55 @@ import { validateRequest } from '../../app/middleWares/validationRequest';
 import { EventValidations } from './event.validation';
 import { ReviewController } from '../reviews/reviews.controller';
 import { ReviewValidations } from '../reviews/reviews.validation';
+import { InvitationController } from '../invitations/invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
-import { InvitationController } from '../invitations/invitations.controller';
 
 const router = express.Router();
 
+//create event
 router.post(
   '/',
-  // auth(Role.USER),
+  auth(Role.USER),
   validateRequest(EventValidations.createEventZodSchema),
   EventController.createEvent
 );
+
+//get all events
 router.get('/', EventController.getEvents);
+
+// get event by id
 router.get('/:id', EventController.getEventById);
+
+// update event
 router.patch(
   '/:id',
+  auth(Role.USER),
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
 
-// reviews routes 
+// delete event from db
+router.delete('/:id', auth(Role.USER), EventController.deleteFromDB);
+
+// updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
+router.patch(
+  '/:id/participants/:participantId/status',
+  auth(Role.USER),
+  EventController.updateParticipantStatus
+);
+
+// event.route.ts
+router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent); // Public events
+router.post('/:id/request', auth(Role.USER), EventController.handleRequestEvent); // Private events
+
+// //join free public event
+// router.post('/:id/join', EventController.joinPublicEvent);
+
+// // Request to join private/paid event
+// router.post('/:id/request', auth(Role.USER), EventController.joinPaidEvent);
+
+// reviews routes
 router.post(
   '/:id/reviews',
   validateRequest(ReviewValidations.createReviewZodSchema),
@@ -32,31 +60,12 @@ router.post(
 );
 router.get('/:id/reviews', ReviewController.getAllReviews);
 
-// invitaion routes 
+// invitaion routes
 
 router.post(
-  '/:id/invite',auth(Role.USER),
+  '/:id/invite',
+  auth(Role.USER),
   InvitationController.createInvitaion
 );
-
-router.delete('/:id', EventController.deleteFromDB);
-
-// approve participant
-router.patch(
-  '/:id/participants/:participantId/approve',
-  EventController.approveParticipant
-);
-
-// // reject participant
-// router.patch('/:id/participants/:participantId/reject');
-
-// // ban participant
-// router.patch('/:id/participants/:participantId/ban');
-
-//join free public event
-router.post('/:id/join', EventController.joinPublicEvent);
-
-// Request to join private/paid event
-router.post('/:id/request', EventController.joinPaidEvent);
 
 export const EventRoutes = router;
