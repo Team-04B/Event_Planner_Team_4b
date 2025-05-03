@@ -36,6 +36,7 @@ model Event {
   title           String
   description     String
   dateTime        DateTime
+  eventImgUrl   String
   venue           String
   isPublic        Boolean
   isPaid          Boolean
