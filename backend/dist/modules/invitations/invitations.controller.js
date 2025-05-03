@@ -26,7 +26,7 @@ const createInvitaion = (0, catchAsync_1.catchAsync)((req, res, next) => __await
         success: true,
         statusCode: http_status_1.default.CREATED,
         message: 'Invitaion Send Successfully',
-        data: result
+        data: result,
     });
 }));
 // create reviews
@@ -39,10 +39,10 @@ const getMyAllnvitaions = (0, catchAsync_1.catchAsync)((req, res, next) => __awa
         success: true,
         statusCode: http_status_1.default.CREATED,
         message: 'Invitaion retrived Successfully',
-        data: result
+        data: result,
     });
 }));
 exports.InvitationController = {
     createInvitaion,
-    getMyAllnvitaions
+    getMyAllnvitaions,
 };

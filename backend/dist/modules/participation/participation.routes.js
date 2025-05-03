@@ -5,9 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParticipationRoutes = void 0;
 const express_1 = __importDefault(require("express"));
+const participation_controller_1 = require("./participation.controller");
+const auth_1 = __importDefault(require("../../app/middleWares/auth"));
+const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
-// //accept invitation
-// router.post('/:invitationId/accept');
-// //decline invitation
-// router.post('/:invitationId/decline');
+//respond invitation
+router.post('/:invitationId/respond', (0, auth_1.default)(client_1.Role.USER), participation_controller_1.ParticipationController.updateParticipantStatus);
 exports.ParticipationRoutes = router;

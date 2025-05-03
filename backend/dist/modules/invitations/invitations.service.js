@@ -15,19 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvitaionServices = void 0;
 const prisma_1 = __importDefault(require("../../app/shared/prisma"));
 const paginationHelper_1 = require("../../app/helper/paginationHelper");
-// create Invitaion 
+// create Invitaion
 const createInvitaionDB = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(id, data.userId);
     yield prisma_1.default.event.findUniqueOrThrow({
         where: {
-            id
-        }
+            id,
+        },
     });
     const result = yield prisma_1.default.invitation.create({
         data: {
             userId: data === null || data === void 0 ? void 0 : data.userId,
-            eventId: id
-        }
+            eventId: id,
+        },
     });
     return result;
 });
@@ -55,7 +55,7 @@ const getMyAllnvitaionsFromDB = (options, id) => __awaiter(void 0, void 0, void 
     });
     const total = yield prisma_1.default.invitation.count({
         where: {
-            userId: id
+            userId: id,
         },
     });
     return {
@@ -69,5 +69,5 @@ const getMyAllnvitaionsFromDB = (options, id) => __awaiter(void 0, void 0, void 
 });
 exports.InvitaionServices = {
     createInvitaionDB,
-    getMyAllnvitaionsFromDB
+    getMyAllnvitaionsFromDB,
 };

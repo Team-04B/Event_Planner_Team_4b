@@ -29,12 +29,14 @@ const paginationHelper_1 = require("../../app/helper/paginationHelper");
 const event_constant_1 = require("./event.constant");
 const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
 const http_status_1 = __importDefault(require("http-status"));
+// create event into db
 const createEventIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.event.create({
         data: payload,
     });
     return result;
 });
+// get all events from db
 const getEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
@@ -83,6 +85,7 @@ const getEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 0, 
         data: result,
     };
 });
+// get event by id from db
 const getEventByIdFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.event.findUnique({
         where: {
@@ -91,6 +94,7 @@ const getEventByIdFromDB = (id) => __awaiter(void 0, void 0, void 0, function* (
     });
     return result;
 });
+// update event into db
 const updateEventIntoDB = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.event.findUniqueOrThrow({
         where: {
@@ -103,6 +107,7 @@ const updateEventIntoDB = (id, data) => __awaiter(void 0, void 0, void 0, functi
     });
     return result;
 });
+// delete event from db
 const deleteEventFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
         const isEventExists = yield transactionClient.event.findUnique({
@@ -140,67 +145,109 @@ const deleteEventFromDB = (id) => __awaiter(void 0, void 0, void 0, function* ()
         return deleteEvent;
     }));
 });
-const joinPublicEvent = (eventId, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const event = yield prisma_1.default.event.findUnique({
-        where: {
-            id: eventId,
-        },
-    });
-    if (!event) {
+// join public free event
+// const joinPublicEvent = async (eventId: string, userId: string) => {
+//   const event = await prisma.event.findUnique({
+//     where: {
+//       id: eventId,
+//     },
+//   });
+//   if (!event) {
+//     throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
+//   }
+//   if (!event.isPublic || event.isPaid) {
+//     throw new ApiError(
+//       httpStatus.BAD_REQUEST,
+//       'This is not a public free event'
+//     );
+//   }
+//   const alreadJoined = await prisma.participation.findFirst({
+//     where: {
+//       eventId,
+//       userId,
+//     },
+//   });
+//   if (alreadJoined) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'Already joined');
+//   }
+//   const createParticipation = await prisma.participation.create({
+//     data: {
+//       userId,
+//       eventId,
+//       status: 'APPROVED',
+//     },
+//   });
+//   return createParticipation;
+// };
+// join public paid event
+// const joinPublicPaidEvent = async (eventId: string, userId: string) => {
+//   const event = await prisma.event.findUnique({
+//     where: {
+//       id: eventId,
+//     },
+//   });
+//   if (!event) {
+//     throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
+//   }
+//   if (!event.isPaid || !event.isPublic) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'This is not a paid event');
+//   }
+//   const alreadJoined = await prisma.participation.findFirst({
+//     where: {
+//       eventId,
+//       userId,
+//     },
+//   });
+//   if (alreadJoined) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'Already joined');
+//   }
+//   const createParticipation = await prisma.participation.create({
+//     data: {
+//       userId,
+//       eventId,
+//       status: 'PENDING',
+//     },
+//   });
+//   return createParticipation;
+// };
+//
+const joinToPublicEvent = (eventId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const event = yield prisma_1.default.event.findUnique({ where: { id: eventId } });
+    if (!event)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Event not found');
-    }
-    if (!event.isPublic || event.isPaid) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'This is not a public free event');
-    }
-    const alreadJoined = yield prisma_1.default.participation.findFirst({
-        where: {
-            eventId,
-            userId,
-        },
+    if (!event.isPublic)
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Not a public event');
+    const alreadyJoined = yield prisma_1.default.participation.findFirst({
+        where: { eventId, userId },
     });
-    if (alreadJoined) {
+    if (alreadyJoined)
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Already joined');
-    }
-    const createParticipation = yield prisma_1.default.participation.create({
-        data: {
-            userId,
-            eventId,
-            status: 'APPROVED',
-        },
+    const status = event.isPaid ? 'PENDING' : 'APPROVED';
+    const participation = yield prisma_1.default.participation.create({
+        data: { userId, eventId, status },
     });
-    return createParticipation;
+    return participation;
 });
-const joinPaidEvent = (eventId, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const event = yield prisma_1.default.event.findUnique({
-        where: {
-            id: eventId,
-        },
-    });
-    if (!event) {
+// handle paid event
+const requestToPaidEvent = (eventId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const event = yield prisma_1.default.event.findUnique({ where: { id: eventId } });
+    if (!event)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Event not found');
-    }
-    if (!event.isPaid || !event.isPublic) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'This is not a paid event');
-    }
-    const alreadJoined = yield prisma_1.default.participation.findFirst({
-        where: {
-            eventId,
-            userId,
-        },
+    if (event.isPublic)
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Not a private event');
+    const alreadyRequested = yield prisma_1.default.participation.findFirst({
+        where: { eventId, userId },
     });
-    if (alreadJoined) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Already joined');
-    }
-    const createParticipation = yield prisma_1.default.participation.create({
-        data: {
-            userId,
-            eventId,
-            status: 'PENDING',
-        },
+    if (alreadyRequested)
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Already requested');
+    // Private events are always pending
+    const participation = yield prisma_1.default.participation.create({
+        data: { userId, eventId, status: 'PENDING' },
     });
-    return createParticipation;
+    return participation;
 });
-const approveParticipant = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
+// update Participant Status
+const updateParticipantStatus = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.participation.findUniqueOrThrow({
         where: {
             id,
@@ -218,7 +265,7 @@ exports.EventService = {
     getEventByIdFromDB,
     updateEventIntoDB,
     deleteEventFromDB,
-    joinPublicEvent,
-    joinPaidEvent,
-    approveParticipant,
+    joinToPublicEvent,
+    requestToPaidEvent,
+    updateParticipantStatus,
 };

@@ -19,6 +19,8 @@ const http_status_1 = __importDefault(require("http-status"));
 const event_service_1 = require("./event.service");
 const pick_1 = __importDefault(require("../../app/shared/pick"));
 const event_constant_1 = require("./event.constant");
+const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
+// create event
 const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const eventData = req.body;
     // console.log(eventData);
@@ -30,6 +32,7 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+// get all event
 const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -65,6 +68,7 @@ const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
         data: result.data,
     });
 }));
+// get event by id
 const getEventById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield event_service_1.EventService.getEventByIdFromDB(id);
@@ -75,6 +79,7 @@ const getEventById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         data: result,
     });
 }));
+//update event
 const updateEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield event_service_1.EventService.updateEventIntoDB(id, req.body);
@@ -85,6 +90,7 @@ const updateEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+// delete event
 const deleteFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield event_service_1.EventService.deleteEventFromDB(id);
@@ -95,36 +101,76 @@ const deleteFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         data: result,
     });
 }));
-const joinPublicEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// join free public event
+// const joinPublicEvent = catchAsync(async (req, res) => {
+//   const { id: eventId } = req.params;
+//   const userId = req.user?.userId;
+//   console.log(userId);
+//   // if (!userId) {
+//   //   throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+//   // }
+//   const result = await EventService.joinPublicEvent(eventId, userId);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Joined public event successfully',
+//     data: result,
+//   });
+// });
+// join public paid event
+// const joinPaidEvent = catchAsync(async (req, res) => {
+//   const { id: eventId } = req.params;
+//   const userId = req.user?.userId;
+// //  console.log(req.user, userId);
+//   const result = await EventService.joinPublicPaidEvent(eventId, userId);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Joined paid event successfully',
+//     data: result,
+//   });
+// });
+// handle public event
+const handleJoinEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { id: eventId } = req.params;
-    const userId = req.body.userId;
-    const result = yield event_service_1.EventService.joinPublicEvent(eventId, userId);
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    // console.log(userId);
+    if (!userId)
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'User ID missing');
+    const result = yield event_service_1.EventService.joinToPublicEvent(eventId, userId);
+    console.log(result);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
-        message: 'Joined public event successfully',
+        message: `Join event ${result.status.toLocaleLowerCase()}`,
         data: result,
     });
 }));
-const joinPaidEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// handle paid event
+const handleRequestEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { id: eventId } = req.params;
-    // console.log(req.params);
-    const userId = req.body.userId;
-    const result = yield event_service_1.EventService.joinPaidEvent(eventId, userId);
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    if (!userId)
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'User ID missing');
+    const result = yield event_service_1.EventService.requestToPaidEvent(eventId, userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
-        message: 'Joined paid event successfully',
+        message: `Request to join event ${result.status.toLocaleLowerCase()}`,
         data: result,
     });
 }));
-const approveParticipant = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// update Participant Status
+const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { participantId } = req.params;
-    const result = yield event_service_1.EventService.approveParticipant(participantId, req.body);
+    // console.log(req.body);
+    const result = yield event_service_1.EventService.updateParticipantStatus(participantId, req.body);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.OK,
-        message: 'Participation approved successfully',
+        message: `Participation ${req.body.status.toLowerCase()} successfully`,
         data: result,
     });
 }));
@@ -134,7 +180,7 @@ exports.EventController = {
     getEventById,
     updateEvent,
     deleteFromDB,
-    joinPublicEvent,
-    joinPaidEvent,
-    approveParticipant,
+    handleJoinEvent,
+    handleRequestEvent,
+    updateParticipantStatus,
 };
