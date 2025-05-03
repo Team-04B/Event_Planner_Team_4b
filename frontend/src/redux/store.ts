@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import userReducer from './userSlice/userSlice'
 import {
   FLUSH,
   REHYDRATE,
@@ -6,13 +7,21 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
+  persistReducer,
 } from 'redux-persist';
+import storage from './storage';
 
+
+const persistOptions = {
+    key:"user",
+    storage
+}
+
+const persistedUser = persistReducer(persistOptions,userReducer);
 export const makeStore = () =>{
   return configureStore({
     reducer: {
-      // ✅ Add your reducers here, e.g.:
-      // user: userReducer,
+      userInfo: persistedUser,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
