@@ -6,6 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "deploy": "npm build && vercel && vercel --prod",
     "migrate": "npx prisma migrate dev",
     "migrate:reset": "prisma migrate reset",
     "prisma:val": "npx prisma validate",
