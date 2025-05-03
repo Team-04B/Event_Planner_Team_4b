@@ -6,6 +6,7 @@ import { ReviewController } from '../reviews/reviews.controller';
 import { ReviewValidations } from '../reviews/reviews.validation';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
+import { InvitationController } from '../invitations/invitations.controller';
 
 const router = express.Router();
 
@@ -22,19 +23,29 @@ router.patch(
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
+
+// reviews routes 
 router.post(
-  '/:id/reviews',validateRequest(ReviewValidations.createReviewZodSchema),
+  '/:id/reviews',
+  validateRequest(ReviewValidations.createReviewZodSchema),
   ReviewController.createReview
 );
-router.get(
-  '/:id/reviews',
-  ReviewController.getAllReviews
+router.get('/:id/reviews', ReviewController.getAllReviews);
+
+// invitaion routes 
+
+router.post(
+  '/:id/invite',auth(Role.USER),
+  InvitationController.createInvitaion
 );
 
 router.delete('/:id', EventController.deleteFromDB);
 
-// // approve participant
-// router.patch('/:id/participants/:participantId/approve');
+// approve participant
+router.patch(
+  '/:id/participants/:participantId/approve',
+  EventController.approveParticipant
+);
 
 // // reject participant
 // router.patch('/:id/participants/:participantId/reject');
@@ -46,6 +57,6 @@ router.delete('/:id', EventController.deleteFromDB);
 router.post('/:id/join', EventController.joinPublicEvent);
 
 // Request to join private/paid event
-// router.post('/:id/request', EventController.requestToJoinEvent);
+router.post('/:id/request', EventController.joinPaidEvent);
 
 export const EventRoutes = router;
