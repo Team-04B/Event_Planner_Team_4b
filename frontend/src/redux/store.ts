@@ -8,8 +8,8 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-export const makeStore = () =>
-  configureStore({
+export const makeStore = () =>{
+  return configureStore({
     reducer: {
       // ✅ Add your reducers here, e.g.:
       // user: userReducer,
@@ -20,7 +20,8 @@ export const makeStore = () =>
           ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
       }),
-  });
+  })
+};
 
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore['getState']>;
