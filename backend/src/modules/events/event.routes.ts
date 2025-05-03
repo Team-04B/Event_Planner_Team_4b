@@ -4,9 +4,9 @@ import { validateRequest } from '../../app/middleWares/validationRequest';
 import { EventValidations } from './event.validation';
 import { ReviewController } from '../reviews/reviews.controller';
 import { ReviewValidations } from '../reviews/reviews.validation';
+import { InvitationController } from '../invitations/invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
-import { InvitationController } from '../invitations/invitations.controller';
 
 const router = express.Router();
 
@@ -42,11 +42,15 @@ router.patch(
   EventController.updateParticipantStatus
 );
 
-//join free public event
-router.post('/:id/join',auth(Role.USER), EventController.joinPublicEvent);
+// event.route.ts
+router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent); // Public events
+router.post('/:id/request', auth(Role.USER), EventController.handleRequestEvent); // Private events
 
-// Request to join private/paid event
-router.post('/:id/request', auth(Role.USER), EventController.joinPaidEvent);
+// //join free public event
+// router.post('/:id/join', EventController.joinPublicEvent);
+
+// // Request to join private/paid event
+// router.post('/:id/request', auth(Role.USER), EventController.joinPaidEvent);
 
 // reviews routes
 router.post(
@@ -63,7 +67,5 @@ router.post(
   auth(Role.USER),
   InvitationController.createInvitaion
 );
-
-
 
 export const EventRoutes = router;

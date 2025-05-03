@@ -107,30 +107,68 @@ const deleteFromDB = catchAsync(async (req, res) => {
 });
 
 // join free public event
-const joinPublicEvent = catchAsync(async (req, res) => {
+// const joinPublicEvent = catchAsync(async (req, res) => {
+//   const { id: eventId } = req.params;
+//   const userId = req.user?.userId;
+//   console.log(userId);
+//   // if (!userId) {
+//   //   throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+//   // }
+
+//   const result = await EventService.joinPublicEvent(eventId, userId);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Joined public event successfully',
+//     data: result,
+//   });
+// });
+
+// join public paid event
+// const joinPaidEvent = catchAsync(async (req, res) => {
+//   const { id: eventId } = req.params;
+//   const userId = req.user?.userId;
+// //  console.log(req.user, userId);
+//   const result = await EventService.joinPublicPaidEvent(eventId, userId);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Joined paid event successfully',
+//     data: result,
+//   });
+// });
+
+// handle public event
+const handleJoinEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  const userId = req.user.userId;
-  const result = await EventService.joinPublicEvent(eventId, userId);
+  const userId = req.user?.id;
+  // console.log(userId);
+  if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
+  const result = await EventService.joinToPublicEvent(eventId, userId);
+  console.log(result);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Joined public event successfully',
+    message: `Join event ${result.status.toLocaleLowerCase()}`,
     data: result,
   });
 });
 
-// join public paid event
-const joinPaidEvent = catchAsync(async (req, res) => {
+// handle paid event
+const handleRequestEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  const userId = req.user?.userId;
- console.log(req.user, userId);
-  const result = await EventService.joinPublicPaidEvent(eventId, userId);
+  const userId = req.user?.id;
+  if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
+
+  const result = await EventService.requestToPaidEvent(eventId, userId);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Joined paid event successfully',
+    message: `Request to join event ${result.status.toLocaleLowerCase()}`,
     data: result,
   });
 });
@@ -158,7 +196,7 @@ export const EventController = {
   getEventById,
   updateEvent,
   deleteFromDB,
-  joinPublicEvent,
-  joinPaidEvent,
+  handleJoinEvent,
+  handleRequestEvent,
   updateParticipantStatus,
 };
