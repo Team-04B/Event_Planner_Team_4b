@@ -1,24 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
-
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
 export const registerUser = async (userData: FieldValues) => {
+  console.log(process.env.NEXT_PUBLIC_BASE_API);
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      }
+    );
     const result = await res.json();
-
-    if (result.success) {
-      (await cookies()).set("accessToken", result.data.accessToken);
-    }
+    console.log("user result", result);
+    // if (result.success) {
+    //   (await cookies()).set("accessToken", result.data.accessToken);
+    // }
 
     return result;
   } catch (error: any) {
@@ -38,9 +41,9 @@ export const loginUser = async (userData: FieldValues) => {
 
     const result = await res.json();
 
-    if (result.success) {
-      (await cookies()).set("accessToken", result.data.accessToken);
-    }
+    // if (result.success) {
+    //   (await cookies()).set("accessToken", result.data.accessToken);
+    // }
 
     return result;
   } catch (error: any) {
@@ -79,6 +82,6 @@ export const reCaptchaTokenVerification = async (token: string) => {
   }
 };
 
-export const logout = async ()=>{
+export const logout = async () => {
   (await cookies()).delete("accessToken");
-}
+};

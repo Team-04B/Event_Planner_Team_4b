@@ -11,14 +11,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { jwtDecode } from "jwt-decode";
+import { registerUser } from "@/service/AuthService";
+import { useRouter } from "next/navigation";
+import { setUser } from "@/redux/userSlice/userSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { toast } from "sonner";
 
 const RegisterPage = () => {
   const form = useForm();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const {
     formState: { isSubmitting },
   } = form;
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
+
+    try {
+      const res = await registerUser(data);
+      console.log(res);
+      const token = res?.data?.accessToken;
+      const user = jwtDecode(token);
+      dispatch(setUser({ user: user, token: token }));
+      console.log(token, user);
+      if (token) {
+        toast.success("user success fully created!");
+        router.push("/");
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
   };
   return (
     <div className="border-2 border-gray-300 rounded-xl flex-grow max-w-md w-full p-5">

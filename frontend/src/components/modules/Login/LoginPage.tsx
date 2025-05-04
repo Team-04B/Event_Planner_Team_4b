@@ -11,14 +11,36 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { loginUser } from "@/service/AuthService";
+import { jwtDecode } from "jwt-decode";
+import { setUser } from "@/redux/userSlice/userSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const form = useForm();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const {
     formState: { isSubmitting },
   } = form;
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
+    try {
+      const res = await loginUser(data);
+      const token = res?.data?.accessToken;
+      const user = jwtDecode(token);
+      dispatch(setUser({ user: user, token: token }));
+      console.log(token, user);
+      if (token) {
+        toast.success("user success fully login!");
+        router.push("/");
+      }
+    } catch (error: any) {
+      toast.error(error?.message);
+      console.log(error);
+    }
   };
   return (
     <div className="border-2 border-gray-300 rounded-xl flex-grow max-w-md w-full p-5">

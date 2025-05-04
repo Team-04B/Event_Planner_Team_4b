@@ -9,7 +9,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const authRegisterInToDB = async (payload: Partial<User>) => {
   const { name, email, password } = payload;
-
+  console.log(payload);
   // Optional: Add validation checks here.
   if (!name || !email || !password) {
     throw new ApiError(
@@ -71,7 +71,7 @@ const authLogingInToDb = async (payload: Partial<User>) => {
     );
   }
   const jwtPayload = {
-    id :isExistUser.id,
+    id: isExistUser.id,
     email: isExistUser.email,
     role: isExistUser.role,
   };
@@ -108,7 +108,7 @@ const refeshTokenInToForDb = async (paylood: string) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'you ar not authorized');
   }
   const jwtPayload = {
-    id:isExistUser.id,
+    id: isExistUser.id,
     email: isExistUser.email,
     role: isExistUser.role,
   };
