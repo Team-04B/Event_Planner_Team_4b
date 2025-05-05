@@ -20,12 +20,25 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { createEvent } from "@/service/Events";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const CreateEvent = () => {
-  const form = useForm();
+  const form = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      date: undefined,
+      venue: "",
+      publicEvent: false,
+      paidEvent: false,
+      image: null,
+      fee: "",
+    },
+  });
 
   const {
     formState: { isSubmitting },
@@ -33,6 +46,24 @@ const CreateEvent = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
+    const eventData = {
+      ...data,
+    };
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(eventData));
+    formData.append("file", req.file);
+
+    try {
+      const res = await createEvent(formData);
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
