@@ -1,5 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './userSlice/userSlice'
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "@/redux/userSlice/userSlice";
 import {
   FLUSH,
   REHYDRATE,
@@ -8,30 +8,29 @@ import {
   PURGE,
   REGISTER,
   persistReducer,
-} from 'redux-persist';
-import storage from './storage';
-
+} from "redux-persist";
+import storage from "./storage";
 
 const persistOptions = {
-    key:"user",
-    storage
-}
+  key: "auth",
+  storage,
+};
 
-const persistedUser = persistReducer(persistOptions,userReducer);
-export const makeStore = () =>{
+const persistedUser = persistReducer(persistOptions, authReducer);
+export const makeStore = () => {
   return configureStore({
     reducer: {
-      userInfo: persistedUser,
+      auth: persistedUser,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
       }),
-  })
+  });
 };
 
 export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore['getState']>;
+export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];
