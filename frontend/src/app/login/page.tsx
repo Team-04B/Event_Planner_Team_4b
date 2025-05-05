@@ -1,8 +1,11 @@
-import LoginPage from '@/components/modules/Login/LoginPage';
-import React from 'react';
+import LoginPage from "@/components/modules/Login/LoginPage";
 
 const Login = () => {
-    return <LoginPage/>
+  return (
+    <div className="flex justify-center items-center  min-h-screen">
+      <LoginPage />
+    </div>
+  );
 };
 
 export default Login;

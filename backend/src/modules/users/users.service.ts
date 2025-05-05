@@ -1,6 +1,5 @@
 import { User } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
-
 const getAllUsersInToDb = async () => {
   const result = await prisma.user.findMany({
     select: {
