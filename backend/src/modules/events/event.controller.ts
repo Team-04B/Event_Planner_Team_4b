@@ -6,10 +6,32 @@ import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
+import { fileUploder } from '../../app/helper/fileUploader';
+import { IFile } from '../../app/interface/file';
 
+// create event
 const createEvent = catchAsync(async (req, res) => {
-  const eventData = req.body;
+  const file = req.file as Express.Multer.File;
+  console.log(file);
+  // Simplified mapping to IFile
+  const mappedFile: IFile = {
+    fileName: file.filename,
+    orginalname: file.originalname,
+    encoding: file.encoding,
+    mimetype: file.mimetype,
+    destination: file.destination,
+    filename: file.filename,
+    path: file.path,
+    size: file.size,
+  };
   // console.log(eventData);
+
+  // Upload the file to Cloudinary
+  const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+  const eventData = {
+    ...req.body,
+    eventImgUrl: uploadedImage?.secure_url, // set image URL
+  };
   const result = await EventService.createEventIntoDB(eventData);
 
   sendResponse(res, {
@@ -20,6 +42,7 @@ const createEvent = catchAsync(async (req, res) => {
   });
 });
 
+// get all event
 const getEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -65,6 +88,7 @@ const getEvents = catchAsync(async (req, res) => {
   });
 });
 
+// get event by id
 const getEventById = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await EventService.getEventByIdFromDB(id);
@@ -77,6 +101,7 @@ const getEventById = catchAsync(async (req, res) => {
   });
 });
 
+//update event
 const updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -89,6 +114,7 @@ const updateEvent = catchAsync(async (req, res) => {
   });
 });
 
+// delete event
 const deleteFromDB = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await EventService.deleteEventFromDB(id);
@@ -101,42 +127,86 @@ const deleteFromDB = catchAsync(async (req, res) => {
   });
 });
 
-const joinPublicEvent = catchAsync(async (req, res) => {
+// join free public event
+// const joinPublicEvent = catchAsync(async (req, res) => {
+//   const { id: eventId } = req.params;
+//   const userId = req.user?.userId;
+//   console.log(userId);
+//   // if (!userId) {
+//   //   throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+//   // }
+
+//   const result = await EventService.joinPublicEvent(eventId, userId);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Joined public event successfully',
+//     data: result,
+//   });
+// });
+
+// join public paid event
+// const joinPaidEvent = catchAsync(async (req, res) => {
+//   const { id: eventId } = req.params;
+//   const userId = req.user?.userId;
+// //  console.log(req.user, userId);
+//   const result = await EventService.joinPublicPaidEvent(eventId, userId);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Joined paid event successfully',
+//     data: result,
+//   });
+// });
+
+// handle public event
+const handleJoinEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  const userId = req.body.userId;
-  const result = await EventService.joinPublicEvent(eventId, userId);
+  const userId = req.user?.id;
+  // console.log(userId);
+  if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
+  const result = await EventService.joinToPublicEvent(eventId, userId);
+  console.log(result);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Joined public event successfully',
+    message: `Join event ${result.status.toLocaleLowerCase()}`,
     data: result,
   });
 });
 
-const joinPaidEvent = catchAsync(async (req, res) => {
+// handle paid event
+const handleRequestEvent = catchAsync(async (req, res) => {
   const { id: eventId } = req.params;
-  // console.log(req.params);
-  const userId = req.body.userId;
-  const result = await EventService.joinPaidEvent(eventId, userId);
+  const userId = req.user?.id;
+  if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
+
+  const result = await EventService.requestToPaidEvent(eventId, userId);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'Joined paid event successfully',
+    message: `Request to join event ${result.status.toLocaleLowerCase()}`,
     data: result,
   });
 });
 
-const approveParticipant = catchAsync(async (req, res) => {
+// update Participant Status
+const updateParticipantStatus = catchAsync(async (req, res) => {
   const { participantId } = req.params;
+  // console.log(req.body);
+  const result = await EventService.updateParticipantStatus(
+    participantId,
+    req.body
+  );
 
-  const result = await EventService.approveParticipant(participantId, req.body);
-  
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Participation approved successfully',
+    message: `Participation ${req.body.status.toLowerCase()} successfully`,
     data: result,
   });
 });
@@ -147,7 +217,7 @@ export const EventController = {
   getEventById,
   updateEvent,
   deleteFromDB,
-  joinPublicEvent,
-  joinPaidEvent,
-  approveParticipant,
+  handleJoinEvent,
+  handleRequestEvent,
+  updateParticipantStatus,
 };

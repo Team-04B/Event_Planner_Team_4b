@@ -14,89 +14,87 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id              String     @id @default(uuid())
-  name            String
-  email           String     @unique
-  password        String
-  role            Role       @default(USER)
-  events          Event[]    @relation("CreatorEvents")
-  participations  Participation[]
-  invitations     Invitation[] @relation("InvitedUser")
-  reviews         Review[]
-  payments        Payment[]
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  role           Role            @default(USER)
+  events         Event[]         @relation("CreatorEvents")
+  participations Participation[]
+  invitations    Invitation[]    @relation("InvitedUser")
+  reviews        Review[]
+  payments       Payment[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Event {
-  id              String     @id @default(uuid())
-  title           String
-  description     String
-  dateTime        DateTime
-  venue           String
-  isPublic        Boolean
-  isPaid          Boolean
-  fee             Float?     // Nullable for free events
-  creator         User       @relation("CreatorEvents", fields: [creatorId], references: [id])
-  creatorId       String
-  participations  Participation[]
-  invitations     Invitation[] @relation("EventInvitations")
-  reviews         Review[]
-  payments        Payment[]
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-
+  id             String          @id @default(uuid())
+  title          String
+  description    String
+  dateTime       DateTime
+  eventImgUrl    String
+  venue          String
+  isPublic       Boolean
+  isPaid         Boolean
+  fee            Float? // Nullable for free events
+  creator        User            @relation("CreatorEvents", fields: [creatorId], references: [id])
+  creatorId      String
+  participations Participation[]
+  invitations    Invitation[]    @relation("EventInvitations")
+  reviews        Review[]
+  payments       Payment[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Participation {
-  id            String     @id @default(uuid())
-  user          User       @relation(fields: [userId], references: [id])
-  userId        String
-  event         Event      @relation(fields: [eventId], references: [id])
-  eventId       String
-  status        ParticipationStatus @default(PENDING)
-  paid          Boolean    @default(false)
-  createdAt     DateTime   @default(now())
+  id        String              @id @default(uuid())
+  user      User                @relation(fields: [userId], references: [id])
+  userId    String
+  event     Event               @relation(fields: [eventId], references: [id])
+  eventId   String
+  status    ParticipationStatus @default(PENDING)
+  paid      Boolean             @default(false)
+  createdAt DateTime            @default(now())
 }
 
 model Invitation {
-  id            String     @id @default(uuid())
-  event         Event      @relation("EventInvitations", fields: [eventId], references: [id])
-  eventId       String
-  invitedUser   User       @relation("InvitedUser", fields: [userId], references: [id])
-  userId        String
-  status        InvitationStatus @default(PENDING)
-  paid          Boolean    @default(false)
-  createdAt     DateTime   @default(now())
+  id          String           @id @default(uuid())
+  event       Event            @relation("EventInvitations", fields: [eventId], references: [id])
+  eventId     String
+  invitedUser User             @relation("InvitedUser", fields: [userId], references: [id])
+  userId      String
+  status      InvitationStatus @default(PENDING)
+  paid        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
 }
 
 model Review {
-  id            String     @id @default(uuid())
-  event         Event      @relation(fields: [eventId], references: [id])
-  eventId       String
-  user          User       @relation(fields: [userId], references: [id])
-  userId        String
-  rating        Int        // 1 to 5
-  comment       String
-  createdAt     DateTime   @default(now())
+  id        String   @id @default(uuid())
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  rating    Int // 1 to 5
+  comment   String
+  createdAt DateTime @default(now())
 }
 
 model Payment {
-  id            String     @id @default(uuid())
-  user         User        @relation(fields: [userId], references: [id])
-  userId       String
-  event        Event       @relation(fields: [eventId], references: [id])
-  eventId      String
-  amount       Int
-  status       PaymentStatus  @default(PENDING) // e.g., SUCCESS, FAILED, PENDING
-  provider     String      // e.g., 'SSLCommerz', 'ShurjoPay'
-  transactionId String     @unique  // From payment gateway
-  paidAt       DateTime?   // When payment was completed
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id            String        @id @default(uuid())
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+  event         Event         @relation(fields: [eventId], references: [id])
+  eventId       String
+  amount        Int
+  status        PaymentStatus @default(PENDING) // e.g., SUCCESS, FAILED, PENDING
+  provider      String // e.g., 'SSLCommerz', 'ShurjoPay'
+  transactionId String        @unique // From payment gateway
+  paidAt        DateTime? // When payment was completed
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 enum PaymentStatus {

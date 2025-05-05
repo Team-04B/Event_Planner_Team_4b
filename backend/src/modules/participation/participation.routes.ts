@@ -1,13 +1,15 @@
-import express from "express"
+import express from 'express';
+import { ParticipationController } from './participation.controller';
+import auth from '../../app/middleWares/auth';
+import { Role } from '@prisma/client';
 
-const router = express.Router()
+const router = express.Router();
 
-// //accept invitation
-// router.post('/:invitationId/accept');
+//respond invitation
+router.post(
+  '/:invitationId/respond',
+  auth(Role.USER),
+  ParticipationController.updateParticipantStatus
+);
 
-
-// //decline invitation
-// router.post('/:invitationId/decline');
-
-
-export const ParticipationRoutes = router
+export const ParticipationRoutes = router;
