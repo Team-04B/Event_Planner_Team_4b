@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/sidebar";
 import { NavMain } from "./nav-main";
 import Link from "next/link";
-import { NavUser } from "./nav-user";
 import { useAppSelector } from "@/redux/hook";
 import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
@@ -93,7 +92,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       .then((res) => res.json())
       .then((data) => setData(data?.data));
   }, [user?.id, token]);
-  console.log(userdata);
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -108,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 alt="profile image"
               />
               <h2 className="font-medium">
-                {userdata?.name ? userdata?.name : "Not Found"}
+                {userdata?.name ? userdata?.name : "Not found"}
               </h2>
             </div>
 
