@@ -24,7 +24,7 @@ import { createEvent } from "@/service/Events";
 import { EventFormData } from "@/types/eventType";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import {  SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const CreateEvent = () => {
@@ -80,7 +80,7 @@ const CreateEvent = () => {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-xl my-3">Create New Event</h1>
+      <h1 className="text-xl my-4 font-bold">Create New Event</h1>
       <Form {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-6">
@@ -205,7 +205,7 @@ const CreateEvent = () => {
                     control={form.control}
                     name="publicEvent"
                     render={({ field }) => (
-                      <FormItem className="flex items-center justify-between">
+                      <FormItem>
                         <FormLabel>Public Event</FormLabel>
                         <FormControl>
                           <Switch
@@ -267,28 +267,30 @@ const CreateEvent = () => {
                   )}
                 />
               </div>
-              <div className="w-full">
-                <FormField
-                  control={form.control}
-                  name="fee"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Entry fee</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="$ 0.00"
-                          {...field}
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-xs">
-                        How much will you charge for this event
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {form.watch("paidEvent") && (
+                <div className="w-full">
+                  <FormField
+                    control={form.control}
+                    name="fee"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Entry fee</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="$ 0.00"
+                            {...field}
+                            value={field.value || ""}
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          How much will you charge for this event
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <Button type="submit" className="mt-5 w-full" disabled={isSubmitting}>
