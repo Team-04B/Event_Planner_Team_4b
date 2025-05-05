@@ -1,7 +1,7 @@
 import { catchAsync } from '../../app/helper/catchAsync';
 import { sendResponse } from '../../app/shared/sendResponse';
 import { userServices } from './users.service';
-
+import httpStatus from 'http-status-codes';
 const getAllUsers = catchAsync(async (req, res) => {
   const result = await userServices.getAllUsersInToDb();
   sendResponse(res, {
