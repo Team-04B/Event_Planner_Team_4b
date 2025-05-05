@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import { FaRegLightbulb } from "react-icons/fa";
 import { IoSparklesSharp } from "react-icons/io5";
 
 const HeroSection = () => {
@@ -21,6 +20,7 @@ const HeroSection = () => {
         {/* <div className="inline-block w-[80px] h-[80px] mx-1 bg-yellow-200 rounded-lg">
           <FaRegLightbulb size={30} className="inline text-yellow-600" />
         </div> */}
+        
         To End
         <span className="inline-block px-2 py-1 mx-1 bg- rounded-lg">
 
