@@ -1,29 +1,14 @@
 import { z } from 'zod';
+
 const createEventZodSchema = z.object({
-  body: z.object({
-    title: z.string({
-      required_error: 'Title is required',
-    }),
-    description: z.string({
-      required_error: 'Description is required',
-    }),
-    dateTime: z.string({
-      required_error: 'Date & Time is required',
-    }),
-    venue: z.string({
-      required_error: 'Venue is required',
-    }),
-    isPublic: z.boolean({
-      required_error: 'isPublic is required',
-    }),
-    isPaid: z.boolean({
-      required_error: 'isPaid is required',
-    }),
-    fee: z.number().nullable().optional(),
-    creatorId: z.string({
-      required_error: 'Creator ID is required',
-    }),
-  }),
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(1, 'Description is required'),
+  date: z.date().nullable(), // Accepts a nullable Date
+  venue: z.string().min(1, 'Venue is required'),
+  image: z.instanceof(File).nullable(), // Ensures image is of type File or null
+  fee: z.number().nullable().optional(), // Directly accepts fee as a number, nullable and optional
+  isPublic: z.boolean(),
+  isPaid: z.boolean(),
 });
 
 const updateEventZodSchema = z.object({
