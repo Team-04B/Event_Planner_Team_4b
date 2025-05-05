@@ -6,11 +6,32 @@ import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
+import { fileUploder } from '../../app/helper/fileUploader';
+import { IFile } from '../../app/interface/file';
 
 // create event
 const createEvent = catchAsync(async (req, res) => {
-  const eventData = req.body;
+  const file = req.file as Express.Multer.File;
+  console.log(file);
+  // Simplified mapping to IFile
+  const mappedFile: IFile = {
+    fileName: file.filename,
+    orginalname: file.originalname,
+    encoding: file.encoding,
+    mimetype: file.mimetype,
+    destination: file.destination,
+    filename: file.filename,
+    path: file.path,
+    size: file.size,
+  };
   // console.log(eventData);
+
+  // Upload the file to Cloudinary
+  const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+  const eventData = {
+    ...req.body,
+    eventImgUrl: uploadedImage?.secure_url, // set image URL
+  };
   const result = await EventService.createEventIntoDB(eventData);
 
   sendResponse(res, {
