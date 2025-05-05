@@ -45,14 +45,22 @@ const CreateEvent = () => {
   } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    if (!data.image || !(data.image instanceof File)) {
+      toast.error("Please upload a valid image.");
+      return;
+    }
+
     console.log(data);
+
     const eventData = {
       ...data,
+      date: data.date?.toISOString() || null,
+      fee: data.fee ? parseFloat(data.fee) : null,
     };
 
     const formData = new FormData();
     formData.append("data", JSON.stringify(eventData));
-    formData.append("file", req.file);
+    formData.append("file", data.image);
 
     try {
       const res = await createEvent(formData);
