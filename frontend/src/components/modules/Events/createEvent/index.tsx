@@ -21,13 +21,14 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { createEvent } from "@/service/Events";
+import { EventFormData } from "@/types/eventType";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const CreateEvent = () => {
-  const form = useForm({
+  const form = useForm<EventFormData>({
     defaultValues: {
       title: "",
       description: "",
@@ -36,7 +37,7 @@ const CreateEvent = () => {
       publicEvent: false,
       paidEvent: false,
       image: null,
-      fee: "",
+      fee: null,
     },
   });
 
@@ -44,7 +45,7 @@ const CreateEvent = () => {
     formState: { isSubmitting },
   } = form;
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const onSubmit: SubmitHandler<EventFormData> = async (data) => {
     if (!data.image || !(data.image instanceof File)) {
       toast.error("Please upload a valid image.");
       return;
@@ -55,8 +56,10 @@ const CreateEvent = () => {
     const eventData = {
       ...data,
       date: data.date?.toISOString() || null,
-      fee: data.fee ? parseFloat(data.fee) : null,
+      fee: data.fee ? parseFloat(data.fee.replace(/[^\d.-]/g, "")) : null,
     };
+
+    console.log(eventData);
 
     const formData = new FormData();
     formData.append("data", JSON.stringify(eventData));
@@ -64,6 +67,7 @@ const CreateEvent = () => {
 
     try {
       const res = await createEvent(formData);
+      console.log(res);
       if (res.success) {
         toast.success(res.message);
       } else {
