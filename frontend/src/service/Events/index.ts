@@ -1,16 +1,14 @@
 "use server";
 
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
 
 // create event
-export const createEvent = async (eventData: FormData) => {
+export const createEvent = async (
+  eventData: FormData,
+  token: string | null
+) => {
   try {
-    const cookieStore = await cookies();
-    // console.log("Cookies:", cookieStore.getAll());
-    const accessToken = cookieStore.get("accessToken")?.value;
-
-    if (!accessToken) {
+    if (!token) {
       throw new Error("No access token found in cookies.");
     }
 
@@ -19,7 +17,7 @@ export const createEvent = async (eventData: FormData) => {
       body: eventData,
       credentials: "include",
       headers: {
-        Authorization: accessToken,
+        Authorization: token,
       },
     });
 

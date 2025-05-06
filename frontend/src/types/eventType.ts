@@ -1,11 +1,11 @@
-export type EventFormData = {
+
+export interface EventFormData {
   title: string;
   description: string;
-  date: Date | undefined;
+  date: Date | undefined; 
   venue: string;
   publicEvent: boolean;
   paidEvent: boolean;
-  image: File | null;
-  fee: string | null;
-};
-
+  image?: File | null;
+  fee?: string | number | null;
+}
