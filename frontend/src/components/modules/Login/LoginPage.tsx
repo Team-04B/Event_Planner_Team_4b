@@ -15,27 +15,31 @@ import { loginUser } from "@/service/AuthService";
 import { jwtDecode } from "jwt-decode";
 import { setUser } from "@/redux/userSlice/userSlice";
 import { useAppDispatch } from "@/redux/hook";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 const LoginPage = () => {
   const form = useForm();
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirectPath");
   const {
     formState: { isSubmitting },
   } = form;
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
+    // console.log(data);
     try {
       const res = await loginUser(data);
+      console.log(res)
       const token = res?.data?.accessToken;
       const user = jwtDecode(token);
       dispatch(setUser({ user: user, token: token }));
-      console.log(token, user);
+      // console.log(token, user);
       if (token) {
         toast.success("user success fully login!");
-        router.push("/");
+        // router.push("/");
+        router.push(redirect);
       }
     } catch (error: any) {
       toast.error(error?.message);
