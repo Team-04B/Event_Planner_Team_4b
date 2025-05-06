@@ -22,8 +22,7 @@ export const makeStore = () => {
     reducer: {
       auth: persistedUser,
     },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
