@@ -1,4 +1,5 @@
 "use client";
+
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,40 +19,56 @@ import { useAppDispatch } from "@/redux/hook";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
+interface LoginResponse {
+  data: {
+    accessToken: string;
+  };
+}
+
 const LoginPage = () => {
-  const form = useForm();
+  const form = useForm<FieldValues>();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirectPath");
+  const redirect = searchParams?.get("redirectPath") || "/dashboard";
+
   const {
     formState: { isSubmitting },
   } = form;
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    // console.log(data);
     try {
-      const res = await loginUser(data);
-      console.log(res)
-      const token = res?.data?.accessToken;
-      const user = jwtDecode(token);
-      dispatch(setUser({ user: user, token: token }));
-      // console.log(token, user);
-      if (token) {
-        toast.success("user success fully login!");
-        // router.push("/");
+      const res = (await loginUser(data)) as LoginResponse;
+
+      if (res?.data?.accessToken) {
+        const token = res.data.accessToken;
+        const user = jwtDecode(token);
+
+        dispatch(setUser({ user, token }));
+        toast.success("User successfully logged in!");
         router.push(redirect);
+      } else {
+        toast.error("Invalid response from server.");
       }
-    } catch (error: any) {
-      toast.error(error?.message);
-      console.log(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+        console.error(error);
+      } else {
+        toast.error("An unknown error occurred.");
+        console.error("Unknown error:", error);
+      }
     }
   };
+
   return (
     <div className="border-2 border-gray-300 rounded-xl flex-grow max-w-md w-full p-5">
-      <div className="flex items-center  space-x-4 mb-6 ">
-        <div className="">
+      <div className="flex items-center space-x-4 mb-6">
+        <div>
           <h1 className="text-xl font-semibold">Login</h1>
-          <p className="font-extralight text-sm text-gray-600">Welcome back!</p>
+          <p className="font-extralight text-sm text-gray-600">
+            Welcome back!
+          </p>
         </div>
       </div>
       <Form {...form}>
@@ -77,11 +94,7 @@ const LoginPage = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      {...field}
-                      value={field.value || ""}
-                    />
+                    <Input type="password" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,17 +102,13 @@ const LoginPage = () => {
             />
           </div>
 
-          <Button
-            // disabled={reCaptchaStatus ? false : true}
-            type="submit"
-            className="mt-5 cursor-pointer w-full"
-          >
-            {isSubmitting ? "Logging...." : "Login"}
+          <Button type="submit" className="mt-5 cursor-pointer w-full">
+            {isSubmitting ? "Logging in..." : "Login"}
           </Button>
         </form>
       </Form>
       <p className="text-sm text-gray-600 text-center my-3">
-        Do not have any account ?
+        Don&apos;t have an account?{" "}
         <Link href="/register" className="text-blue-500">
           Register
         </Link>
