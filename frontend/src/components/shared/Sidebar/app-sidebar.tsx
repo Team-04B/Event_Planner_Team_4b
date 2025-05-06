@@ -76,10 +76,30 @@ const data = {
     },
   ],
 };
+const adminItem = [
+  {
+    title: "Overview",
+    url: "/dashboard",
+    icon: SquareTerminal,
+    isActive: true,
+  },
+  {
+    title: "My Event",
+    url: "/dashboard/myevent",
+    icon: CalendarDays,
+  },
+  {
+    title: "Pending Invitations",
+    url: "/dashboard/pendinginvitations",
+    icon: Clock,
+  },
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppSelector(currentUser);
   const token = useAppSelector(currentToken);
   const [userdata, setData] = React.useState<any>(null);
+
   React.useEffect(() => {
     if (!user?.id || !token) return;
     fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${user?.id}`, {
@@ -92,6 +112,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       .then((res) => res.json())
       .then((data) => setData(data?.data));
   }, [user?.id, token]);
+  const userRole = {
+    ADMIN: "USER",
+
+    USER: "ADMIN",
+  };
+  let sidebarItem;
+  switch (user?.role) {
+    case userRole.ADMIN:
+      sidebarItem = adminItem;
+      break;
+    case userRole.USER:
+      sidebarItem = data.navMain;
+      break;
+
+    default:
+      break;
+  }
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -109,15 +146,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {userdata?.name ? userdata?.name : "Not found"}
               </h2>
             </div>
-
-            <SidebarMenuButton>
-              <Link href="/dashboard/createevent">
-                <h2 className="flex items-center gap-1">
-                  {" "}
-                  <Plus fontSize={700} size={20} /> Create Event
-                </h2>
-              </Link>
-            </SidebarMenuButton>
+            {user?.role === "USER" && (
+              <SidebarMenuButton>
+                <Link href="/dashboard/createevent">
+                  <h2 className="flex items-center gap-1">
+                    {" "}
+                    <Plus fontSize={700} size={20} /> Create Event.
+                  </h2>
+                </Link>
+              </SidebarMenuButton>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
