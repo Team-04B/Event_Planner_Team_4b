@@ -12,10 +12,11 @@ import { IFile } from '../../app/interface/file';
 // create event
 const createEvent = catchAsync(async (req, res) => {
   const file = req.file as Express.Multer.File;
+  const creatorId = req.user.id;
   console.log(file);
   // Simplified mapping to IFile
   const mappedFile: IFile = {
-    fileName: file.filename,
+    // fileName: file.filename,
     orginalname: file.originalname,
     encoding: file.encoding,
     mimetype: file.mimetype,
@@ -30,6 +31,7 @@ const createEvent = catchAsync(async (req, res) => {
   const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
   const eventData = {
     ...req.body,
+    creatorId,
     eventImgUrl: uploadedImage?.secure_url, // set image URL
   };
   const result = await EventService.createEventIntoDB(eventData);
