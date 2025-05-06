@@ -33,6 +33,7 @@ import Link from "next/link";
 import { useAppSelector } from "@/redux/hook";
 import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
+import { LogoutModal } from "@/components/modules/Login/LogoutModal";
 
 // This is sample data.
 const data = {
@@ -111,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
 
             <SidebarMenuButton>
-              <Link href="/dashboard/createevent">
+              <Link href="/dashboard/create-event">
                 <h2 className="flex items-center gap-1">
                   {" "}
                   <Plus fontSize={700} size={20} /> Create Event
@@ -125,9 +126,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
-      {/* <SidebarFooter>
-        <NavUser />
-      </SidebarFooter> */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <LogoutModal />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
