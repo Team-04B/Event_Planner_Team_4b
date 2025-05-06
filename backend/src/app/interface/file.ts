@@ -25,7 +25,7 @@ export interface ICloudinaryResponse {
 
 
 export interface IFile {
-    fileName:string
+    // fileName:string
     orginalname:string
     encoding:string
     mimetype:string

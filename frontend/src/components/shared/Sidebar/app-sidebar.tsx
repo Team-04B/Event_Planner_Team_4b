@@ -112,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
 
             <SidebarMenuButton>
-              <Link href="/dashboard/createevent">
+              <Link href="/dashboard/create-event">
                 <h2 className="flex items-center gap-1">
                   {" "}
                   <Plus fontSize={700} size={20} /> Create Event
