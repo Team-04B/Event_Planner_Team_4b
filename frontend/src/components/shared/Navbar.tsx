@@ -8,7 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useMobile } from "@/hooks/use-mobile"
 import { toast } from "sonner"
-
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { DialogTitle } from "../ui/dialog"
 interface Notification {
   id: string
   title: string
@@ -95,6 +96,9 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <VisuallyHidden>
+                <DialogTitle>My hidden accessible title</DialogTitle>
+              </VisuallyHidden>
               <div className="flex flex-col gap-6 mt-6">
                 <Link href="/" className="text-lg font-medium">
                   Home

@@ -37,7 +37,7 @@ const uploadToCloudinary = async (
           reject(error);
         } else {
           resolve(result);
-        }
+        } 
       }
     );
   });

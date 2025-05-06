@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { EventController } from './event.controller';
 import { validateRequest } from '../../app/middleWares/validationRequest';
 import { EventValidations } from './event.validation';
@@ -7,6 +7,7 @@ import { ReviewValidations } from '../reviews/reviews.validation';
 import { InvitationController } from '../invitations/invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
+import { fileUploder } from '../../app/helper/fileUploader';
 
 const router = express.Router();
 
@@ -14,6 +15,11 @@ const router = express.Router();
 router.post(
   '/',
   auth(Role.USER),
+  fileUploder.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateRequest(EventValidations.createEventZodSchema),
   EventController.createEvent
 );
@@ -42,15 +48,16 @@ router.patch(
   EventController.updateParticipantStatus
 );
 
-// event.route.ts
-router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent); // Public events
-router.post('/:id/request', auth(Role.USER), EventController.handleRequestEvent); // Private events
 
-// //join free public event
-// router.post('/:id/join', EventController.joinPublicEvent);
+// Public events
+router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent);
 
-// // Request to join private/paid event
-// router.post('/:id/request', auth(Role.USER), EventController.joinPaidEvent);
+// Private events
+router.post(
+  '/:id/request',
+  auth(Role.USER),
+  EventController.handleRequestEvent
+);
 
 // reviews routes
 router.post(
