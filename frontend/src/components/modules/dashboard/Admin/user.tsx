@@ -60,6 +60,7 @@ const users = [
     name: "Emily Davis",
     email: "emily@example.com",
     role: "User",
+
     status: "Pending",
     lastActive: "Just now",
   },

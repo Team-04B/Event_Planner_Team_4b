@@ -63,19 +63,9 @@ const data = {
       url: "/dashboard/invite",
       icon: UserPlus,
     },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-      items: [
-        {
-          title: "Profile",
-          url: "/profile",
-        },
-      ],
-    },
   ],
 };
+
 const adminItem = [
   {
     title: "Overview",
@@ -114,10 +104,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [user?.id, token]);
   const userRole = {
     ADMIN: "USER",
-
     USER: "ADMIN",
   };
-  let sidebarItem;
+
+  let sidebarItem: any = [];
   switch (user?.role) {
     case userRole.ADMIN:
       sidebarItem = adminItem;
@@ -154,6 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Plus fontSize={700} size={20} /> Create Event.
                   </h2>
                 </Link>
+                ;
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>
@@ -161,7 +152,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={sidebarItem} />
       </SidebarContent>
       {/* <SidebarFooter>
         <NavUser />
