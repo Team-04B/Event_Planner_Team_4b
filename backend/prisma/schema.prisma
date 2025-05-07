@@ -64,8 +64,9 @@ model Invitation {
   id          String           @id @default(uuid())
   event       Event            @relation("EventInvitations", fields: [eventId], references: [id])
   eventId     String
-  invitedUser User             @relation("InvitedUser", fields: [userId], references: [id])
-  userId      String
+  invitedUser User             @relation("InvitedUser", fields: [userEmail], references: [email])
+  invitationNote String
+  userEmail      String
   status      InvitationStatus @default(PENDING)
   paid        Boolean          @default(false)
   createdAt   DateTime         @default(now())
