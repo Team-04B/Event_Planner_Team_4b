@@ -13,7 +13,7 @@ import { IFile } from '../../app/interface/file';
 const createEvent = catchAsync(async (req, res) => {
   const file = req.file as Express.Multer.File;
   const creatorId = req.user.id;
-  console.log(file);
+
   // Simplified mapping to IFile
   const mappedFile: IFile = {
     // fileName: file.filename,
@@ -108,7 +108,31 @@ const getEventById = catchAsync(async (req, res) => {
 const updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
 
-  const result = await EventService.updateEventIntoDB(id, req.body);
+  const file = req.file as Express.Multer.File;
+  const creatorId = req.user.id;
+  
+  // Simplified mapping to IFile
+  const mappedFile: IFile = {
+    // fileName: file.filename,
+    orginalname: file.originalname,
+    encoding: file.encoding,
+    mimetype: file.mimetype,
+    destination: file.destination,
+    filename: file.filename,
+    path: file.path,
+    size: file.size,
+  };
+  // console.log(eventData);
+
+  // Upload the file to Cloudinary
+  const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+  const eventData = {
+    ...req.body,
+    creatorId,
+    eventImgUrl: uploadedImage?.secure_url, // set image URL
+  };
+
+  const result = await EventService.updateEventIntoDB(id, eventData);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

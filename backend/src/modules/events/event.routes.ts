@@ -36,6 +36,11 @@ router.get('/:id',
 router.patch(
   '/:id',
   auth(Role.USER),
+  fileUploder.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
