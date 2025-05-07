@@ -1,5 +1,6 @@
 "use server";
 
+import { error } from "console";
 import { revalidateTag } from "next/cache";
 
 // create event
@@ -17,7 +18,7 @@ export const createEvent = async (
       body: eventData,
       credentials: "include",
       headers: {
-        Authorization: token,
+        Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyNmFkNmQ0LWI0MzktNDE2Yy05NGYxLTE4ZWEyMWYyYTZjZSIsImVtYWlsIjoibTFAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDY2MDYwNDYsImV4cCI6MTc0NjYwNjM0Nn0.SGNGQ2LBez2TVddDYvUKPH_hI3S3UFT4nL5p5HAUHho",
       },
     });
 

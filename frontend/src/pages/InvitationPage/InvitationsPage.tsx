@@ -135,7 +135,7 @@ const generateFakeInvitations = (count: number): Invitation[] => {
   }))
 }
 
-export default function InvitationsPage() {
+export default function InvitationsPage(allusers:any) {
   const [invitations] = useState<Invitation[]>(generateFakeInvitations(50))
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")

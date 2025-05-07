@@ -4,10 +4,10 @@ import { getAllUser } from "@/service/user"
 
 const page =async () => {
  const allusers = await getAllUser()
- console.log(allusers)
+//  console.log(allusers)
   return (
     <div>
-    <InvitationsPage/>
+    <InvitationsPage allusers={allusers} />
     </div>
   )
 }
