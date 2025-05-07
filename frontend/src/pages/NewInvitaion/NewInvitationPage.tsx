@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeftIcon, CheckCircleIcon, Loader2Icon, PlusIcon, UserIcon } from "lucide-react"
+import { ArrowLeftIcon, CheckCircleIcon, Loader2Icon, PlusIcon, UserIcon } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,13 +28,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { User } from "@/commonTypes/commonTypes"
-import { events, users } from "@/data/data"
+import { events } from "@/data/data"
 
-
-
-export default function NewInvitationPage() {
+export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
   const router = useRouter()
-
+ 
   // Form state
   const [formData, setFormData] = useState({
     eventId: "",
@@ -53,18 +51,14 @@ export default function NewInvitationPage() {
   const [userSearchQuery, setUserSearchQuery] = useState("")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
-  
-
   // Filter users based on search query
-  const filteredUsers = users.filter(
-    (user) =>
+  const filteredUsers = userDatas?.filter(
+    (user:User) =>
       user.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(userSearchQuery.toLowerCase()),
   )
-
   // Get selected event details
   const selectedEvent = events.find((event) => event.id === formData.eventId)
-
   // Handle form input changes
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
@@ -92,7 +86,7 @@ export default function NewInvitationPage() {
     }))
     setUserSearchOpen(false)
   }
-
+  
   // Validate form
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -124,20 +118,23 @@ export default function NewInvitationPage() {
     e.preventDefault()
 
     if (!validateForm()) {
-      toast({
-        title: "Validation Error",
-        description: "Please check the form for errors",
-        variant: "destructive",
-      })
+      toast("Please check the form for errors")
       return
     }
-
     setIsSubmitting(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Format data to match the Invitation model structure
+      const invitationData = {
+        eventId: formData.eventId,
+        userEmail: formData.email,
+        invitationNote: formData.message,
+        paid: false, 
 
+      }
+      console.log(invitationData)
+  const res = await CreateInvitaion(invitationData)
+  console.log(res)
       // Show success dialog
       setShowSuccess(true)
 
@@ -148,15 +145,12 @@ export default function NewInvitationPage() {
         email: "",
         message: "",
         requirePayment: false,
-        amount: "0.00",
+        amount: "0.00", // Reset this field in the form even though we don't send it to API
       })
       setSelectedUser(null)
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send invitation. Please try again.",
-        variant: "destructive",
-      })
+      console.error('Invitation error:', error);
+      toast(error instanceof Error ? error.message : "Failed to send invitation. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -379,7 +373,9 @@ export default function NewInvitationPage() {
             )}
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => router.push("/dashboard/invitations")}>
+            <Button variant="outline" type="button" 
+            // onClick={() => router.push("/dashboard/invitations")}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
