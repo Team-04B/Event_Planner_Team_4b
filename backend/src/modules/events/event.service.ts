@@ -19,13 +19,15 @@ const createEventIntoDB = async (payload: Event) => {
 // get all events from db
 const getEventsFromDB = async (
   filters: IEventFilterRequest,
-  options: IPaginationOptions
+  options: IPaginationOptions,
+  creatorId: string
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
 
   const andConditions: Prisma.EventWhereInput[] = [];
 
+  // Search term filter
   if (searchTerm) {
     andConditions.push({
       OR: eventSearchableFields.map((field) => ({
@@ -37,25 +39,32 @@ const getEventsFromDB = async (
     });
   }
 
+  // Other filters
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
-      AND: Object.keys(filterData).map((key) => {
-        return {
-          [key]: {
-            equals: (filterData as any)[key],
-          },
-        };
-      }),
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  // Filter by creatorId
+  if (creatorId) {
+    andConditions.push({
+      creatorId: {
+        equals: creatorId,
+      },
     });
   }
 
   const whereConditions: Prisma.EventWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
 
-  const result = await prisma.event.findMany({
+  // Fetch all events
+  const allEvents = await prisma.event.findMany({
     where: whereConditions,
-    skip,
-    take: limit,
     orderBy:
       options.sortBy && options.sortOrder
         ? { [options.sortBy]: options.sortOrder }
@@ -64,16 +73,28 @@ const getEventsFromDB = async (
           },
   });
 
-  const total = await prisma.event.count({
-    where: whereConditions,
-  });
+  // Today's date
+  const now = new Date();
+
+  // Segment the events
+  const completedEvents = allEvents.filter(event => new Date(event.dateTime) < now);
+  const upcomingEvents = allEvents.filter(event => new Date(event.dateTime) >= now);
+
+  // Paginate the allEvents list
+  const paginatedData = allEvents.slice(skip, skip + limit);
+
   return {
     meta: {
       page,
       limit,
-      total,
+      total: allEvents.length,
     },
-    data: result,
+    data: {
+      paginatedData,
+      completed: completedEvents,
+      upcoming: upcomingEvents,
+      all: allEvents
+    },
   };
 };
 
@@ -82,7 +103,13 @@ const getEventByIdFromDB = async (id: string): Promise<Event | null> => {
   const result = await prisma.event.findUnique({
     where: {
       id,
+      
     },
+    include: {
+      creator:true,
+      participations:true,
+      invitations:true
+    }
   });
   return result;
 };

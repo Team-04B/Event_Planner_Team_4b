@@ -46,7 +46,7 @@ const data = {
     },
     {
       title: "My Event",
-      url: "/dashboard/myevent",
+      url: "/dashboard/my-events",
       icon: CalendarDays,
     },
     {
