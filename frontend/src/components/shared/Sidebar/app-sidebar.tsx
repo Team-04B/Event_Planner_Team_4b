@@ -61,7 +61,7 @@ const data = {
     },
     {
       title: "Invite People",
-      url: "/dashboard/invite",
+      url: "/dashboard/invitations",
       icon: UserPlus,
     },
     {

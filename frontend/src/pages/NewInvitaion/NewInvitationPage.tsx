@@ -28,9 +28,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { User } from "@/commonTypes/commonTypes"
-import { events } from "@/data/data"
+import { CreateInvitaion } from "@/service/Invitations"
 
-export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
+export default function NewInvitationPage({ userDatas, allEventData }: { userDatas: User[]; allEventData: any }) {
   const router = useRouter()
  
   // Form state
@@ -40,7 +40,6 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
     email: "",
     message: "",
     requirePayment: false,
-    amount: "0.00",
   })
 
   // UI state
@@ -58,7 +57,7 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
       user.email.toLowerCase().includes(userSearchQuery.toLowerCase()),
   )
   // Get selected event details
-  const selectedEvent = events.find((event) => event.id === formData.eventId)
+  const selectedEvent = allEventData.find((event) => event.id === formData.eventId)
   // Handle form input changes
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
@@ -101,14 +100,6 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
       newErrors.email = "Please enter a valid email address"
     }
 
-    if (
-      selectedEvent?.isPaid &&
-      formData.requirePayment &&
-      (Number.parseFloat(formData.amount) <= 0 || isNaN(Number.parseFloat(formData.amount)))
-    ) {
-      newErrors.amount = "Please enter a valid amount"
-    }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -129,25 +120,26 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
         eventId: formData.eventId,
         userEmail: formData.email,
         invitationNote: formData.message,
-        paid: false, 
-
+        paid: formData.requirePayment
       }
-      console.log(invitationData)
-  const res = await CreateInvitaion(invitationData)
-  console.log(res)
-      // Show success dialog
-      setShowSuccess(true)
-
-      // Reset form
+      const res = await CreateInvitaion(invitationData)
+      console.log(res)
+      if(res.success){
+         // Show success dialog
+         setShowSuccess(true)
+              // Reset form
       setFormData({
         eventId: "",
         userId: "",
         email: "",
         message: "",
         requirePayment: false,
-        amount: "0.00", // Reset this field in the form even though we don't send it to API
       })
       setSelectedUser(null)
+      }
+   
+
+ 
     } catch (error) {
       console.error('Invitation error:', error);
       toast(error instanceof Error ? error.message : "Failed to send invitation. Please try again.")
@@ -161,18 +153,20 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
     router.push("/dashboard/invitations")
   }
 
-  // Format date to readable string
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(date)
-  }
-
+// Format date to readable string
+const formatDate = (date: string | Date) => {
+  // Convert string date to Date object if it's a string
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }).format(dateObj)
+}
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center gap-2">
@@ -201,7 +195,7 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
                     <SelectValue placeholder="Select an event" />
                   </SelectTrigger>
                   <SelectContent>
-                    {events.map((event) => (
+                    {allEventData?.map((event) => (
                       <SelectItem key={event.id} value={event.id}>
                         {event.title}
                       </SelectItem>
@@ -345,36 +339,11 @@ export default function NewInvitationPage({userDatas}:{userDatas:User[]}) {
                     />
                   </div>
                 </div>
-
-                {formData.requirePayment && (
-                  <div className="space-y-2">
-                    <Label htmlFor="amount" className={errors.amount ? "text-destructive" : ""}>
-                      Payment Amount ($)
-                    </Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      placeholder="0.00"
-                      min="0"
-                      step="0.01"
-                      value={formData.amount}
-                      onChange={(e) => handleChange("amount", e.target.value)}
-                      className={errors.amount ? "border-destructive" : ""}
-                    />
-                    {errors.amount && <p className="text-sm text-destructive mt-1">{errors.amount}</p>}
-                    {selectedEvent.fee && (
-                      <p className="text-xs text-muted-foreground">
-                        Default event fee: ${selectedEvent.fee.toFixed(2)}
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
             )}
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button variant="outline" type="button" 
-            // onClick={() => router.push("/dashboard/invitations")}
             >
               Cancel
             </Button>

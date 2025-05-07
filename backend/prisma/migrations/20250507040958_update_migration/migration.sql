@@ -29,6 +29,7 @@ CREATE TABLE "Event" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "dateTime" TIMESTAMP(3) NOT NULL,
+    "eventImgUrl" TEXT NOT NULL,
     "venue" TEXT NOT NULL,
     "isPublic" BOOLEAN NOT NULL,
     "isPaid" BOOLEAN NOT NULL,
@@ -56,7 +57,8 @@ CREATE TABLE "Participation" (
 CREATE TABLE "Invitation" (
     "id" TEXT NOT NULL,
     "eventId" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "invitationNote" TEXT NOT NULL,
+    "userEmail" TEXT NOT NULL,
     "status" "InvitationStatus" NOT NULL DEFAULT 'PENDING',
     "paid" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -111,7 +113,7 @@ ALTER TABLE "Participation" ADD CONSTRAINT "Participation_eventId_fkey" FOREIGN 
 ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Invitation" ADD CONSTRAINT "Invitation_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "User"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

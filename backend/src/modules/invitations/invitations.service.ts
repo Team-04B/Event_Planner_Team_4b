@@ -4,8 +4,8 @@ import { IPaginationOptions } from '../../app/interface/pagination';
 import { paginationHelper } from '../../app/helper/paginationHelper';
 
 // create Invitaion
-const createInvitaionDB = async (id: string, data: Invitation) => {
-  console.log(id, data.userId);
+const createInvitaionDB = async (id: string, data: any) => {
+console.log(id,{data})
   await prisma.event.findUniqueOrThrow({
     where: {
       id,
@@ -14,8 +14,11 @@ const createInvitaionDB = async (id: string, data: Invitation) => {
 
   const result = await prisma.invitation.create({
     data: {
-      userId: data?.userId,
       eventId: id,
+      userEmail: data.userEmail,
+      paid: data?.paid,
+      status: data?.status,
+      invitationNote:data?.invitationNote
     },
   });
 
@@ -32,13 +35,13 @@ const createInvitaionDB = async (id: string, data: Invitation) => {
 //  }
 const getMyAllnvitaionsFromDB = async (
   options: IPaginationOptions,
-  id: string
+  userEmail: string
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
 
   const result = await prisma.invitation.findMany({
     where: {
-      userId: id,
+      userEmail: userEmail,
     },
     skip,
     take: limit,
@@ -52,7 +55,7 @@ const getMyAllnvitaionsFromDB = async (
 
   const total = await prisma.invitation.count({
     where: {
-      userId: id,
+      userEmail: userEmail,
     },
   });
 

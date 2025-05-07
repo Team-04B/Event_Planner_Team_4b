@@ -1,13 +1,15 @@
 import InvitationsPage from "@/pages/InvitationPage/InvitationsPage"
-import { getAllUser } from "@/service/user"
+import { getAllInvitaions } from "@/service/Invitations"
+
 
 
 const page =async () => {
- const allusers = await getAllUser()
- console.log(allusers)
+ const Invitations = await getAllInvitaions()
+         const InvitationsData = Invitations?.data
+         console.log(Invitations)
   return (
     <div>
-    <InvitationsPage/>
+    <InvitationsPage InvitationsData={InvitationsData} />
     </div>
   )
 }

@@ -71,7 +71,7 @@ router.get('/:id/reviews', ReviewController.getAllReviews);
 
 router.post(
   '/:id/invite',
-  auth(Role.USER),
+  auth(Role.ADMIN,Role.USER),
   InvitationController.createInvitaion
 );
 

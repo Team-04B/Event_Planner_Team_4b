@@ -28,3 +28,25 @@ export const createEvent = async (
     return { success: false, error: error.message || "Unknown error" };
   }
 };
+
+
+
+// create by mydul islam mahim
+
+// get all event 
+
+export const getAllEvents= async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events`, {
+      method: "GET",
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+

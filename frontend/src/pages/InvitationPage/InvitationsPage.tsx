@@ -49,124 +49,45 @@ type Invitation = {
   createdAt: Date
 }
 
-// Generate fake invitation data
-const generateFakeInvitations = (count: number): Invitation[] => {
-  const statuses: InvitationStatus[] = ["PENDING", "ACCEPTED", "DECLINED"]
-  const events = [
-    {
-      id: "event-1",
-      title: "Annual Tech Conference",
-      description: "Join us for the biggest tech event of the year",
-      dateTime: new Date(2025, 5, 15, 9, 0),
-      eventImgUrl: "/placeholder.svg?height=400&width=600",
-      venue: "Convention Center, New York",
-      isPublic: true,
-      isPaid: true,
-      fee: 99.99,
-    },
-    {
-      id: "event-2",
-      title: "Product Launch Party",
-      description: "Be the first to see our new product lineup",
-      dateTime: new Date(2025, 6, 20, 18, 30),
-      eventImgUrl: "/placeholder.svg?height=400&width=600",
-      venue: "Tech Hub, San Francisco",
-      isPublic: false,
-      isPaid: true,
-      fee: 49.99,
-    },
-    {
-      id: "event-3",
-      title: "Team Building Retreat",
-      description: "A weekend of team building activities",
-      dateTime: new Date(2025, 7, 5, 10, 0),
-      eventImgUrl: "/placeholder.svg?height=400&width=600",
-      venue: "Mountain Resort, Colorado",
-      isPublic: false,
-      isPaid: false,
-      fee: null,
-    },
-    {
-      id: "event-4",
-      title: "Networking Mixer",
-      description: "Connect with professionals in your industry",
-      dateTime: new Date(2025, 8, 12, 19, 0),
-      eventImgUrl: "/placeholder.svg?height=400&width=600",
-      venue: "Downtown Lounge, Chicago",
-      isPublic: true,
-      isPaid: true,
-      fee: 25.0,
-    },
-    {
-      id: "event-5",
-      title: "Workshop: Future of AI",
-      description: "Learn about the latest developments in AI",
-      dateTime: new Date(2025, 9, 8, 13, 0),
-      eventImgUrl: "/placeholder.svg?height=400&width=600",
-      venue: "Innovation Center, Boston",
-      isPublic: true,
-      isPaid: true,
-      fee: 75.0,
-    },
-  ]
-
-  const users = [
-    { id: "user-1", name: "John Doe", email: "john.doe@example.com" },
-    { id: "user-2", name: "Sarah Smith", email: "sarah.smith@example.com" },
-    { id: "user-3", name: "Michael Johnson", email: "michael.j@example.com" },
-    { id: "user-4", name: "Emily Davis", email: "emily.davis@example.com" },
-    { id: "user-5", name: "Alex Wilson", email: "alex.wilson@example.com" },
-    { id: "user-6", name: "Lisa Brown", email: "lisa.brown@example.com" },
-    { id: "user-7", name: "David Miller", email: "david.miller@example.com" },
-    { id: "user-8", name: "Emma Wilson", email: "emma.wilson@example.com" },
-    { id: "user-9", name: "Chris Taylor", email: "chris.taylor@example.com" },
-    { id: "user-10", name: "Olivia Martin", email: "olivia.martin@example.com" },
-  ]
-
-  return Array.from({ length: count }).map((_, i) => ({
-    id: `inv-${i + 1}`,
-    eventId: events[i % events.length].id,
-    event: events[i % events.length],
-    userId: users[i % users.length].id,
-    invitedUser: users[i % users.length],
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    paid: Math.random() > 0.6,
-    createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000),
-  }))
+type InvitationsData={
+  data:Invitation[];
+  meta:any
 }
 
-export default function InvitationsPage() {
-  const [invitations] = useState<Invitation[]>(generateFakeInvitations(50))
+export default function InvitationsPage({ InvitationsData }:{InvitationsData:InvitationsData}) {
+const invitations = InvitationsData?.data;
+  const [invitationsState] = useState<any[]>(invitations || [])
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [paymentFilter, setPaymentFilter] = useState("all")
   const [currentTab, setCurrentTab] = useState("all")
 
   // Filter invitations based on search, status, and payment filters
-  const filteredInvitations = invitations.filter((invitation) => {
+  const filteredInvitations = invitationsState.filter((invitation: any) => {
     // Search filter
     const matchesSearch =
-      invitation.invitedUser.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invitation.invitedUser.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invitation.event.title.toLowerCase().includes(searchQuery.toLowerCase())
+      invitation?.invitedUser?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invitation?.invitedUser?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invitation?.event?.title?.toLowerCase().includes(searchQuery.toLowerCase())
 
     // Status filter
-    const matchesStatus = statusFilter === "all" || invitation.status.toLowerCase() === statusFilter.toLowerCase()
+    const matchesStatus = statusFilter === "all" || invitation?.status?.toLowerCase() === statusFilter.toLowerCase()
 
     // Payment filter
     const matchesPayment =
       paymentFilter === "all" ||
-      (paymentFilter === "paid" && invitation.paid) ||
-      (paymentFilter === "unpaid" && !invitation.paid)
+      (paymentFilter === "paid" && invitation?.paid) ||
+      (paymentFilter === "unpaid" && !invitation?.paid)
 
     // Tab filter
-    const matchesTab = currentTab === "all" || invitation.status.toLowerCase() === currentTab.toLowerCase()
+    const matchesTab = currentTab === "all" || invitation?.status?.toLowerCase() === currentTab.toLowerCase()
 
     return matchesSearch && matchesStatus && matchesPayment && matchesTab
   })
 
   // Format date to readable string
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string | Date) => {
+    const date = typeof dateString === "string" ? new Date(dateString) : dateString
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "short",
@@ -270,7 +191,7 @@ export default function InvitationsPage() {
                     </div>
                   ) : (
                     <div className="divide-y">
-                      {filteredInvitations.slice(0, 10).map((invitation) => (
+                      {filteredInvitations.slice(0, 10).map((invitation: any) => (
                         <div
                           key={invitation.id}
                           className="grid grid-cols-1 md:grid-cols-7 p-4 text-sm items-center gap-4 md:gap-0"
@@ -278,23 +199,23 @@ export default function InvitationsPage() {
                           <div className="md:col-span-2 flex items-center gap-3">
                             <Avatar className="h-9 w-9">
                               <AvatarImage
-                                src={`https://api.dicebear.com/7.x/initials/svg?seed=${invitation.invitedUser.name}`}
-                                alt={invitation.invitedUser.name}
+                                src={`https://api.dicebear.com/7.x/initials/svg?seed=${invitation?.invitedUser?.name}`}
+                                alt={invitation?.invitedUser?.name}
                               />
                               <AvatarFallback>
                                 <UserIcon className="h-4 w-4" />
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className="font-medium">{invitation.invitedUser.name}</div>
-                              <div className="text-xs text-muted-foreground">{invitation.invitedUser.email}</div>
+                              <div className="font-medium">{invitation?.invitedUser?.name}</div>
+                              <div className="text-xs text-muted-foreground">{invitation?.invitedUser?.email}</div>
                             </div>
                           </div>
                           <div className="md:col-span-2">
-                            <div className="font-medium">{invitation.event.title}</div>
+                            <div className="font-medium">{invitation?.event?.title}</div>
                             <div className="flex items-center text-xs text-muted-foreground">
                               <CalendarIcon className="mr-1 h-3 w-3" />
-                              {formatDate(invitation.event.dateTime)}
+                              {formatDate(invitation?.event?.dateTime)}
                             </div>
                           </div>
                           <div>
@@ -302,33 +223,33 @@ export default function InvitationsPage() {
                               variant="outline"
                               className={`
                                 ${
-                                  invitation.status === "ACCEPTED"
+                                  invitation?.status === "ACCEPTED"
                                     ? "bg-green-50 text-green-700 border-green-200"
-                                    : invitation.status === "PENDING"
+                                    : invitation?.status === "PENDING"
                                       ? "bg-yellow-50 text-yellow-700 border-yellow-200"
                                       : "bg-red-50 text-red-700 border-red-200"
                                 }
                               `}
                             >
-                              {invitation.status === "ACCEPTED" && <CheckIcon className="mr-1 h-3 w-3" />}
-                              {invitation.status === "PENDING" && <ClockIcon className="mr-1 h-3 w-3" />}
-                              {invitation.status === "DECLINED" && <XIcon className="mr-1 h-3 w-3" />}
-                              {invitation.status}
+                              {invitation?.status === "ACCEPTED" && <CheckIcon className="mr-1 h-3 w-3" />}
+                              {invitation?.status === "PENDING" && <ClockIcon className="mr-1 h-3 w-3" />}
+                              {invitation?.status === "DECLINED" && <XIcon className="mr-1 h-3 w-3" />}
+                              {invitation?.status}
                             </Badge>
                           </div>
                           <div>
-                            {invitation.event.isPaid ? (
+                            {invitation?.event?.isPaid ? (
                               <Badge
                                 variant="outline"
                                 className={`
                                   ${
-                                    invitation.paid
+                                    invitation?.paid
                                       ? "bg-green-50 text-green-700 border-green-200"
                                       : "bg-gray-50 text-gray-700 border-gray-200"
                                   }
                                 `}
                               >
-                                {invitation.paid ? "PAID" : "UNPAID"}
+                                {invitation?.paid ? "PAID" : "UNPAID"}
                               </Badge>
                             ) : (
                               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
