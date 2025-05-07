@@ -25,10 +25,12 @@ router.post(
 );
 
 //get all events
-router.get('/',auth(Role.USER), EventController.getEvents);
+router.get('/',auth(Role.USER,Role.ADMIN), EventController.getEvents);
 
 // get event by id
-router.get('/:id', EventController.getEventById);
+router.get('/:id',
+  // auth(Role.USER,Role.ADMIN), 
+  EventController.getEventById);
 
 // update event
 router.patch(
