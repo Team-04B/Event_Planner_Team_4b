@@ -19,7 +19,8 @@ const createEventIntoDB = async (payload: Event) => {
 // get all events from db
 const getEventsFromDB = async (
   filters: IEventFilterRequest,
-  options: IPaginationOptions
+  options: IPaginationOptions,
+  creatorId
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
@@ -46,6 +47,15 @@ const getEventsFromDB = async (
           },
         };
       }),
+    });
+  }
+
+  // Filter by creatorId
+  if (creatorId) {
+    andConditions.push({
+      creatorId: {
+        equals: creatorId,
+      },
     });
   }
 
