@@ -86,10 +86,10 @@ export default function ReviewList({ eventId, refreshTrigger = 0 }: ReviewListPr
               <div className="flex items-start gap-3">
                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                   {/* <AvatarImage src={review.user.avatar || "/placeholder.svg"} alt={review.user.name} /> */}
-                  <AvatarFallback>{review.user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  <AvatarFallback>{review?.user?.name?.substring(0, 2)?.toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{review.user.name}</p>
+                  <p className="font-medium">{review?.user?.name}</p>
                   <div className="flex mt-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <StarIcon

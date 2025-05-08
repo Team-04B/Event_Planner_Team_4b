@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/types/eventType";
 import Image from "next/image";
+import Link from "next/link";
 
 export function EventCard({ event }: { event: Event }) {
   // Safely format date with error handling
@@ -103,7 +104,7 @@ export function EventCard({ event }: { event: Event }) {
       </CardContent>
 
       <CardFooter>
-        <Button className="w-full mb-4">View Details</Button>
+        <Link href={`/events/${event.id}`} className="w-full mb-4">View Detailsaaa</Link>
       </CardFooter>
     </Card>
   );
