@@ -18,6 +18,9 @@ const registerUser = catchAsync(async (req, res, next) => {
 
 const logingUser = catchAsync(async (req, res) => {
   const result = await AuthService.authLogingInToDb(req.body);
+
+
+
   res.cookie('refeshToken', result.refeshToken, {
     secure: false,
     httpOnly: true,

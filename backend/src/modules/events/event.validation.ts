@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 const createEventZodSchema = z.object({
   body: z.object({
     title: z.string({
@@ -20,9 +21,6 @@ const createEventZodSchema = z.object({
       required_error: 'isPaid is required',
     }),
     fee: z.number().nullable().optional(),
-    creatorId: z.string({
-      required_error: 'Creator ID is required',
-    }),
   }),
 });
 

@@ -58,11 +58,7 @@ export default function Navbar() {
   }
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })))
-    toast({
-      title: "All notifications marked as read",
-      description: "All notifications have been marked as read",
-    })
+  
   }
 
   const handleAcceptInvitation = (id: string, eventId: string) => {}
@@ -197,7 +193,7 @@ function NotificationsDesktop({
                   <div className="flex gap-2 mt-2">
                     <Button
                       size="sm"
-                      className="h-8 w-full"
+                      className="h-8 "
                       onClick={() => handleAcceptInvitation(notification.id, notification.eventId!)}
                     >
                       Accept
@@ -205,7 +201,7 @@ function NotificationsDesktop({
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 w-full"
+                      className="h-8 "
                       onClick={() => handleDeclineInvitation(notification.id, notification.eventId!)}
                     >
                       Decline
@@ -273,7 +269,7 @@ function NotificationsMobile({
                   <div className="flex gap-2 mt-2">
                     <Button
                       size="sm"
-                      className="h-8 w-full"
+                      className="h-8 "
                       onClick={() => handleAcceptInvitation(notification.id, notification.eventId!)}
                     >
                       Accept
@@ -281,7 +277,7 @@ function NotificationsMobile({
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-8 w-full"
+                      className="h-8 "
                       onClick={() => handleDeclineInvitation(notification.id, notification.eventId!)}
                     >
                       Decline

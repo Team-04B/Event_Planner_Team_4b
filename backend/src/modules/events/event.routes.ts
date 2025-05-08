@@ -24,16 +24,29 @@ router.post(
   EventController.createEvent
 );
 
-//get all events
-router.get('/', EventController.getEvents);
+
+// get all events 
+router.get('/', EventController.getAllEvents);
+
+//get all events by user
+router.get('/', auth(Role.USER, Role.ADMIN), EventController.getEvents);
 
 // get event by id
-router.get('/:id', EventController.getEventById);
+router.get(
+  '/:id',
+  // auth(Role.USER,Role.ADMIN),
+  EventController.getEventById
+);
 
 // update event
 router.patch(
   '/:id',
   auth(Role.USER),
+  fileUploder.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
@@ -47,7 +60,6 @@ router.patch(
   auth(Role.USER),
   EventController.updateParticipantStatus
 );
-
 
 // Public events
 router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent);
@@ -71,7 +83,7 @@ router.get('/:id/reviews', ReviewController.getAllReviews);
 
 router.post(
   '/:id/invite',
-  auth(Role.USER),
+  auth(Role.ADMIN, Role.USER),
   InvitationController.createInvitaion
 );
 
