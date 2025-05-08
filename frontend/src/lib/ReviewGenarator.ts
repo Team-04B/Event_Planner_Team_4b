@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getCurrentUser } from "@/service/AuthService";
 import { getAllReviews } from "@/service/Review";
 
 
 // Core helper to fetch reviews for a specific event
-const getReviews = async (eventId: string): Promise<Review[]> => {
+const getReviews = async (eventId: string): Promise<any[]> => {
   const getData = await getAllReviews(eventId);
   return getData.data;
 };
 
 // Check if a user has already reviewed an event
-export async function hasUserReviewedEvent(userId: string, eventId: string):boolean {
+export async function hasUserReviewedEvent(userId: string, eventId: string):Promise<boolean> {
   const reviews = await getReviews(eventId);
   return reviews.some((review) => review.userId === userId && review.eventId === eventId);
 }

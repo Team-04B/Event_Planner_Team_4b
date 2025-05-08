@@ -1,5 +1,5 @@
 "use client";
-
+import { z } from "zod"
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -21,7 +21,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { createEvent } from "@/service/Events";
-import { EventFormData } from "@/types/eventType";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -30,7 +29,7 @@ import { eventFormSchema } from "./createEventValidations";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const CreateEvent = () => {
-  const form = useForm<EventFormData>({
+  const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       title: "",

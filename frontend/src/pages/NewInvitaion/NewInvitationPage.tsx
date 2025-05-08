@@ -59,7 +59,7 @@ export default function NewInvitationPage({ userDatas, allEventData }: { userDat
       user.email.toLowerCase().includes(userSearchQuery.toLowerCase()),
   )
   // Get selected event details
-  const selectedEvent = allEventData.find((event: { id: string }) => event.id === formData.eventId)
+  const selectedEvent = allEventData?.find((event: { id: string }) => event.id === formData?.eventId)
   // Handle form input changes
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
@@ -269,7 +269,7 @@ const formatDate = (date: string | Date) => {
                         <CommandList>
                           <CommandEmpty>No users found.</CommandEmpty>
                           <CommandGroup>
-                            {filteredUsers.map((user) => (
+                            {filteredUsers?.map((user) => (
                               <CommandItem key={user.id} value={user.id} onSelect={() => handleUserSelect(user)}>
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-6 w-6">
