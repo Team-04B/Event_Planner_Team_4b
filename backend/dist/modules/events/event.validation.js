@@ -23,9 +23,6 @@ const createEventZodSchema = zod_1.z.object({
             required_error: 'isPaid is required',
         }),
         fee: zod_1.z.number().nullable().optional(),
-        creatorId: zod_1.z.string({
-            required_error: 'Creator ID is required',
-        }),
     }),
 });
 const updateEventZodSchema = zod_1.z.object({

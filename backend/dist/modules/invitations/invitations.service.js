@@ -17,7 +17,7 @@ const prisma_1 = __importDefault(require("../../app/shared/prisma"));
 const paginationHelper_1 = require("../../app/helper/paginationHelper");
 // create Invitaion
 const createInvitaionDB = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(id, data.userId);
+    console.log(id, { data });
     yield prisma_1.default.event.findUniqueOrThrow({
         where: {
             id,
@@ -25,8 +25,11 @@ const createInvitaionDB = (id, data) => __awaiter(void 0, void 0, void 0, functi
     });
     const result = yield prisma_1.default.invitation.create({
         data: {
-            userId: data === null || data === void 0 ? void 0 : data.userId,
             eventId: id,
+            userEmail: data.userEmail,
+            paid: data === null || data === void 0 ? void 0 : data.paid,
+            status: data === null || data === void 0 ? void 0 : data.status,
+            invitationNote: data === null || data === void 0 ? void 0 : data.invitationNote
         },
     });
     return result;
@@ -39,11 +42,11 @@ const createInvitaionDB = (id, data) => __awaiter(void 0, void 0, void 0, functi
 //      })
 //      return result;
 //  }
-const getMyAllnvitaionsFromDB = (options, id) => __awaiter(void 0, void 0, void 0, function* () {
+const getMyAllnvitaionsFromDB = (options, email) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const result = yield prisma_1.default.invitation.findMany({
         where: {
-            userId: id,
+            userEmail: email,
         },
         skip,
         take: limit,
@@ -52,10 +55,14 @@ const getMyAllnvitaionsFromDB = (options, id) => __awaiter(void 0, void 0, void 
             : {
                 createdAt: 'desc',
             },
+        include: {
+            event: true,
+            invitedUser: true
+        },
     });
     const total = yield prisma_1.default.invitation.count({
         where: {
-            userId: id,
+            userEmail: email,
         },
     });
     return {

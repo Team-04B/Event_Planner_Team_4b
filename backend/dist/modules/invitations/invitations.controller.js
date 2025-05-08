@@ -32,9 +32,9 @@ const createInvitaion = (0, catchAsync_1.catchAsync)((req, res, next) => __await
 // create reviews
 const getMyAllnvitaions = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    const email = (_a = req.user) === null || _a === void 0 ? void 0 : _a.email;
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-    const result = yield invitations_service_1.InvitaionServices.getMyAllnvitaionsFromDB(options, id);
+    const result = yield invitations_service_1.InvitaionServices.getMyAllnvitaionsFromDB(options, email);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,

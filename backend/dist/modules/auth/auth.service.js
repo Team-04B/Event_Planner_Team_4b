@@ -22,15 +22,14 @@ const config_1 = __importDefault(require("../../app/config"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = payload;
+    // console.log(payload);
     // Optional: Add validation checks here.
     if (!name || !email || !password) {
         throw new ApiError_1.default(http_status_1.default.NON_AUTHORITATIVE_INFORMATION, 'Missing required fields');
     }
-    console.log(payload);
     const isExistUser = yield prisma_1.default.user.findFirst({
         where: { email: email },
     });
-    console.log(isExistUser);
     if (isExistUser) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User already exists');
     }
@@ -45,7 +44,18 @@ const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, functi
             password: hasPassword,
         },
     });
-    return registeredUser;
+    console.log(registeredUser, 'register user');
+    if (!registeredUser.id) {
+        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'user create problem');
+    }
+    const jwtPayload = {
+        id: registeredUser.id,
+        name: registeredUser.name,
+        email: registeredUser.email,
+        role: registeredUser.role,
+    };
+    const accessToken = (0, createToken_1.createToken)(jwtPayload, config_1.default.jwt.jwt_scret, config_1.default.jwt.expires_in);
+    return accessToken;
 });
 const authLogingInToDb = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!payload.email || !payload.password) {
@@ -63,6 +73,7 @@ const authLogingInToDb = (payload) => __awaiter(void 0, void 0, void 0, function
     }
     const jwtPayload = {
         id: isExistUser.id,
+        name: isExistUser.name,
         email: isExistUser.email,
         role: isExistUser.role,
     };
@@ -90,6 +101,7 @@ const refeshTokenInToForDb = (paylood) => __awaiter(void 0, void 0, void 0, func
     }
     const jwtPayload = {
         id: isExistUser.id,
+        name: isExistUser.name,
         email: isExistUser.email,
         role: isExistUser.role,
     };
