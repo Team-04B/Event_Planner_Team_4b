@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -29,6 +30,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { User } from "@/commonTypes/commonTypes"
 import { CreateInvitaion } from "@/service/Invitations"
+import { Event } from "@/types/eventType"
 
 export default function NewInvitationPage({ userDatas, allEventData }: { userDatas: User[]; allEventData: any }) {
   const router = useRouter()
@@ -57,7 +59,7 @@ export default function NewInvitationPage({ userDatas, allEventData }: { userDat
       user.email.toLowerCase().includes(userSearchQuery.toLowerCase()),
   )
   // Get selected event details
-  const selectedEvent = allEventData.find((event) => event.id === formData.eventId)
+  const selectedEvent = allEventData.find((event: { id: string }) => event.id === formData.eventId)
   // Handle form input changes
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
@@ -195,7 +197,7 @@ const formatDate = (date: string | Date) => {
                     <SelectValue placeholder="Select an event" />
                   </SelectTrigger>
                   <SelectContent>
-                    {allEventData?.map((event) => (
+                    {allEventData?.map((event:Event) => (
                       <SelectItem key={event.id} value={event.id}>
                         {event.title}
                       </SelectItem>

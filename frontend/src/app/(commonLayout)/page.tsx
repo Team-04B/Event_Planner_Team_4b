@@ -1,6 +1,3 @@
-import { TReactChildrenType } from "@/commonTypes/commonTypes";
-import Footer from "@/components/shared/Footer";
-import Navbar from "@/components/shared/Navbar";
 import HomePage from "@/pages/HomePage/HomePage";
 
 const Home = () => {

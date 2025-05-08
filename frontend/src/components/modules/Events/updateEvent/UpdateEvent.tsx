@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form"
 import { z } from "zod"
-import { CalendarIcon, ImageIcon, Loader2, Upload } from 'lucide-react'
+import { CalendarIcon, ImageIcon, Loader2 } from 'lucide-react'
 import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { getEventById, updateEvent } from "@/service/Events"
 import { toast } from "sonner"
+import Image from "next/image"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -26,8 +27,8 @@ const formSchema = z.object({
   description: z.string().min(10, { message: "Description must be at least 10 characters" }),
   date: z.date({ required_error: "Event date is required" }),
   venue: z.string().min(3, { message: "Venue must be at least 3 characters" }),
-  publicEvent: z.boolean().default(true),
-  paidEvent: z.boolean().default(false),
+  publicEvent: z.boolean(),
+  paidEvent: z.boolean(),
   fee: z.string().optional().nullable(),
   image: z
     .instanceof(File)
@@ -298,7 +299,7 @@ export function EditEventDialog({ eventId, open, onOpenChange, onEventUpdated }:
                   <div className="flex items-center justify-center">
                     {imagePreview ? (
                       <div className="relative h-32 w-full rounded-md overflow-hidden border border-border">
-                        <img
+                        <Image
                           src={imagePreview || "/placeholder.svg"}
                           alt="Event preview"
                           className="h-full w-full object-cover"

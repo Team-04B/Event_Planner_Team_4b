@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { format } from "date-fns";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
 import {

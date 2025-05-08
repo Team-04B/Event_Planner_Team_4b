@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image"
 import { CalendarIcon, MapPinIcon, TicketIcon } from "lucide-react"
 import { format } from "date-fns"

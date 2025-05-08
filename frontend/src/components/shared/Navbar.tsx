@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useMobile } from "@/hooks/use-mobile"
-import { toast } from "sonner"
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { DialogTitle } from "../ui/dialog"
 interface Notification {
@@ -22,7 +21,7 @@ interface Notification {
 
 export default function Navbar() {
   const isMobile = useMobile()
-  const [notifications, setNotifications] = useState<Notification[]>([
+  const [notifications] = useState<Notification[]>([
     {
       id: "1",
       title: "Event Invitation",
@@ -53,7 +52,9 @@ export default function Navbar() {
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
-  const markAsRead = (id: string) => {
+  const markAsRead = (
+    // id: string
+  ) => {
     
   }
 
@@ -61,9 +62,13 @@ export default function Navbar() {
   
   }
 
-  const handleAcceptInvitation = (id: string, eventId: string) => {}
+  const handleAcceptInvitation = (
+    // id: string, eventId: string
+  ) => {}
 
-  const handleDeclineInvitation = (id: string, eventId: string) => {
+  const handleDeclineInvitation = (
+    // id: string, eventId: string
+  ) => {
   }
 
   return (
@@ -143,7 +148,6 @@ export default function Navbar() {
 function NotificationsDesktop({
   notifications,
   unreadCount,
-  markAsRead,
   markAllAsRead,
   handleAcceptInvitation,
   handleDeclineInvitation,
@@ -222,7 +226,6 @@ function NotificationsDesktop({
 function NotificationsMobile({
   notifications,
   unreadCount,
-  markAsRead,
   markAllAsRead,
   handleAcceptInvitation,
   handleDeclineInvitation,

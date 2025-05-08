@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ export default function AllEvents() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [,setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   // Pagination state

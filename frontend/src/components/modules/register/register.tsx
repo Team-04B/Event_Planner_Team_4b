@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";

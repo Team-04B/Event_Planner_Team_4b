@@ -2,21 +2,12 @@
 
 import * as React from "react";
 import {
-  Bot,
   CalendarDays,
   Clock,
-  Frame,
-  HeartPulse,
-  LifeBuoy,
-  ListOrdered,
-  Map,
   MessageSquare,
-  PieChart,
   Plus,
-  Send,
   Settings,
   SquareTerminal,
-  User,
   UserPlus,
 } from "lucide-react";
 import {
@@ -80,6 +71,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppSelector(currentUser);
   const token = useAppSelector(currentToken);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userdata, setData] = React.useState<any>(null);
   React.useEffect(() => {
     if (!user?.id || !token) return;
