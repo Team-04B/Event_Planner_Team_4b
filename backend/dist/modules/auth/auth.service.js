@@ -27,12 +27,12 @@ const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, functi
     if (!name || !email || !password) {
         throw new ApiError_1.default(http_status_1.default.NON_AUTHORITATIVE_INFORMATION, 'Missing required fields');
     }
-    const isExistUser = yield prisma_1.default.user.findFirst({
-        where: { email: email },
-    });
-    if (isExistUser) {
-        throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'User already exists');
-    }
+    // const isExistUser = await prisma.user.findFirst({
+    //   where: { email: email },
+    // });
+    // if (isExistUser) {
+    //   throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
+    // }
     const hasPassword = yield bcryptjs_1.default.hash(password, 10);
     if (!hasPassword) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'bcrypt solt generate problem');

@@ -18,13 +18,15 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
     );
   }
 
-  const isExistUser = await prisma.user.findFirst({
-    where: { email: email },
-  });
+  // const isExistUser = await prisma.user.findFirst({
+  //   where: { email: email },
+  // });
 
-  if (isExistUser) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
-  }
+
+
+  // if (isExistUser) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
+  // }
 
   const hasPassword = await bcrypt.hash(password, 10);
   if (!hasPassword) {
