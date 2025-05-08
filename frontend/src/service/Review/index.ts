@@ -2,7 +2,8 @@
 import { cookies } from "next/headers";
 
 
-export const CreateInvitaion = async (data:any) => {
+
+export const CreateReview= async (data:any) => {
 console.log(data)
   try {
     const token = (await cookies()).get("accessToken")?.value;
@@ -11,7 +12,7 @@ console.log(data)
         throw new Error("Access token not found");
       }
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_API}/events/${data?.eventId}/invite`,
+        `${process.env.NEXT_PUBLIC_BASE_API}/events/${data?.eventId}/reviews`,
         {
           method: "POST",
           headers: {
@@ -28,7 +29,7 @@ console.log(data)
 
     return await response.json();
   } catch (error) {
-    console.error("Error blog post:", error);
+    console.error("Error Review Send:", error);
     return null;
   }
 };
@@ -37,13 +38,15 @@ console.log(data)
 
 // get all Invitation 
 
-export const getAllInvitaions= async () => {
+export const getAllReviews= async (eventId:string) => {
   try {
     const token = (await cookies()).get("accessToken")?.value;
     if (!token) {
       throw new Error("Access token not found");
     }
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations`, {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/reviews`,
+    {
       method: "GET",
       headers: {
         Authorization: token
