@@ -6,23 +6,26 @@ import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
 export const registerUser = async (userData: FieldValues) => {
+  console.log(process.env.NEXT_PUBLIC_BASE_API);
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include',
+        body: JSON.stringify(userData),
+      }
+    );
     const result = await res.json();
-
-    if (result.success) {
-      (await cookies()).set("accessToken", result.data.accessToken);
-    }
+    console.log("user result", result);
 
     return result;
   } catch (error: any) {
-    return Error(error);
+    console.error("Register error:", error);
+    return { success: false, message: error.message };
   }
 };
 
@@ -33,31 +36,38 @@ export const loginUser = async (userData: FieldValues) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: 'include',
       body: JSON.stringify(userData),
     });
 
     const result = await res.json();
 
-    if (result.success) {
-      (await cookies()).set("accessToken", result.data.accessToken);
+    if (result.success && result?.data?.accessToken) {
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", result.data.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        sameSite: "lax",
+      });
     }
 
     return result;
   } catch (error: any) {
-    return Error(error);
+    console.error('Login error:', error);
+    return { success: false, message: error.message };
   }
 };
 
 export const getCurrentUser = async () => {
-  const accessToken = (await cookies()).get("accessToken")?.value;
-  let decodedData = null;
-
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  
   if (accessToken) {
-    decodedData = await jwtDecode(accessToken);
+    const decodedData = jwtDecode(accessToken);
     return decodedData;
-  } else {
-    return null;
   }
+  return null;
 };
 
 export const reCaptchaTokenVerification = async (token: string) => {
@@ -75,10 +85,12 @@ export const reCaptchaTokenVerification = async (token: string) => {
 
     return res.json();
   } catch (err: any) {
-    return Error(err);
+    console.error("reCaptcha error:", err);
+    return { success: false, message: err.message };
   }
 };
 
-export const logout = async ()=>{
-  (await cookies()).delete("accessToken");
-}
+export const logout = async () => {
+  const cookieStore = await cookies();
+  cookieStore.delete("accessToken");
+};

@@ -1,19 +1,14 @@
 import { TReactChildrenType } from "@/commonTypes/commonTypes";
 import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
+import HomePage from "@/pages/HomePage/HomePage";
 
-const Home = ({children}:TReactChildrenType) => {
+const Home = () => {
   return (
     <>
-        <header>
-           <Navbar/>
            <main className="min-h-[calc(100vh-200px)]">
-            {children}
+         <HomePage/>
            </main>
-        </header>
-        <footer>
-            <Footer/>
-        </footer>   
     </>
   )
 }

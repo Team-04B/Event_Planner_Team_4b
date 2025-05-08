@@ -9,7 +9,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const authRegisterInToDB = async (payload: Partial<User>) => {
   const { name, email, password } = payload;
-
+  console.log(payload);
   // Optional: Add validation checks here.
   if (!name || !email || !password) {
     throw new ApiError(
@@ -17,7 +17,7 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
       'Missing required fields'
     );
   }
-  console.log(payload);
+  
   const isExistUser = await prisma.user.findFirst({
     where: { email: email },
   });
@@ -37,6 +37,8 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
       password: hasPassword,
     },
   });
+
+  console.log(registeredUser,'register user')
   if (!registeredUser.id) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'user create problem');
   }

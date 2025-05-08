@@ -5,7 +5,9 @@ import { Role } from '@prisma/client';
 
 const router = express.Router();
 
-router.get('/', auth(Role.ADMIN), UserContolors.getAllUsers);
+router.get('/',
+// auth(Role.ADMIN,Role.USER), 
+UserContolors.getAllUsers);
 router.get('/:id', auth(Role.ADMIN, Role.USER), UserContolors.getSingleUsers);
 router.put(
   '/:id',

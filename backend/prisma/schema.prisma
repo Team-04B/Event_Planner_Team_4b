@@ -20,7 +20,7 @@ model User {
   email          String          @unique
   password       String
   role           Role            @default(USER)
-  events         Event[]         @relation("CreatorEvents")
+  events         Event[]         @relation("User")
   participations Participation[]
   invitations    Invitation[]    @relation("InvitedUser")
   reviews        Review[]
@@ -39,7 +39,7 @@ model Event {
   isPublic       Boolean
   isPaid         Boolean
   fee            Float? // Nullable for free events
-  creator        User            @relation("CreatorEvents", fields: [creatorId], references: [id])
+  creator        User            @relation("User", fields: [creatorId], references: [id])
   creatorId      String
   participations Participation[]
   invitations    Invitation[]    @relation("EventInvitations")
@@ -64,8 +64,9 @@ model Invitation {
   id          String           @id @default(uuid())
   event       Event            @relation("EventInvitations", fields: [eventId], references: [id])
   eventId     String
-  invitedUser User             @relation("InvitedUser", fields: [userId], references: [id])
-  userId      String
+  invitedUser User             @relation("InvitedUser", fields: [userEmail], references: [email])
+  invitationNote String
+  userEmail      String 
   status      InvitationStatus @default(PENDING)
   paid        Boolean          @default(false)
   createdAt   DateTime         @default(now())
