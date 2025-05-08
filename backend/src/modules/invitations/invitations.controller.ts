@@ -16,9 +16,9 @@ const createInvitaion = catchAsync(async (req, res, next) => {
 });
 // create reviews
 const getMyAllnvitaions = catchAsync(async (req, res, next) => {
-  const id = req.user?.id;
+  const email = req.user?.email
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-  const result = await InvitaionServices.getMyAllnvitaionsFromDB(options, id);
+  const result = await InvitaionServices.getMyAllnvitaionsFromDB(options, email);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
