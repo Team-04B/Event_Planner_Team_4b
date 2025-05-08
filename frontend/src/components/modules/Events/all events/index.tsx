@@ -12,7 +12,6 @@ import { EventSkeleton } from "./event-skeleton";
 import { EventCard } from "./event-card";
 import { Pagination } from "./pagination";
 
-
 export default function AllEvents() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
@@ -42,20 +41,20 @@ export default function AllEvents() {
       setError("");
 
       try {
-        const response = await getAllEvents();
+        const res = await getAllEvents();
 
-        if (response?.success) {
+        if (res?.success) {
           // Check if paginatedData exists and has items
           if (
-            response.data?.paginatedData &&
-            Array.isArray(response.data.paginatedData)
+            res.data?.paginatedData &&
+            Array.isArray(res.data.paginatedData)
           ) {
-            setEvents(response.data.paginatedData);
-            setFilteredEvents(response.data.paginatedData);
-          } else if (response.data && Array.isArray(response.data)) {
+            setEvents(res.data.paginatedData);
+            setFilteredEvents(res.data.paginatedData);
+          } else if (res.data && Array.isArray(res.data)) {
             // Alternative: check if data is directly an array
-            setEvents(response.data);
-            setFilteredEvents(response.data);
+            setEvents(res.data);
+            setFilteredEvents(res.data);
           } else {
             setError("No events found.");
           }
