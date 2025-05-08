@@ -18,7 +18,84 @@ const createEventIntoDB = async (payload: Event, creatorId: string) => {
   return result;
 };
 
-// get all events from db
+// getAll events from db
+
+const getAllEventsFromDB = async (
+  filters: IEventFilterRequest,
+  options: IPaginationOptions,
+) => {
+  const { limit, page, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = filters;
+
+  const andConditions: Prisma.EventWhereInput[] = [];
+
+  // Search term filter
+  if (searchTerm) {
+    andConditions.push({
+      OR: eventSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+
+  // Other filters
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.EventWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  // Fetch all events
+  const allEvents = await prisma.event.findMany({
+    where: whereConditions,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+  });
+
+  // Today's date
+  const now = new Date();
+
+  // Segment the events
+  const completedEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) < now
+  );
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) >= now
+  );
+
+  // Paginate the allEvents list
+  const paginatedData = allEvents.slice(skip, skip + limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total: allEvents.length,
+    },
+    data: {
+      paginatedData,
+      completed: completedEvents,
+      upcoming: upcomingEvents,
+      all: allEvents,
+    },
+  };
+};
+
+// get all events from db by creatorId
 const getEventsFromDB = async (
   filters: IEventFilterRequest,
   options: IPaginationOptions,
@@ -326,6 +403,7 @@ const updateParticipantStatus = async (
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
+  getAllEventsFromDB,
   getEventByIdFromDB,
   updateEventIntoDB,
   deleteEventFromDB,

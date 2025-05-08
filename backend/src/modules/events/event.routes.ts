@@ -24,13 +24,19 @@ router.post(
   EventController.createEvent
 );
 
-//get all events
-router.get('/',auth(Role.USER,Role.ADMIN), EventController.getEvents);
+
+// get all events 
+router.get('/', EventController.getAllEvents);
+
+//get all events by user
+router.get('/', auth(Role.USER, Role.ADMIN), EventController.getEvents);
 
 // get event by id
-router.get('/:id',
-  // auth(Role.USER,Role.ADMIN), 
-  EventController.getEventById);
+router.get(
+  '/:id',
+  // auth(Role.USER,Role.ADMIN),
+  EventController.getEventById
+);
 
 // update event
 router.patch(
@@ -49,7 +55,6 @@ router.patch(
   auth(Role.USER),
   EventController.updateParticipantStatus
 );
-
 
 // Public events
 router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent);
@@ -73,7 +78,7 @@ router.get('/:id/reviews', ReviewController.getAllReviews);
 
 router.post(
   '/:id/invite',
-  auth(Role.ADMIN,Role.USER),
+  auth(Role.ADMIN, Role.USER),
   InvitationController.createInvitaion
 );
 
