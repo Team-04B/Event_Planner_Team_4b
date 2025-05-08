@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 const createEventZodSchema = z.object({
   body: z.object({
     title: z.string({

@@ -20,8 +20,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/redux/hook";
-import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
 import { createEvent } from "@/service/Events";
 import { EventFormData } from "@/types/eventType";
 import { format } from "date-fns";
@@ -50,13 +48,10 @@ const CreateEvent = () => {
     control,
     watch,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
     setValue,
   } = form;
-
-  const user = useAppSelector(currentUser);
-  console.log(user);
-  const token = useAppSelector(currentToken);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const eventData = {
@@ -69,9 +64,9 @@ const CreateEvent = () => {
 
       fee: data.fee
         ? typeof data.fee === "string"
-          ? parseFloat(data.fee.replace(/[^\d.-]/g, "")) 
-          : data.fee 
-        : null, 
+          ? parseFloat(data.fee.replace(/[^\d.-]/g, ""))
+          : data.fee
+        : null,
     };
 
     const formData = new FormData();
@@ -79,10 +74,11 @@ const CreateEvent = () => {
     formData.append("file", data.image);
 
     try {
-      const res = await createEvent(formData, token);
+      const res = await createEvent(formData);
       console.log(res);
       if (res.success) {
         toast.success(res.message);
+        reset();
       } else {
         toast.error(res.message);
       }
