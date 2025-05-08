@@ -48,6 +48,7 @@ const createEvent = catchAsync(async (req, res) => {
 const getEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+  const user = req.user
 
   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
   const filters: IEventFilterRequest = {
@@ -79,7 +80,7 @@ const getEvents = catchAsync(async (req, res) => {
     filters.searchTerm = undefined;
   }
 
-  const result = await EventService.getEventsFromDB(filters, options);
+  const result = await EventService.getEventsFromDB(filters, options,user.id);
 
   sendResponse(res, {
     success: true,

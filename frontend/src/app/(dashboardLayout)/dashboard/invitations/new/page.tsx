@@ -1,12 +1,13 @@
 import NewInvitationPage from "@/pages/NewInvitaion/NewInvitationPage"
-import { getAllEvents } from "@/service/Events"
+import { getAllEventsByUserId } from "@/service/Events"
 import { getAllUser } from "@/service/user"
 
 const page = async() => {
  const allusers = await getAllUser()
- const allEvents = await getAllEvents()
+ const allEvents = await getAllEventsByUserId()
    const userDatas = allusers?.data
-    const allEventData = allEvents?.data
+   console.log(userDatas,'user data')
+    const allEventData = allEvents?.data.all
     console.log(allEventData)
   return (
    <>
