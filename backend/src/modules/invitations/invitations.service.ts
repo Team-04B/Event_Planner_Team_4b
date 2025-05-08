@@ -35,13 +35,13 @@ console.log(id,{data})
 //  }
 const getMyAllnvitaionsFromDB = async (
   options: IPaginationOptions,
-  userEmail: string
+  email: string
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
 
   const result = await prisma.invitation.findMany({
     where: {
-      userEmail: userEmail,
+      userEmail: email,
     },
     skip,
     take: limit,
@@ -51,11 +51,15 @@ const getMyAllnvitaionsFromDB = async (
         : {
             createdAt: 'desc',
           },
+          include: {
+            event: true, 
+            invitedUser:true
+          },
   });
 
   const total = await prisma.invitation.count({
     where: {
-      userEmail: userEmail,
+      userEmail: email,
     },
   });
 

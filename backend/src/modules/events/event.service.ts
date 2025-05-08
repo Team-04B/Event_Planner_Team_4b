@@ -51,7 +51,6 @@ const getEventsFromDB = async (
 
   const whereConditions: Prisma.EventWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
-
   const result = await prisma.event.findMany({
     where: whereConditions,
     skip,
