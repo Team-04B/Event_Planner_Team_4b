@@ -77,7 +77,6 @@ const CreateEvent = () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(eventData));
     formData.append("file", data.image);
-    console.log(eventData);
 
     try {
       const res = await createEvent(formData, token);

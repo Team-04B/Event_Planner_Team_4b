@@ -126,6 +126,40 @@ export const getEventById = async (eventId: string) => {
   }
 }
 
+export const updateEvent = async (eventId: string, eventData: FormData) => {
+  try {
+    const cookieStore = cookies()
+    const accessToken = (await cookieStore).get("accessToken")?.value
+
+    if (!accessToken) {
+      throw new Error("No access token found in cookies.")
+    }
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`, {
+      method: "PATCH",
+      headers: {
+        // "Content-Type": "application/json",
+        Authorization: accessToken,
+      },
+      body: eventData,
+      credentials: "include",
+    })
+
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`)
+    }
+
+    const data = await res.json()
+    return data
+  } catch (error: any) {
+    console.error("Event update error:", error)
+    return {
+      success: false,
+      error: error.message || "Unknown error",
+    }
+  }
+}
+
 
 export const deleteEvent = async (eventId: string) => {
   try {

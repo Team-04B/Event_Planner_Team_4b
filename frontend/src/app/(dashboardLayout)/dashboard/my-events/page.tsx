@@ -32,6 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getAllEventsByUserId, deleteEvent } from "@/service/Events"
 import DeleteModal from "@/components/modules/Events/myEvents/DeleteModal"
 import { EventDetailsDialog } from "@/components/modules/Events/myEvents/ViewEventsDetails"
+import { EditEventDialog } from "@/components/modules/Events/updateEvent/UpdateEvent"
 
 
 // Update the Event interface to match your Prisma model
@@ -75,6 +76,10 @@ export default function MyEventsPage() {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
 
+    // State for edit event dialog
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [eventToEdit, setEventToEdit] = useState<string | null>(null)
+
   // Debounce search term to avoid too many API calls
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm)
 
@@ -87,75 +92,76 @@ export default function MyEventsPage() {
   }, [searchTerm])
 
   // Fetch events when filters change
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true)
+  const fetchEvents = async () => {
+    try {
+      setLoading(true)
 
-        // Prepare filter parameters for API call
-        const filterParams: {
-          page: number
-          limit: number
-          searchTerm?: string
-          sortBy: string
-          sortOrder: "asc" | "desc"
-          [key: string]: any // 👈 allows extra dynamic fields like isPublic or status
-        } = {
-          page: currentPage,
-          limit: itemsPerPage,
-          searchTerm: debouncedSearchTerm,
-          sortBy: sortField,
-          sortOrder: sortDirection,
-        }
-
-        // Add status filter if not "all"
-        if (statusFilter !== "all") {
-          filterParams.status = statusFilter
-        }
-
-        // Add type filter if not "all"
-        if (typeFilter !== "all") {
-          filterParams.isPublic = typeFilter === "public" ? "true" : "false"
-        }
-
-        if (typeFilter === "paid" || typeFilter === "free") {
-          filterParams.isPaid = typeFilter === "paid" ? "true" : "false"
-          filterParams.isPublic = ""
-        }
-
-        // Call API with filter parameters
-        const response = await getAllEventsByUserId(filterParams)
-
-        if (response.success && response.data) {
-          // Use the appropriate data based on the active tab
-          let eventsData = []
-
-          switch (activeTab) {
-            case "upcoming":
-              eventsData = response.data.upcoming || []
-              break
-            case "completed":
-              eventsData = response.data.completed || []
-              break
-            default:
-              // Default to paginatedData for "all" tab
-              eventsData = response.data.paginatedData || []
-          }
-
-          setEvents(eventsData)
-          setTotalEvents(response.meta.total || 0)
-          setTotalPages(Math.ceil((response.meta.total || 0) / itemsPerPage))
-        } else {
-          console.error("Failed to fetch events:", response.message)
-          setEvents([])
-        }
-      } catch (error) {
-        console.error("Error fetching events:", error)
-        setEvents([])
-      } finally {
-        setLoading(false)
+      // Prepare filter parameters for API call
+      const filterParams: {
+        page: number
+        limit: number
+        searchTerm?: string
+        sortBy: string
+        sortOrder: "asc" | "desc"
+        [key: string]: any // 👈 allows extra dynamic fields like isPublic or status
+      } = {
+        page: currentPage,
+        limit: itemsPerPage,
+        searchTerm: debouncedSearchTerm,
+        sortBy: sortField,
+        sortOrder: sortDirection,
       }
+
+      // Add status filter if not "all"
+      if (statusFilter !== "all") {
+        filterParams.status = statusFilter
+      }
+
+      // Add type filter if not "all"
+      if (typeFilter !== "all") {
+        filterParams.isPublic = typeFilter === "public" ? "true" : "false"
+      }
+
+      if (typeFilter === "paid" || typeFilter === "free") {
+        filterParams.isPaid = typeFilter === "paid" ? "true" : "false"
+        filterParams.isPublic = ""
+      }
+
+      // Call API with filter parameters
+      const response = await getAllEventsByUserId(filterParams)
+
+      if (response.success && response.data) {
+        // Use the appropriate data based on the active tab
+        let eventsData = []
+
+        switch (activeTab) {
+          case "upcoming":
+            eventsData = response.data.upcoming || []
+            break
+          case "completed":
+            eventsData = response.data.completed || []
+            break
+          default:
+            // Default to paginatedData for "all" tab
+            eventsData = response.data.paginatedData || []
+        }
+
+        setEvents(eventsData)
+        setTotalEvents(response.meta.total || 0)
+        setTotalPages(Math.ceil((response.meta.total || 0) / itemsPerPage))
+      } else {
+        console.error("Failed to fetch events:", response.message)
+        setEvents([])
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error)
+      setEvents([])
+    } finally {
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
 
     fetchEvents()
   }, [currentPage, debouncedSearchTerm, statusFilter, typeFilter, sortField, sortDirection, itemsPerPage, activeTab])
@@ -192,23 +198,7 @@ export default function MyEventsPage() {
 
         if (response.success) {
           // Refresh the events list after deletion
-          const filterParams = {
-            page: currentPage,
-            limit: itemsPerPage,
-            searchTerm: debouncedSearchTerm,
-            sortBy: sortField,
-            sortOrder: sortDirection,
-            status: statusFilter !== "all" ? statusFilter : undefined,
-            isPublic: typeFilter !== "all" ? (typeFilter === "public" ? "true" : "false") : undefined,
-          }
-
-          const refreshResponse = await getAllEventsByUserId(filterParams)
-
-          if (refreshResponse.success && refreshResponse.data) {
-            setEvents(refreshResponse.data.paginatedData || [])
-            setTotalEvents(refreshResponse.meta.total || 0)
-            setTotalPages(Math.ceil((refreshResponse.meta.total || 0) / itemsPerPage))
-          }
+          fetchEvents()
 
           setDeleteDialogOpen(false)
           setEventToDelete(null)
@@ -254,6 +244,13 @@ export default function MyEventsPage() {
     setCurrentPage(1) // Reset to first page when changing items per page
     // The API call will be triggered by the useEffect hook when itemsPerPage changes
   }
+
+    // Handle edit event
+  const handleEditEvent = (id: string) => {
+    setEventToEdit(id)
+    setEditDialogOpen(true)
+  }
+
 
   return (
     <div className="container mx-auto pb-10">
@@ -470,7 +467,7 @@ export default function MyEventsPage() {
                                     <EyeIcon className="mr-2 h-4 w-4" />
                                     View Details
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => router.push(`/events/edit/${event.id}`)}>
+                                  <DropdownMenuItem onClick={() => handleEditEvent(event.id)}>
                                     <EditIcon className="mr-2 h-4 w-4" />
                                     Edit Event
                                   </DropdownMenuItem>
@@ -571,6 +568,14 @@ export default function MyEventsPage() {
       eventId={selectedEventId} 
       open={detailsDialogOpen} 
       onOpenChange={setDetailsDialogOpen}/>
+
+       {/* Edit Event Dialog */}
+      <EditEventDialog
+        eventId={eventToEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onEventUpdated={fetchEvents}
+      />
     </div>
   )
 }

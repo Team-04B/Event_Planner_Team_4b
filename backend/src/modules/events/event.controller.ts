@@ -107,30 +107,38 @@ const getEventById = catchAsync(async (req, res) => {
 //update event
 const updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
-
-  const file = req.file as Express.Multer.File;
   const creatorId = req.user.id;
-  
-  // Simplified mapping to IFile
-  const mappedFile: IFile = {
-    // fileName: file.filename,
-    orginalname: file.originalname,
-    encoding: file.encoding,
-    mimetype: file.mimetype,
-    destination: file.destination,
-    filename: file.filename,
-    path: file.path,
-    size: file.size,
+  let eventData = {
+     ...req.body,
+      creatorId,
   };
-  // console.log(eventData);
 
-  // Upload the file to Cloudinary
-  const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
-  const eventData = {
-    ...req.body,
-    creatorId,
-    eventImgUrl: uploadedImage?.secure_url, // set image URL
-  };
+  if(req.file){
+
+    const file = req.file as Express.Multer.File;
+    
+    // Simplified mapping to IFile
+    const mappedFile: IFile = {
+      // fileName: file.filename,
+      orginalname: file.originalname,
+      encoding: file.encoding,
+      mimetype: file.mimetype,
+      destination: file.destination,
+      filename: file.filename,
+      path: file.path,
+      size: file.size,
+    };
+    // console.log(eventData);
+  
+    // Upload the file to Cloudinary
+    const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+    eventData = {
+      ...req.body,
+      creatorId,
+      eventImgUrl: uploadedImage?.secure_url, // set image URL
+    };
+  }
+
 
   const result = await EventService.updateEventIntoDB(id, eventData);
   sendResponse(res, {
