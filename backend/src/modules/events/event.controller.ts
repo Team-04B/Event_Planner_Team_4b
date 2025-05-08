@@ -13,6 +13,8 @@ import { IFile } from '../../app/interface/file';
 const createEvent = catchAsync(async (req, res) => {
   const file = req.file as Express.Multer.File;
   const creatorId = req.user.id;
+  console.log(req.user, "rifat");
+  const creator = req.user?.name;
 
   // Simplified mapping to IFile
   const mappedFile: IFile = {
@@ -95,7 +97,7 @@ const getAllEvents = catchAsync(async (req, res) => {
 const getEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-  const user = req.user;
+  // const user = req.user;
 
   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
   const filters: IEventFilterRequest = {
@@ -218,7 +220,7 @@ const handleJoinEvent = catchAsync(async (req, res) => {
   // console.log(userId);
   if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
   const result = await EventService.joinToPublicEvent(eventId, userId);
-  console.log(result);
+  // console.log(result);
 
   sendResponse(res, {
     success: true,

@@ -22,7 +22,7 @@ const createEventIntoDB = async (payload: Event, creatorId: string) => {
 
 const getAllEventsFromDB = async (
   filters: IEventFilterRequest,
-  options: IPaginationOptions,
+  options: IPaginationOptions
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
@@ -58,6 +58,9 @@ const getAllEventsFromDB = async (
   // Fetch all events
   const allEvents = await prisma.event.findMany({
     where: whereConditions,
+    include: {
+      creator: true,
+    },
     orderBy:
       options.sortBy && options.sortOrder
         ? { [options.sortBy]: options.sortOrder }
