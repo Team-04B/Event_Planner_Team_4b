@@ -102,7 +102,7 @@ const getAllEventsFromDB = async (
 const getEventsFromDB = async (
   filters: IEventFilterRequest,
   options: IPaginationOptions,
-  creatorId: string
+  creatorId?: string
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
