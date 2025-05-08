@@ -8,10 +8,12 @@ import ApiError from '../../app/error/ApiError';
 import httpStatus from 'http-status';
 
 // create event into db
-const createEventIntoDB = async (payload: Event) => {
+const createEventIntoDB = async (payload: Event, creatorId: string) => {
   const result = await prisma.event.create({
-    data: payload,
-    
+    data: {
+      ...payload,
+      creatorId,
+    },
   });
   return result;
 };
@@ -77,8 +79,12 @@ const getEventsFromDB = async (
   const now = new Date();
 
   // Segment the events
-  const completedEvents = allEvents.filter(event => new Date(event.dateTime) < now);
-  const upcomingEvents = allEvents.filter(event => new Date(event.dateTime) >= now);
+  const completedEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) < now
+  );
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) >= now
+  );
 
   // Paginate the allEvents list
   const paginatedData = allEvents.slice(skip, skip + limit);
@@ -93,7 +99,7 @@ const getEventsFromDB = async (
       paginatedData,
       completed: completedEvents,
       upcoming: upcomingEvents,
-      all: allEvents
+      all: allEvents,
     },
   };
 };
@@ -103,13 +109,12 @@ const getEventByIdFromDB = async (id: string): Promise<Event | null> => {
   const result = await prisma.event.findUnique({
     where: {
       id,
-      
     },
     include: {
-      creator:true,
-      participations:true,
-      invitations:true
-    }
+      creator: true,
+      participations: true,
+      invitations: true,
+    },
   });
   return result;
 };
@@ -174,6 +179,7 @@ const deleteEventFromDB = async (id: string): Promise<Event> => {
 };
 
 // join public free event
+
 // const joinPublicEvent = async (eventId: string, userId: string) => {
 //   const event = await prisma.event.findUnique({
 //     where: {
@@ -252,8 +258,9 @@ const deleteEventFromDB = async (id: string): Promise<Event> => {
 //   return createParticipation;
 // };
 
-
 //
+
+// join public event
 const joinToPublicEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
   if (!event) throw new ApiError(httpStatus.NOT_FOUND, 'Event not found');
@@ -276,7 +283,6 @@ const joinToPublicEvent = async (eventId: string, userId: string) => {
   return participation;
 };
 
-
 // handle paid event
 const requestToPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
@@ -284,7 +290,7 @@ const requestToPaidEvent = async (eventId: string, userId: string) => {
 
   if (event.isPublic)
     throw new ApiError(httpStatus.BAD_REQUEST, 'Not a private event');
-  
+
   const alreadyRequested = await prisma.participation.findFirst({
     where: { eventId, userId },
   });
