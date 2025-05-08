@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Event } from "@/types/eventType";
+import Image from "next/image";
 
 export function EventCard({ event }: { event: Event }) {
   // Safely format date with error handling
@@ -33,18 +34,22 @@ export function EventCard({ event }: { event: Event }) {
   };
 
   return (
-    <Card className="overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow">
+    <Card className="overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow p-0">
       <div className="relative h-48 w-full overflow-hidden">
-        <img
+        <Image
           src={
             event.eventImgUrl ||
-            `/placeholder.svg?height=200&width=400&text=${
+            `/placeholder.svg?height=192&width=384&text=${
               encodeURIComponent(event.title) || "/placeholder.svg"
             }`
           }
           alt={event.title}
-          className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover"
+          priority
         />
+
         <div className="absolute top-3 right-3 flex gap-2">
           <Badge
             variant={event.isPublic ? "default" : "secondary"}
@@ -98,7 +103,7 @@ export function EventCard({ event }: { event: Event }) {
       </CardContent>
 
       <CardFooter>
-        <Button className="w-full">View Details</Button>
+        <Button className="w-full mb-4">View Details</Button>
       </CardFooter>
     </Card>
   );

@@ -21,7 +21,7 @@ export default function AllEvents() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage] = useState(6);
+  const [eventsPerPage] = useState(9);
 
   // Filter state
   const [filters, setFilters] = useState({
@@ -79,7 +79,7 @@ export default function AllEvents() {
     // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some((value) => value);
 
-    // Apply category filters if any are active
+
     if (hasActiveFilters) {
       result = result.filter((event) => {
         if (filters.publicFree && event.isPublic && !event.isPaid) return true;
@@ -91,7 +91,6 @@ export default function AllEvents() {
       });
     }
 
-    // Apply search filter (case insensitive)
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(
