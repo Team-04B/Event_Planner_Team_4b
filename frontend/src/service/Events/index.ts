@@ -5,9 +5,7 @@ import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 // create event
-export const createEvent = async (
-  eventData: FormData
-) => {
+export const createEvent = async (eventData: FormData) => {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value;
@@ -30,6 +28,52 @@ export const createEvent = async (
   } catch (error: any) {
     console.error("Event creation error:", error);
     return { success: false, error: error.message || "Unknown error" };
+  }
+};
+
+// get all events
+
+export const getAllEvents = async (filters = {}) => {
+  try {
+    const query = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        query.append(key, String(value));
+      }
+    });
+
+    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events${
+      query.toString() ? `?${query.toString()}` : ""
+    }`;
+
+    const res = await fetch(url, {
+      method: "GET",
+      cache: "no-store", // Ensure fresh data
+    });
+
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Unknown error",
+      data: {
+        all: [],
+        completed: [],
+        upcoming: [],
+        paginatedData: [],
+      },
+      meta: {
+        page: 1,
+        limit: 10,
+        total: 0,
+      },
+    };
   }
 };
 
