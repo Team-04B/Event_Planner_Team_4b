@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle } from "lucide-react"
 import ReviewForm from "./ReviewForm"
 import ReviewList from "./ReviewList"
-import { hasUserReviewedEvent } from "@/lib/data"
+import { hasUserReviewedEvent } from "@/lib/ReviewGenarator"
+
 
 
 interface EventReviewSectionProps {
@@ -16,9 +17,18 @@ interface EventReviewSectionProps {
 
 export default function EventReviewSection({ eventId, userId }: EventReviewSectionProps) {
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0)
-  const [hasReviewed, setHasReviewed] = useState<boolean>(hasUserReviewedEvent(userId, eventId))
+  const [hasReviewed, setHasReviewed] = useState<boolean>()
+  useEffect(() => {
+    const check = async () => {
+      const result = await hasUserReviewedEvent(userId, eventId);
+      console.log(result)
+      setHasReviewed(result);
+    };
+    check();
+  }, []);
 
-  const handleReviewSuccess = (newReview: any) => {
+
+  const handleReviewSuccess = () => {
     setHasReviewed(true)
     setRefreshTrigger((prev) => prev + 1)
   }

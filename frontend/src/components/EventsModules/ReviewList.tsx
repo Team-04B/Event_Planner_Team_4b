@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { StarIcon } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getAverageRating, getReviewsForEvent } from "@/lib/data"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { getAverageRating } from "@/lib/ReviewGenarator"
 import { User } from "@/commonTypes/commonTypes"
 import { getAllReviews } from "@/service/Review"
 
@@ -30,7 +30,7 @@ export default function ReviewList({ eventId, refreshTrigger = 0 }: ReviewListPr
   useEffect(() => {
     // Simulate API call with a small delay
     const fetchReviews = async () => {
-      setLoading(true)
+      setLoading(false)
       try {
         // Get reviews from our mock data
         const Reviews =await getAllReviews(eventId)
@@ -38,7 +38,8 @@ export default function ReviewList({ eventId, refreshTrigger = 0 }: ReviewListPr
         setReviews(eventReviews)
 
         // Calculate average rating
-        setAverageRating(getAverageRating(eventId))
+        const avgRating = await (getAverageRating(eventId))
+        setAverageRating(avgRating)
       } finally {
         setLoading(false)
       }

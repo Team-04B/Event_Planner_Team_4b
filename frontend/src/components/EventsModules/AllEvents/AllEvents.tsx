@@ -1,11 +1,14 @@
+
 import Link from "next/link"
 import Image from "next/image"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CalendarIcon, MapPinIcon, StarIcon } from "lucide-react"
 import { format } from "date-fns"
-import { getAverageRating } from "@/lib/data"
+
 import { IEvent } from "@/commonTypes/commonTypes"
+import { getAverageRating } from "@/lib/ReviewGenarator"
+import { use } from "react"
 
 
 
@@ -16,7 +19,8 @@ export default function AllEvents({events}:{events:IEvent[]}) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {events.map((event) => {
-          const avgRating = getAverageRating(event.id)
+          const avgRating = use(getAverageRating(event.id))
+          console.log(avgRating)
 
           return (
             <Card key={event.id} className="overflow-hidden flex flex-col h-full">
