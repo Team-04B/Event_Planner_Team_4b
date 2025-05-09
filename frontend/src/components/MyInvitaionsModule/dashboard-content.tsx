@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { getAllInvitaions } from "@/service/Invitations"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import Link from "next/link"
 
 interface Invitation {
   id: string
@@ -392,6 +393,9 @@ export default function DashboardContent() {
                         <Button variant="outline" size="sm">
                           Decline
                         </Button>
+                        <Button variant="outline" size="sm" asChild>
+                              <Link href={`/dashboard/invitations/${invitation.id}`}>View</Link>
+                            </Button>
                       </div>
                     ) : (
                       <DropdownMenu>
@@ -403,7 +407,9 @@ export default function DashboardContent() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Contact Organizer</DropdownMenuItem>
+                          <DropdownMenuItem>
+                          <Link href={''}>Contact Organizer</Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Add to Calendar</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

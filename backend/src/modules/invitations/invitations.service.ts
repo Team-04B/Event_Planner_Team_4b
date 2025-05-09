@@ -113,8 +113,23 @@ const getMyInvitedOnvitationsFromDB = async (
   };
 };
 
+const getSingleInvitaionIntoDB =async (id:string)=>{
+  const result =await prisma.invitation.findUniqueOrThrow({
+  where:{
+  id
+  },
+  include:{
+  invitedBy:true,
+  event:true,
+  }
+  })
+  
+  return result;
+}
+
 export const InvitaionServices = {
   createInvitaionDB,
   getMyAllnvitaionsFromDB,
-  getMyInvitedOnvitationsFromDB
+  getMyInvitedOnvitationsFromDB,
+  getSingleInvitaionIntoDB
 };
