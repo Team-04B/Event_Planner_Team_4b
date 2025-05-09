@@ -33,6 +33,7 @@ import Link from "next/link";
 import { useAppSelector } from "@/redux/hook";
 import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
+import { LogoutModal } from "@/components/modules/Login/LogoutModal";
 
 // This is sample data.
 const data = {
@@ -45,7 +46,7 @@ const data = {
     },
     {
       title: "My Event",
-      url: "/dashboard/myevent",
+      url: "/dashboard/my-events",
       icon: CalendarDays,
     },
     {
@@ -60,7 +61,7 @@ const data = {
     },
     {
       title: "Invite People",
-      url: "/dashboard/invite",
+      url: "/dashboard/invitations",
       icon: UserPlus,
     },
   ],
@@ -154,9 +155,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={sidebarItem} />
       </SidebarContent>
-      {/* <SidebarFooter>
-        <NavUser />
-      </SidebarFooter> */}
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <LogoutModal />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
