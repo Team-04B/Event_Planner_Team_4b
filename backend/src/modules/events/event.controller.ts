@@ -13,7 +13,7 @@ import { IFile } from '../../app/interface/file';
 const createEvent = catchAsync(async (req, res) => {
   const file = req.file as Express.Multer.File;
   const creatorId = req.user.id;
-
+console.log(creatorId)
   // Simplified mapping to IFile
   const mappedFile: IFile = {
     // fileName: file.filename,

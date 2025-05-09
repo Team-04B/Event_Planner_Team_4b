@@ -1,14 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useMobile } from "@/hooks/use-mobile"
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { DialogTitle } from "../ui/dialog"
+import { useAppSelector } from "@/redux/hook"
+import { currentUser, logOut } from "@/redux/userSlice/userSlice"
+import { getAllInvitaions } from "@/service/Invitations"
+import { logout } from "@/service/AuthService"
+import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
 interface Notification {
   id: string
   title: string
@@ -17,50 +23,57 @@ interface Notification {
   read: boolean
   type: "invitation" | "reminder" | "update"
   eventId?: string
+  status?: string
+  paid?: boolean
 }
 
 export default function Navbar() {
+  const user = useAppSelector(currentUser)
+  const [invitations, setInvitations] = useState<any[]>([])
+  // const router = useRouter()
+  const dispatch = useDispatch()
+
+   const handleLogout = () => {
+    // Dispatch logout action to clear user data and token
+    logout()
+    dispatch(logOut())
+  
+    // router.push("/login")
+
+  }
+
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      const invitationData = await getAllInvitaions()
+      console.log(invitationData)
+      setInvitations(invitationData?.data?.data || [])
+    }
+      fetchInvitations()
+
+  }, [])
+console.log(invitations)
+  const notifications = invitations.map((invitation) => ({
+    id: invitation.id,
+    title: `Event Invitation: ${invitation.event.title}`,
+    message: invitation.invitationNote || `You've been invited to ${invitation.event.title}`,
+    time: new Date(invitation.createdAt).toLocaleDateString(),
+    read: false,
+    type: "invitation" as const,
+    eventId: invitation.eventId,
+    status: invitation.status,
+    paid: invitation.paid,
+  }))
+
   const isMobile = useMobile()
-  const [notifications] = useState<Notification[]>([
-    {
-      id: "1",
-      title: "Event Invitation",
-      message: "John invited you to 'Tech Conference 2025'",
-      time: "5 min ago",
-      read: false,
-      type: "invitation",
-      eventId: "event-123",
-    },
-    {
-      id: "2",
-      title: "Event Invitation",
-      message: "Sarah invited you to 'Team Building Workshop'",
-      time: "1 hour ago",
-      read: false,
-      type: "invitation",
-      eventId: "event-456",
-    },
-    {
-      id: "3",
-      title: "Reminder",
-      message: "Your event 'Team Meeting' starts in 1 hour",
-      time: "3 hours ago",
-      read: true,
-      type: "reminder",
-    },
-  ])
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
   const markAsRead = (
     // id: string
-  ) => {
-    
-  }
+  ) => {}
 
-  const markAllAsRead = () => {
-  
-  }
+  const markAllAsRead = () => {}
 
   const handleAcceptInvitation = (
     // id: string, eventId: string
@@ -68,8 +81,7 @@ export default function Navbar() {
 
   const handleDeclineInvitation = (
     // id: string, eventId: string
-  ) => {
-  }
+  ) => {}
 
   return (
     <nav className="w-full py-4 px-6 flex items-center justify-between border-b">
@@ -111,10 +123,25 @@ export default function Navbar() {
                 <Link href="/events" className="text-lg font-medium">
                   Events
                 </Link>
-                <Button variant="outline" className="justify-start">
-                 <Link href={'/login'} >Login</Link>
-                </Button>
-                <Button className="justify-start"><Link  href={'/register'}>Sign in</Link></Button>
+                {user ? (
+                  <>
+                    <Link href="/dashboard" className="text-lg font-medium">
+                      Dashboard
+                    </Link>
+                    <Button variant="outline" className="justify-start">
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" className="justify-start">
+                      <Link href="/login">Login</Link>
+                    </Button>
+                    <Button className="justify-start">
+                      <Link href="/register">Sign up</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>
@@ -127,18 +154,33 @@ export default function Navbar() {
           <Link href="/events" className="text-sm font-medium">
             Events
           </Link>
-          <Button variant="outline" className="justify-start">
-                 <Link href={'/login'} >Login</Link>
-                </Button>
-                <Button className="justify-start"><Link  href={'/register'}>Sign in</Link></Button>
-          <NotificationsDesktop
-            notifications={notifications}
-            unreadCount={unreadCount}
-            markAsRead={markAsRead}
-            markAllAsRead={markAllAsRead}
-            handleAcceptInvitation={handleAcceptInvitation}
-            handleDeclineInvitation={handleDeclineInvitation}
-          />
+          {user ? (
+            <>
+              <Link href="/dashboard" className="text-sm font-medium">
+                Dashboard
+              </Link>
+              <Button onClick={handleLogout} variant="outline" size="sm">
+                Logout
+              </Button>
+              <NotificationsDesktop
+                notifications={notifications}
+                unreadCount={notifications.filter((n) => !n.read).length}
+                markAsRead={markAsRead}
+                markAllAsRead={markAllAsRead}
+                handleAcceptInvitation={handleAcceptInvitation}
+                handleDeclineInvitation={handleDeclineInvitation}
+              />
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm">
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button size="sm">
+                <Link href="/register">Sign up</Link>
+              </Button>
+            </>
+          )}
         </div>
       )}
     </nav>
@@ -172,51 +214,63 @@ function NotificationsDesktop({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between border-b p-3">
-          <h3 className="font-medium">Notifications</h3>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-8">
-              Mark all as read
-            </Button>
-          )}
-        </div>
-        <div className="max-h-80 overflow-auto">
-          {notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 border-b last:border-0 ${notification.read ? "" : "bg-slate-50"}`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notification.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground">{notification.message}</p>
-
-                {notification.type === "invitation" && !notification.read && notification.eventId && (
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      size="sm"
-                      className="h-8 "
-                      onClick={() => handleAcceptInvitation(notification.id, notification.eventId!)}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 "
-                      onClick={() => handleDeclineInvitation(notification.id, notification.eventId!)}
-                    >
-                      Decline
-                    </Button>
+        <div className="w-80 p-0" align="end">
+          <div className="flex items-center justify-between border-b p-3">
+            <h3 className="font-medium">Invitations</h3>
+            {unreadCount > 0 && (
+              <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-8">
+                Mark all as read
+              </Button>
+            )}
+          </div>
+          <div className="max-h-80 overflow-auto">
+            {notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-3 border-b last:border-0 ${notification.read ? "" : "bg-slate-50"}`}
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-medium text-sm">{notification.title}</h4>
+                    <span className="text-xs text-muted-foreground">{notification.time}</span>
                   </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">No notifications</div>
-          )}
+                  <p className="text-sm text-muted-foreground">{notification.message}</p>
+                  <div className="mt-1 text-xs">
+                    <span
+                      className={`px-2 py-0.5 rounded-full ${notification.status === "PENDING" ? "bg-yellow-100 text-yellow-800" : notification.status === "ACCEPTED" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    >
+                      {notification.status}
+                    </span>
+                    {notification.paid && (
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-green-100 text-green-800">Paid</span>
+                    )}
+                  </div>
+
+                  {notification.status === "PENDING" && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        className="h-8"
+                        onClick={() => handleAcceptInvitation(notification.id, notification.eventId)}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8"
+                        onClick={() => handleDeclineInvitation(notification.id, notification.eventId)}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-muted-foreground">No invitations</div>
+            )}
+          </div>
         </div>
       </PopoverContent>
     </Popover>
@@ -250,48 +304,63 @@ function NotificationsMobile({
         </Button>
       </SheetTrigger>
       <SheetContent side="right">
-        <div className="flex items-center justify-between border-b pb-3 mt-6">
-          <h3 className="font-medium">Notifications</h3>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-8">
-              Mark all as read
-            </Button>
-          )}
-        </div>
-        <div className="mt-4 space-y-4">
-          {notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div key={notification.id} className={`p-3 border rounded-lg ${notification.read ? "" : "bg-slate-50"}`}>
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notification.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground">{notification.message}</p>
-
-                {notification.type === "invitation" && !notification.read && notification.eventId && (
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      size="sm"
-                      className="h-8 "
-                      onClick={() => handleAcceptInvitation(notification.id, notification.eventId!)}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 "
-                      onClick={() => handleDeclineInvitation(notification.id, notification.eventId!)}
-                    >
-                      Decline
-                    </Button>
+        <div>
+          <div className="flex items-center justify-between border-b pb-3 mt-6">
+            <h3 className="font-medium">Invitations</h3>
+            {unreadCount > 0 && (
+              <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-8">
+                Mark all as read
+              </Button>
+            )}
+          </div>
+          <div className="mt-4 space-y-4">
+            {notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-3 border rounded-lg ${notification.read ? "" : "bg-slate-50"}`}
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-medium text-sm">{notification.title}</h4>
+                    <span className="text-xs text-muted-foreground">{notification.time}</span>
                   </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">No notifications</div>
-          )}
+                  <p className="text-sm text-muted-foreground">{notification.message}</p>
+                  <div className="mt-1 text-xs">
+                    <span
+                      className={`px-2 py-0.5 rounded-full ${notification.status === "PENDING" ? "bg-yellow-100 text-yellow-800" : notification.status === "ACCEPTED" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                    >
+                      {notification.status}
+                    </span>
+                    {notification.paid && (
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-green-100 text-green-800">Paid</span>
+                    )}
+                  </div>
+
+                  {notification.status === "PENDING" && (
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        className="h-8"
+                        onClick={() => handleAcceptInvitation(notification.id, notification?.eventId)}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8"
+                        onClick={() => handleDeclineInvitation(notification.id, notification?.eventId)}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-muted-foreground">No invitations</div>
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>

@@ -92,5 +92,6 @@ export const reCaptchaTokenVerification = async (token: string) => {
 
 export const logout = async () => {
   const cookieStore = await cookies();
+  console.log({cookieStore})
   cookieStore.delete("accessToken");
 };

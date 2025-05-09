@@ -58,5 +58,28 @@ export const getAllInvitaions= async () => {
     console.log(error);
   }
 };
+// get all Invitation 
+
+export const getAllSentInvitaions= async () => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/sent-invitaions`, {
+      method: "GET",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   
