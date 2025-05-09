@@ -6,7 +6,8 @@ import pick from '../../app/shared/pick';
 // create reviews
 const createInvitaion = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const result = await InvitaionServices.createInvitaionDB(id, req.body);
+  const userId = req.user?.id
+  const result = await InvitaionServices.createInvitaionDB(id, req.body,userId);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
@@ -14,7 +15,7 @@ const createInvitaion = catchAsync(async (req, res, next) => {
     data: result,
   });
 });
-// create reviews
+// get reviews
 const getMyAllnvitaions = catchAsync(async (req, res, next) => {
   const email = req.user?.email
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -26,8 +27,31 @@ const getMyAllnvitaions = catchAsync(async (req, res, next) => {
     data: result,
   });
 });
+const getMySentInvitaions= catchAsync(async (req, res, next) => {
+  const id = req.user?.id
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+  const result = await InvitaionServices.getMyInvitedOnvitationsFromDB(options, id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'Invitaions retrived Successfully',
+    data: result,
+  });
+});
+const getSingleInvitaion= catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await InvitaionServices.getSingleInvitaionIntoDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'Invitaion retrived Successfully',
+    data: result,
+  });
+});
 
 export const InvitationController = {
   createInvitaion,
   getMyAllnvitaions,
+  getMySentInvitaions,
+  getSingleInvitaion
 };

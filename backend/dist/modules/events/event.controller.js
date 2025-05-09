@@ -25,6 +25,7 @@ const fileUploader_1 = require("../../app/helper/fileUploader");
 const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const file = req.file;
     const creatorId = req.user.id;
+    console.log(creatorId);
     // Simplified mapping to IFile
     const mappedFile = {
         // fileName: file.filename,

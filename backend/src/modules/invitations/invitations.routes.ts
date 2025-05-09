@@ -8,5 +8,9 @@ const router = express.Router()
 
 router.get('/',auth(Role.ADMIN,Role.USER),
     InvitationController.getMyAllnvitaions)
+router.get('/invitaion/:id',auth(Role.ADMIN,Role.USER),
+    InvitationController.getSingleInvitaion)
+router.get('/sent-invitaions',auth(Role.ADMIN,Role.USER),
+    InvitationController.getMySentInvitaions)
     
 export const InvitationRoutes = router

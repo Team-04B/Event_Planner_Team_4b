@@ -16,7 +16,7 @@ exports.InvitaionServices = void 0;
 const prisma_1 = __importDefault(require("../../app/shared/prisma"));
 const paginationHelper_1 = require("../../app/helper/paginationHelper");
 // create Invitaion
-const createInvitaionDB = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
+const createInvitaionDB = (id, data, userId) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(id, { data });
     yield prisma_1.default.event.findUniqueOrThrow({
         where: {
@@ -25,6 +25,7 @@ const createInvitaionDB = (id, data) => __awaiter(void 0, void 0, void 0, functi
     });
     const result = yield prisma_1.default.invitation.create({
         data: {
+            invitedById: userId,
             eventId: id,
             userEmail: data.userEmail,
             paid: data === null || data === void 0 ? void 0 : data.paid,
@@ -74,7 +75,40 @@ const getMyAllnvitaionsFromDB = (options, email) => __awaiter(void 0, void 0, vo
         data: result,
     };
 });
+const getMyInvitedOnvitationsFromDB = (options, id) => __awaiter(void 0, void 0, void 0, function* () {
+    const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
+    const result = yield prisma_1.default.invitation.findMany({
+        where: {
+            invitedById: id,
+        },
+        skip,
+        take: limit,
+        orderBy: options.sortBy && options.sortOrder
+            ? { [options.sortBy]: options.sortOrder }
+            : {
+                createdAt: 'desc',
+            },
+        include: {
+            event: true,
+            invitedUser: true
+        },
+    });
+    const total = yield prisma_1.default.invitation.count({
+        where: {
+            invitedById: id,
+        },
+    });
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+        },
+        data: result,
+    };
+});
 exports.InvitaionServices = {
     createInvitaionDB,
     getMyAllnvitaionsFromDB,
+    getMyInvitedOnvitationsFromDB
 };

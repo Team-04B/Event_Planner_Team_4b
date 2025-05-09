@@ -58,6 +58,10 @@ const getAllReviewFromDB=async (id:string)=>{
    const result = prisma.review.findMany({
    where:{
    eventId:id
+   },
+   include:{
+   event:true,
+   user:true
    }
    })
    return result;
