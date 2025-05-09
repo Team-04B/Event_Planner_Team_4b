@@ -38,13 +38,14 @@ console.log(data)
 
 // get all Invitation 
 
-export const getAllInvitaions= async () => {
+export const getAllInvitaions= async (page:any, limit:any) => {
   try {
     const token = (await cookies()).get("accessToken")?.value;
     if (!token) {
       throw new Error("Access token not found");
     }
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations`, {
+    console.log(limit,page)
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations?limit=${limit}&page=${page}`, {
       method: "GET",
       headers: {
         Authorization: token
