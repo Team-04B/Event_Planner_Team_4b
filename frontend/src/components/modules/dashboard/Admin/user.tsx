@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  MoreHorizontal,
-  Search,
-  UserPlus,
-} from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -27,113 +20,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { User } from "@/commonTypes/commonTypes";
+import { deleteUser } from "@/service/user";
+import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 // Mock user data
-const users = [
-  {
-    id: "1",
-    name: "Alex Johnson",
-    email: "alex@example.com",
-    role: "Admin",
-    status: "Active",
-    lastActive: "2 hours ago",
-  },
-  {
-    id: "2",
-    name: "Sarah Williams",
-    email: "sarah@example.com",
-    role: "User",
-    status: "Active",
-    lastActive: "1 day ago",
-  },
-  {
-    id: "3",
-    name: "Michael Brown",
-    email: "michael@example.com",
-    role: "Editor",
-    status: "Inactive",
-    lastActive: "1 week ago",
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily@example.com",
-    role: "User",
 
-    status: "Pending",
-    lastActive: "Just now",
-  },
-  {
-    id: "5",
-    name: "David Wilson",
-    email: "david@example.com",
-    role: "User",
-    status: "Active",
-    lastActive: "3 days ago",
-  },
-];
-
-export function UserManagementTable() {
+export function UserManagementTable({ userData, meta }: any) {
+  const router = useRouter();
+  const pathName = usePathname();
+  const rawParams = useSearchParams();
+  const searchParams = rawParams || new URLSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = Number(searchParams.get("limit")) || 10;
 
-  // Handle sorting
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+  const handleClickDeleteUser = async (id: string) => {
+    const userDelete = await deleteUser(id);
   };
 
-  // Filter and sort users
-  const filteredUsers = users
-    .filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      const fieldA = a[sortField as keyof typeof a];
-      const fieldB = b[sortField as keyof typeof b];
-
-      if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
-      if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-
-  // Render status badge with appropriate color
-  const renderStatusBadge = (status: string) => {
-    switch (status) {
-      case "Active":
-        return <Badge className="bg-green-500">{status}</Badge>;
-      case "Inactive":
-        return <Badge variant="secondary">{status}</Badge>;
-      case "Pending":
-        return (
-          <Badge
-            variant="outline"
-            className="text-yellow-600 border-yellow-600"
-          >
-            {status}
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const handleClickSearchQuery = (value: string) => {
+    setSearchTerm(value);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("searchTerm", value);
+    params.set("page", "1"); // Reset page to 1 on search change
+    if (!value) {
+      params.delete("searchTerm"); // Clear searchTerm if no value
     }
+    router.push(`${pathName}?${params.toString()}`, { scroll: false });
+  };
+
+  const handlePagination = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+    params.set("limit", limit.toString());
+    if (searchTerm) {
+      params.set("searchTerm", searchTerm); // Keep the searchTerm if set
+    } else {
+      params.delete("searchTerm"); // Clear searchTerm if not set
+    }
+    router.push(`${pathName}?${params.toString()}`, { scroll: false });
+  };
+
+  // Reset all search parameters
+  const resetSearchParams = () => {
+    const params = new URLSearchParams();
+    params.set("page", "1"); // Reset to first page
+    router.push(`${pathName}?${params.toString()}`, { scroll: false });
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">User Management</h2>
-        <Button className="flex items-center gap-2">
-          <UserPlus className="h-4 w-4" />
-          Add User
+        <Button variant="outline" onClick={resetSearchParams}>
+          Reset Filters
         </Button>
       </div>
 
@@ -144,8 +86,8 @@ export function UserManagementTable() {
             type="search"
             placeholder="Search users..."
             className="pl-8"
+            onChange={(e) => handleClickSearchQuery(e.target.value)}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -154,60 +96,14 @@ export function UserManagementTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
-                Name
-                {sortField === "name" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-1 inline h-4 w-4" />
-                  ))}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("email")}
-              >
-                Email
-                {sortField === "email" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-1 inline h-4 w-4" />
-                  ))}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("role")}
-              >
-                Role
-                {sortField === "role" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-1 inline h-4 w-4" />
-                  ))}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer"
-                onClick={() => handleSort("status")}
-              >
-                Status
-                {sortField === "status" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-1 inline h-4 w-4" />
-                  ))}
-              </TableHead>
-              <TableHead>Last Active</TableHead>
+              <TableHead>Full Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length === 0 ? (
+            {userData?.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -217,13 +113,11 @@ export function UserManagementTable() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
+              userData?.map((user: any) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{renderStatusBadge(user.status)}</TableCell>
-                  <TableCell>{user.lastActive}</TableCell>
+                  <TableCell className="font-medium">{user?.name}</TableCell>
+                  <TableCell>{user?.email}</TableCell>
+                  <TableCell>{user?.role}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -233,20 +127,11 @@ export function UserManagementTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit user</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        {user.status === "Active" ? (
-                          <DropdownMenuItem className="text-amber-600">
-                            Deactivate
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem className="text-green-600">
-                            Activate
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem
+                          onClick={() => handleClickDeleteUser(user?.id)}
+                          className="text-red-600 cursor-pointer"
+                        >
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -261,20 +146,22 @@ export function UserManagementTable() {
 
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {filteredUsers.length} of {users.length} users
+          Showing {userData?.length} of {meta?.total} users
         </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
-            disabled={filteredUsers.length === users.length}
+            disabled={page <= 1}
+            onClick={() => handlePagination(page - 1)}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            disabled={filteredUsers.length === users.length}
+            disabled={page >= Math.ceil(meta?.total / limit)}
+            onClick={() => handlePagination(page + 1)}
           >
             Next
           </Button>

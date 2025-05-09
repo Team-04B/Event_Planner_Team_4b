@@ -42,119 +42,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { deleteEvent } from "@/service/Events";
 
-// Sample data for demonstration
-const events = [
-  {
-    id: 1,
-    name: "Annual Conference 2024",
-    date: new Date(2024, 5, 15),
-    location: "Convention Center, New York",
-    attendees: 250,
-    status: "upcoming",
-    organizer: "Marketing Team",
-  },
-  {
-    id: 2,
-    name: "Product Launch",
-    date: new Date(2024, 6, 22),
-    location: "Tech Hub, San Francisco",
-    attendees: 120,
-    status: "upcoming",
-    organizer: "Product Team",
-  },
-  {
-    id: 3,
-    name: "Team Building Retreat",
-    date: new Date(2024, 4, 10),
-    location: "Mountain Resort, Colorado",
-    attendees: 45,
-    status: "completed",
-    organizer: "HR Department",
-  },
-  {
-    id: 4,
-    name: "Quarterly Review",
-    date: new Date(2024, 3, 5),
-    location: "Main Office, Chicago",
-    attendees: 30,
-    status: "completed",
-    organizer: "Executive Team",
-  },
-  {
-    id: 5,
-    name: "Industry Networking",
-    date: new Date(2024, 7, 18),
-    location: "Grand Hotel, Boston",
-    attendees: 180,
-    status: "upcoming",
-    organizer: "Business Development",
-  },
-  {
-    id: 6,
-    name: "Customer Appreciation Day",
-    date: new Date(2024, 2, 28),
-    location: "City Park, Austin",
-    attendees: 200,
-    status: "cancelled",
-    organizer: "Customer Success",
-  },
-  {
-    id: 7,
-    name: "Training Workshop",
-    date: new Date(2024, 8, 12),
-    location: "Learning Center, Seattle",
-    attendees: 75,
-    status: "upcoming",
-    organizer: "Training Department",
-  },
-];
-
-type SortField = "name" | "date" | "attendees" | null;
-type SortDirection = "asc" | "desc";
-
-export function EventManagementTable() {
+export function EventManagementTable({ eventData }: any) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
-  // Handle sorting
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+  const handileClickDeleteEvent = async (id: string) => {
+    const deleteEvents = await deleteEvent(id);
   };
-
-  // Filter and sort events
-  const filteredEvents = events
-    .filter(
-      (event) =>
-        (statusFilter === "all" || event.status === statusFilter) &&
-        (event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.organizer.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-    .sort((a, b) => {
-      if (!sortField) return 0;
-
-      const factor = sortDirection === "asc" ? 1 : -1;
-
-      if (sortField === "name") {
-        return a.name.localeCompare(b.name) * factor;
-      } else if (sortField === "date") {
-        return (a.date.getTime() - b.date.getTime()) * factor;
-      } else if (sortField === "attendees") {
-        return (a.attendees - b.attendees) * factor;
-      }
-
-      return 0;
-    });
-
-  // Status badge renderer
   const renderStatusBadge = (status: string) => {
     switch (status) {
       case "upcoming":
@@ -201,11 +96,6 @@ export function EventManagementTable() {
                 </SelectContent>
               </Select>
             </div>
-
-            <Button className="ml-auto">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Event
-            </Button>
           </div>
         </div>
 
@@ -213,33 +103,13 @@ export function EventManagementTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  <div className="flex items-center">
-                    Event Name
-                    {sortField === "name" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
-                  </div>
+                <TableHead className="cursor-pointer">
+                  <div className="flex items-center">Event Name</div>
                 </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("date")}
-                >
+                <TableHead className="cursor-pointer">
                   <div className="flex items-center">
                     <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
                     Date
-                    {sortField === "date" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
                   </div>
                 </TableHead>
                 <TableHead>
@@ -248,19 +118,10 @@ export function EventManagementTable() {
                     Location
                   </div>
                 </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("attendees")}
-                >
+                <TableHead className="cursor-pointer">
                   <div className="flex items-center">
                     <Users className="mr-2 h-4 w-4 text-muted-foreground" />
                     Attendees
-                    {sortField === "attendees" &&
-                      (sortDirection === "asc" ? (
-                        <ChevronUp className="ml-1 h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      ))}
                   </div>
                 </TableHead>
                 <TableHead>Status</TableHead>
@@ -269,21 +130,21 @@ export function EventManagementTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredEvents.length === 0 ? (
+              {eventData?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="h-24 text-center">
                     No events found.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredEvents.map((event) => (
-                  <TableRow key={event.id}>
+                eventData?.map((event: any) => (
+                  <TableRow key={event?.id}>
                     <TableCell className="font-medium">{event.name}</TableCell>
-                    <TableCell>{format(event.date, "MMM d, yyyy")}</TableCell>
-                    <TableCell>{event.location}</TableCell>
-                    <TableCell>{event.attendees}</TableCell>
-                    <TableCell>{renderStatusBadge(event.status)}</TableCell>
-                    <TableCell>{event.organizer}</TableCell>
+                    <TableCell>{format(event?.date, "MMM d, yyyy")}</TableCell>
+                    <TableCell>{event?.venue}</TableCell>
+                    <TableCell>{event?.attendees}</TableCell>
+                    <TableCell>{renderStatusBadge(event?.status)}</TableCell>
+                    <TableCell>{event?.organizer}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -293,16 +154,11 @@ export function EventManagementTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Event
-                          </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
+                            <Trash2
+                              onClick={() => handileClickDeleteEvent(event?.id)}
+                              className="mr-2 h-4 w-4"
+                            />
                             Delete Event
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -317,7 +173,7 @@ export function EventManagementTable() {
 
         <div className="flex items-center justify-between mt-4">
           <p className="text-sm text-muted-foreground">
-            Showing {filteredEvents.length} of {events.length} events
+            Showing {eventData.length} of {eventData.events} events
           </p>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" disabled>

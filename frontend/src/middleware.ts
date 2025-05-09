@@ -7,6 +7,7 @@ const authRoutes = ["/login", "/register"];
 
 const roleBasedPrivateRoutes = {
   USER: [/^\/dashboard/],
+
   ADMIN: [/^\/dashboard/],
 };
 

@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppSelector(currentUser);
   const token = useAppSelector(currentToken);
   const [userdata, setData] = React.useState<any>(null);
-
+  console.log(userdata, token);
   React.useEffect(() => {
     if (!user?.id || !token) return;
     fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${user?.id}`, {
