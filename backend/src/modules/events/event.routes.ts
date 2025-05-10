@@ -25,12 +25,15 @@ router.post(
 );
 
 //get all events
-router.get('/',auth(Role.USER,Role.ADMIN), EventController.getEvents);
+router.get('/', EventController.getEvents);
 
 // get event by id
-router.get('/:id',
-  // auth(Role.USER,Role.ADMIN), 
-  EventController.getEventById);
+
+router.get(
+  '/:id',
+  // auth(Role.USER,Role.ADMIN),
+  EventController.getEventById
+);
 
 // update event
 router.patch(
@@ -49,7 +52,6 @@ router.patch(
   auth(Role.USER),
   EventController.updateParticipantStatus
 );
-
 
 // Public events
 router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent);
@@ -73,8 +75,13 @@ router.get('/:id/reviews', ReviewController.getAllReviews);
 
 router.post(
   '/:id/invite',
-  auth(Role.ADMIN,Role.USER),
+  auth(Role.ADMIN, Role.USER),
   InvitationController.createInvitaion
+);
+router.get(
+  '/all-events',
+  // auth(Role.ADMIN, Role.USER),
+  EventController.getAllEvents
 );
 
 export const EventRoutes = router;

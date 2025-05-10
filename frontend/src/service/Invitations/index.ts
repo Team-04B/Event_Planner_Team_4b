@@ -1,9 +1,9 @@
 "use server";
 import { getValidToken } from "@/lib/verifyToken";
-import { cookies } from "next/headers";
 
 // export const GetAllBlog = async () => {
 //   try {
+
 //     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/blog`, {
 //       method: "GET",
 //       headers: {

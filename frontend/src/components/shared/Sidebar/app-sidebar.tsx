@@ -40,7 +40,7 @@ const data = {
   navMain: [
     {
       title: "Overview",
-      url: "/dashboard",
+      url: "/dashboard/user-overivew",
       icon: SquareTerminal,
       isActive: true,
     },

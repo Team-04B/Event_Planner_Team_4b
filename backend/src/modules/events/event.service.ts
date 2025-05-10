@@ -11,7 +11,6 @@ import httpStatus from 'http-status';
 const createEventIntoDB = async (payload: Event) => {
   const result = await prisma.event.create({
     data: payload,
-    
   });
   return result;
 };
@@ -77,8 +76,12 @@ const getEventsFromDB = async (
   const now = new Date();
 
   // Segment the events
-  const completedEvents = allEvents.filter(event => new Date(event.dateTime) < now);
-  const upcomingEvents = allEvents.filter(event => new Date(event.dateTime) >= now);
+  const completedEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) < now
+  );
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) >= now
+  );
 
   // Paginate the allEvents list
   const paginatedData = allEvents.slice(skip, skip + limit);
@@ -93,7 +96,7 @@ const getEventsFromDB = async (
       paginatedData,
       completed: completedEvents,
       upcoming: upcomingEvents,
-      all: allEvents
+      all: allEvents,
     },
   };
 };
@@ -103,13 +106,12 @@ const getEventByIdFromDB = async (id: string): Promise<Event | null> => {
   const result = await prisma.event.findUnique({
     where: {
       id,
-      
     },
     include: {
-      creator:true,
-      participations:true,
-      invitations:true
-    }
+      creator: true,
+      participations: true,
+      invitations: true,
+    },
   });
   return result;
 };
@@ -252,7 +254,6 @@ const deleteEventFromDB = async (id: string): Promise<Event> => {
 //   return createParticipation;
 // };
 
-
 //
 const joinToPublicEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
@@ -276,7 +277,6 @@ const joinToPublicEvent = async (eventId: string, userId: string) => {
   return participation;
 };
 
-
 // handle paid event
 const requestToPaidEvent = async (eventId: string, userId: string) => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
@@ -284,7 +284,7 @@ const requestToPaidEvent = async (eventId: string, userId: string) => {
 
   if (event.isPublic)
     throw new ApiError(httpStatus.BAD_REQUEST, 'Not a private event');
-  
+
   const alreadyRequested = await prisma.participation.findFirst({
     where: { eventId, userId },
   });
@@ -317,6 +317,83 @@ const updateParticipantStatus = async (
   return result;
 };
 
+const getAllEventsFromDB = async (
+  filters: IEventFilterRequest,
+  options: IPaginationOptions
+) => {
+  const { limit, page, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = filters;
+
+  const andConditions: Prisma.EventWhereInput[] = [];
+
+  // Search term filter
+  if (searchTerm) {
+    andConditions.push({
+      OR: eventSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+
+  // Other filters
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  // Filter by creatorId
+
+  const whereConditions: Prisma.EventWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  // Fetch all events
+  const allEvents = await prisma.event.findMany({
+    where: whereConditions,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+  });
+
+  // Today's date
+  const now = new Date();
+
+  // Segment the events
+  const completedEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) < now
+  );
+  const upcomingEvents = allEvents.filter(
+    (event) => new Date(event.dateTime) >= now
+  );
+
+  // Paginate the allEvents list
+  const paginatedData = allEvents.slice(skip, skip + limit);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total: allEvents.length,
+    },
+    data: {
+      paginatedData,
+      completed: completedEvents,
+      upcoming: upcomingEvents,
+      all: allEvents,
+    },
+  };
+};
+
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
@@ -326,4 +403,5 @@ export const EventService = {
   joinToPublicEvent,
   requestToPaidEvent,
   updateParticipantStatus,
+  getAllEventsFromDB,
 };
