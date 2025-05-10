@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Calendar, ChevronLeft, ChevronRight, Filter, MapPin, MoreHorizontal } from "lucide-react"
+import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Filter, MapPin, MoreHorizontal, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -333,6 +333,7 @@ export default function DashboardContent() {
                 <TableHead className="w-[250px]">Date & Venue</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Payment</TableHead>
+                <TableHead>Payment Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -374,9 +375,13 @@ export default function DashboardContent() {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      {invitation.paid && (
+                      {invitation.paid ? (
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                          Paid
+                          Payable Balance
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Not Payable
                         </Badge>
                       )}
                       {invitation.event.isPaid && (
@@ -387,6 +392,23 @@ export default function DashboardContent() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
+                    {invitation?.paid ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Paid
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1"
+                      >
+                        <XCircle className="w-4 h-4" /> Not Paid
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
                     {invitation.status === "PENDING" ? (
                       <div className="flex justify-end gap-2">
                         <Button size="sm">Accept</Button>
@@ -394,8 +416,35 @@ export default function DashboardContent() {
                           Decline
                         </Button>
                         <Button variant="outline" size="sm" asChild>
-                              <Link href={`/dashboard/invitations/${invitation.id}`}>View</Link>
-                            </Button>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View</Link>
+                        </Button>
+                      </div>
+                    ) : invitation.status === "ACCEPTED" && invitation.event.isPaid && !invitation.paid ? (
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                          Pay Now
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View</Link>
+                        </Button>
+                      </div>
+                    ) : invitation.status === "ACCEPTED" && invitation.paid ? (
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" disabled>
+                          Accepted
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View Attachment</Link>
+                        </Button>
+                      </div>
+                    ) : invitation.status === "DECLINED" ? (
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" disabled>
+                          Declined
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View Attachment</Link>
+                        </Button>
                       </div>
                     ) : (
                       <DropdownMenu>
@@ -408,7 +457,7 @@ export default function DashboardContent() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>View Details</DropdownMenuItem>
                           <DropdownMenuItem>
-                          <Link href={''}>Contact Organizer</Link>
+                            <Link href={""}>Contact Organizer</Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem>Add to Calendar</DropdownMenuItem>
                         </DropdownMenuContent>
