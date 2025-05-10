@@ -63,10 +63,9 @@ const initPayment = async (payload:any,userId:string) => {
         }
     })
     const paymentInitData = await response.data
-    console.log(paymentInitData?.GatewayPageURL)
-
+    
     if (event?.fee == null) {
-    throw new Error("Event fee is missing.");
+        throw new Error("Event fee is missing.");
     }
 
     const isPaymentInitExist = await prisma.payment.findFirst({
@@ -74,11 +73,11 @@ const initPayment = async (payload:any,userId:string) => {
             transactionId:userId+event.id
         }
     })
-
+    
     if(isPaymentInitExist){
         throw new ApiError(httpStatus.BAD_REQUEST,"Already Payment Inted Created!")
     }
-
+    
     await prisma.payment.create({
         data:{
             userId,
@@ -89,12 +88,14 @@ const initPayment = async (payload:any,userId:string) => {
         }
     })
 
-
-    return {
-        paymentUrl:paymentInitData?.GetewayPageURL
-    }
+    
+    console.log(paymentInitData?.GatewayPageURL,'1')
+    const paymentUrl = paymentInitData?.GatewayPageURL
+    console.log(paymentUrl,'2')
+    return paymentUrl
+    
     } catch (error) {
-        throw new ApiError(httpStatus.BAD_REQUEST,"Payment Error Occured")
+        throw new ApiError(httpStatus.BAD_REQUEST,`Payment Error Occured${error?.message}`)
     }
     // const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
     // sslcz.init(data).then(apiResponse => {

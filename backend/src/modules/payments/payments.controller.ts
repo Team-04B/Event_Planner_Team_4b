@@ -12,6 +12,8 @@ const initPayment = catchAsync(async(req,res)=>{
     
     const result = await PaymentService.initPayment(payload,user.id);
 
+    console.log(result,'asdfsadfsdafsa')
+
     sendResponse(res,{
         statusCode: httpStatus.OK,
         success:true,

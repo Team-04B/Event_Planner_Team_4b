@@ -43,7 +43,7 @@ export const getAllEvents = async (filters = {}) => {
       }
     });
 
-    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events${
+    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events/all${
       query.toString() ? `?${query.toString()}` : ""
     }`;
 

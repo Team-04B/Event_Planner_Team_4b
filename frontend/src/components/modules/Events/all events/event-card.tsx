@@ -105,7 +105,7 @@ export function EventCard({ event }: { event: Event }) {
       </CardContent>
 
       <CardFooter>
-        <Link href={`/events/${event.id}`} className="w-full mb-4">View Detailsaaa</Link>
+        <Link href={`/events/${event.id}`} className="w-full mb-4"><Button>View Details</Button></Link>
       </CardFooter>
     </Card>
   );
