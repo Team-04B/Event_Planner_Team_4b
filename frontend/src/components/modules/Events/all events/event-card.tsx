@@ -76,7 +76,7 @@ export function EventCard({ event }: { event: Event }) {
         </div>
       </div>
 
-      <CardHeader className="pb-2">
+      <CardHeader className="">
         <CardTitle className="line-clamp-1">{event.title}</CardTitle>
         <CardDescription className="flex items-center gap-1">
           <User className="h-3 w-3" />
@@ -84,7 +84,7 @@ export function EventCard({ event }: { event: Event }) {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="pb-2 flex-grow">
+      <CardContent className=" flex-grow">
         <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
           {event.description}
         </p>
@@ -105,7 +105,9 @@ export function EventCard({ event }: { event: Event }) {
       </CardContent>
 
       <CardFooter>
-        <Link href={`/events/${event.id}`} className="w-full mb-4">View Detailsaaa</Link>
+        <Link href={`/events/${event.id}`} className="w-full mb-4">
+          <Button className="w-full">View Details</Button>
+        </Link>
       </CardFooter>
     </Card>
   );
