@@ -7,7 +7,8 @@ import { ReviewValidations } from '../reviews/reviews.validation';
 import { InvitationController } from '../invitations/invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
-import { fileUploder } from '../../app/helper/fileUploader';
+// import { fileUploder } from '../../app/helper/fileUploader';
+import { multerUpload } from '../../app/config/multer-config';
 
 const router = express.Router();
 
@@ -15,7 +16,8 @@ const router = express.Router();
 router.post(
   '/',
   auth(Role.USER),
-  fileUploder.upload.single('file'),
+  multerUpload.single('file'),
+  // fileUploder.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
@@ -24,8 +26,7 @@ router.post(
   EventController.createEvent
 );
 
-
-// get all events 
+// get all events
 router.get('/', EventController.getAllEvents);
 
 //get all events by user
@@ -42,13 +43,13 @@ router.get(
 router.patch(
   '/:id',
   auth(Role.USER),
-  fileUploder.upload.single('file'),
+  // fileUploder.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   },
   validateRequest(EventValidations.updateEventZodSchema),
-  EventController.updateEvent
+  // EventController.updateEvent
 );
 
 // delete event from db
