@@ -1,4 +1,5 @@
-"use server"
+"use server";
+import { getValidToken } from "@/lib/verifyToken";
 import { cookies } from "next/headers";
 
 // export const GetAllBlog = async () => {
@@ -46,28 +47,23 @@ import { cookies } from "next/headers";
 //   }
 // };
 
-
-
-
-export const CreateInvitaion = async (data:any) => {
-console.log(data)
+export const CreateInvitaion = async (data: any) => {
+  const token = await getValidToken();
   try {
-    const token = (await cookies()).get("accessToken")?.value;
-  console.log({token})
-      if (!token) {
-        throw new Error("Access token not found");
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/events/${data?.eventId}/invite`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       }
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_API}/events/${data?.eventId}/invite`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: token,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data), 
-        }
-      );
+    );
 
     // if (!response.ok) {
     //   throw new Error(`Request failed with status: ${response.status}`);
@@ -80,29 +76,24 @@ console.log(data)
   }
 };
 
+// get all Invitation
 
-
-// get all Invitation 
-
-export const getAllInvitaions= async () => {
+export const getAllInvitaions = async () => {
+  const token = await getValidToken();
   try {
-    const token = (await cookies()).get("accessToken")?.value;
     if (!token) {
       throw new Error("Access token not found");
     }
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations`, {
       method: "GET",
       headers: {
-        Authorization: token
+        Authorization: token,
       },
       credentials: "include",
-    },
-    );
+    });
     const result = await res.json();
     return result;
   } catch (error) {
     console.log(error);
   }
 };
-
-  

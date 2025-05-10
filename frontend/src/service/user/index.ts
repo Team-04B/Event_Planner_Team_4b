@@ -20,7 +20,7 @@ export const getAllUser = async (query: {
 }) => {
   const params = new URLSearchParams();
   const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken");
+  const token = cookieStore.get("accessToken")?.value;
   if (query?.searchTerm) {
     params.append("searchTerm", query.searchTerm.toString());
   }

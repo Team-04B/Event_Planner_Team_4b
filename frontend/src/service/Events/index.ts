@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { getValidToken } from "@/lib/verifyToken";
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
-
 // create event
 export const createEvent = async (
   eventData: FormData,
-  token: string | null
+  tokens: string | null
 ) => {
+  const token = await getValidToken();
   try {
     if (!token) {
       throw new Error("No access token found in cookies.");
@@ -33,10 +33,9 @@ export const createEvent = async (
 
 export const getAllEventsByUserId = async (filters = {}) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("accessToken")?.value;
+    const token = await getValidToken();
 
-    if (!accessToken) {
+    if (!token) {
       throw new Error("No access token found in cookies.");
     }
 
@@ -60,7 +59,7 @@ export const getAllEventsByUserId = async (filters = {}) => {
     const res = await fetch(url, {
       method: "GET",
       headers: {
-        Authorization: accessToken,
+        Authorization: token,
       },
       credentials: "include",
       cache: "no-store", // Ensure we don't cache the results
@@ -94,10 +93,8 @@ export const getAllEventsByUserId = async (filters = {}) => {
 
 export const getEventById = async (eventId: string) => {
   try {
-    const cookieStore = cookies();
-    const accessToken = (await cookieStore).get("accessToken")?.value;
-
-    if (!accessToken) {
+    const token = await getValidToken();
+    if (!token) {
       throw new Error("No access token found in cookies.");
     }
 
@@ -106,7 +103,7 @@ export const getEventById = async (eventId: string) => {
       {
         method: "GET",
         headers: {
-          Authorization: accessToken,
+          Authorization: token,
         },
         credentials: "include",
         cache: "no-store", // Ensure we don't cache the results
@@ -131,10 +128,9 @@ export const getEventById = async (eventId: string) => {
 
 export const deleteEvent = async (eventId: string) => {
   try {
-    const cookieStore = cookies();
-    const accessToken = (await cookieStore).get("accessToken")?.value;
+    const token = await getValidToken();
 
-    if (!accessToken) {
+    if (!token) {
       throw new Error("No access token found in cookies.");
     }
 
@@ -143,7 +139,7 @@ export const deleteEvent = async (eventId: string) => {
       {
         method: "DELETE",
         headers: {
-          Authorization: accessToken,
+          Authorization: token,
         },
         credentials: "include",
       }
@@ -165,9 +161,7 @@ export const deleteEvent = async (eventId: string) => {
 };
 
 export const getAllEvents = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken");
-  console.log(token);
+  const token = await getValidToken();
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events`, {
       next: { tags: ["EVENT"] },
@@ -182,5 +176,65 @@ export const getAllEvents = async () => {
     return result;
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const getAllEventsDb = async (filters = {}) => {
+  try {
+    const token = await getValidToken();
+
+    if (!token) {
+      throw new Error("No access token found in cookies.");
+    }
+
+    // Convert filters object to URL query parameters
+    const queryParams = new URLSearchParams();
+
+    // Add each filter to the query params
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        queryParams.append(key, String(value));
+      }
+    });
+
+    // Build the URL with query parameters
+    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events/all-events${
+      queryParams.toString() ? `?${queryParams.toString()}` : ""
+    }`;
+
+    // console.log("Fetching events with URL:", url)
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: token,
+      },
+      credentials: "include",
+      cache: "no-store", // Ensure we don't cache the results
+    });
+
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error: any) {
+    // console.error("Event fetch error:", error)
+    return {
+      success: false,
+      error: error.message || "Unknown error",
+      data: {
+        all: [],
+        completed: [],
+        upcoming: [],
+        paginatedData: [],
+      },
+      meta: {
+        page: 1,
+        limit: 10,
+        total: 0,
+      },
+    };
   }
 };
