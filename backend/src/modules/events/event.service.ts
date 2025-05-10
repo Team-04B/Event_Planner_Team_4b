@@ -412,6 +412,15 @@ const updateParticipantStatus = async (
   return result;
 };
 
+const adminDeletedEventFromDB = async (eventId: string) => {
+  const result = await prisma.event.delete({
+    where: {
+      id: eventId,
+    },
+  });
+  return result;
+};
+
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
@@ -422,4 +431,5 @@ export const EventService = {
   joinToPublicEvent,
   requestToPaidEvent,
   updateParticipantStatus,
+  adminDeletedEventFromDB,
 };

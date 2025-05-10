@@ -298,6 +298,10 @@ const updateParticipantStatus = catchAsync(async (req, res) => {
   });
 });
 
+
+// const adminDeleteEvent = catchAsync(async(req,res)=> {
+//   const 
+// })
 export const EventController = {
   createEvent,
   getEvents,
@@ -308,4 +312,5 @@ export const EventController = {
   handleJoinEvent,
   handleRequestEvent,
   updateParticipantStatus,
+  // adminDeleteEvent,
 };

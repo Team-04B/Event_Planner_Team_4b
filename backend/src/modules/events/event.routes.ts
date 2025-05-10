@@ -44,16 +44,20 @@ router.patch(
   '/:id',
   auth(Role.USER),
   // fileUploder.upload.single('file'),
+  multerUpload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   },
-  validateRequest(EventValidations.updateEventZodSchema),
+  validateRequest(EventValidations.updateEventZodSchema)
   // EventController.updateEvent
 );
 
 // delete event from db
 router.delete('/:id', auth(Role.USER), EventController.deleteFromDB);
+
+// admin delete event
+router.delete('/deleteEvent', auth(Role.ADMIN), )
 
 // updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
 router.patch(
