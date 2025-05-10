@@ -13,14 +13,17 @@ const reviews_validation_1 = require("../reviews/reviews.validation");
 const invitations_controller_1 = require("../invitations/invitations.controller");
 const auth_1 = __importDefault(require("../../app/middleWares/auth"));
 const client_1 = require("@prisma/client");
-const fileUploader_1 = require("../../app/helper/fileUploader");
+// import { fileUploder } from '../../app/helper/fileUploader';
+const multer_config_1 = require("../../app/config/multer-config");
 const router = express_1.default.Router();
 //create event
-router.post('/', (0, auth_1.default)(client_1.Role.USER), fileUploader_1.fileUploder.upload.single('file'), (req, res, next) => {
+router.post('/', (0, auth_1.default)(client_1.Role.USER), multer_config_1.multerUpload.single('file'), 
+// fileUploder.upload.single('file'),
+(req, res, next) => {
     req.body = JSON.parse(req.body.data);
     next();
 }, (0, validationRequest_1.validateRequest)(event_validation_1.EventValidations.createEventZodSchema), event_controller_1.EventController.createEvent);
-// get all events 
+// get all events
 router.get('/', event_controller_1.EventController.getAllEvents);
 //get all events by user
 router.get('/', (0, auth_1.default)(client_1.Role.USER, client_1.Role.ADMIN), event_controller_1.EventController.getEvents);
@@ -29,12 +32,18 @@ router.get('/:id',
 // auth(Role.USER,Role.ADMIN),
 event_controller_1.EventController.getEventById);
 // update event
-router.patch('/:id', (0, auth_1.default)(client_1.Role.USER), fileUploader_1.fileUploder.upload.single('file'), (req, res, next) => {
+router.patch('/:id', (0, auth_1.default)(client_1.Role.USER), 
+// fileUploder.upload.single('file'),
+multer_config_1.multerUpload.single('file'), (req, res, next) => {
     req.body = JSON.parse(req.body.data);
     next();
-}, (0, validationRequest_1.validateRequest)(event_validation_1.EventValidations.updateEventZodSchema), event_controller_1.EventController.updateEvent);
+}, (0, validationRequest_1.validateRequest)(event_validation_1.EventValidations.updateEventZodSchema)
+// EventController.updateEvent
+);
 // delete event from db
 router.delete('/:id', (0, auth_1.default)(client_1.Role.USER), event_controller_1.EventController.deleteFromDB);
+// admin delete event
+router.delete('/deleteEvent', (0, auth_1.default)(client_1.Role.ADMIN));
 // updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
 router.patch('/:id/participants/:participantId/status', (0, auth_1.default)(client_1.Role.USER), event_controller_1.EventController.updateParticipantStatus);
 // Public events

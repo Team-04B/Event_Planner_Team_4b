@@ -9,6 +9,9 @@ dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
 exports.default = {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
+    cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
+    cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
     jwt: {
         jwt_scret: process.env.JWT_SECRET,
         expires_in: process.env.EXPIRES_IN,
@@ -19,5 +22,5 @@ exports.default = {
     reset_password_expires_in: process.env.RESET_PASS_TOKEN_EXPIRES_IN,
     reset_password_link: process.env.RESET_PASSWORD_LINK,
     email: process.env.EMAIL,
-    app_password: process.env.APP_PASSWORD
+    app_password: process.env.APP_PASSWORD,
 };
