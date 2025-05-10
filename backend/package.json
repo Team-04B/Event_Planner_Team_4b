@@ -26,7 +26,6 @@
     "@prisma/client": "^6.7.0",
     "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -35,6 +34,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2",
     "sslcommerz-lts": "^1.1.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "ts-node-dev": "^2.0.0",
     "vercel": "^41.7.0",
     "zod": "^3.24.3"

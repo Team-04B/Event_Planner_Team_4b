@@ -302,10 +302,13 @@ export function EditEventDialog({ eventId, open, onOpenChange, onEventUpdated }:
                         <Image
                           src={imagePreview || "/placeholder.svg"}
                           alt="Event preview"
-                          className="h-full w-full object-cover"
+                          width={400}
+                          height={300}  
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=128&width=256"
                           }}
+                          unoptimized={imagePreview?.startsWith("http") ? false : true}
                         />
                       </div>
                     ) : (

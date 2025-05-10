@@ -107,8 +107,21 @@ const getMyInvitedOnvitationsFromDB = (options, id) => __awaiter(void 0, void 0,
         data: result,
     };
 });
+const getSingleInvitaionIntoDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.invitation.findUniqueOrThrow({
+        where: {
+            id
+        },
+        include: {
+            invitedBy: true,
+            event: true,
+        }
+    });
+    return result;
+});
 exports.InvitaionServices = {
     createInvitaionDB,
     getMyAllnvitaionsFromDB,
-    getMyInvitedOnvitationsFromDB
+    getMyInvitedOnvitationsFromDB,
+    getSingleInvitaionIntoDB
 };

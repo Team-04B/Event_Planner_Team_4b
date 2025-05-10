@@ -6,33 +6,41 @@ import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
-import { fileUploder } from '../../app/helper/fileUploader';
+// import { fileUploder } from '../../app/helper/fileUploader';
 import { IFile } from '../../app/interface/file';
 
 // create event
 const createEvent = catchAsync(async (req, res) => {
-  const file = req.file as Express.Multer.File;
+  // const file = req.file as Express.Multer.File;
+  const file = req.file;
+  console.log(file);
+  if (!file) {
+    throw new Error('Image file is required');
+  }
+
   const creatorId = req.user.id;
-console.log(creatorId)
-  // Simplified mapping to IFile
-  const mappedFile: IFile = {
-    // fileName: file.filename,
-    orginalname: file.originalname,
-    encoding: file.encoding,
-    mimetype: file.mimetype,
-    destination: file.destination,
-    filename: file.filename,
-    path: file.path,
-    size: file.size,
-  };
+  // console.log(creatorId)
+  //   // Simplified mapping to IFile
+  //   const mappedFile: IFile = {
+  //     // fileName: file.filename,
+  //     orginalname: file.originalname,
+  //     encoding: file.encoding,
+  //     mimetype: file.mimetype,
+  //     destination: file.destination,
+  //     filename: file.filename,
+  //     path: file.path,
+  //     size: file.size,
+  //   };
 
   // console.log(eventData);
 
   // Upload the file to Cloudinary
-  const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+  // const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+
   const eventData = {
     ...req.body,
-    eventImgUrl: uploadedImage?.secure_url, // set image URL
+    // eventImgUrl: uploadedImage?.secure_url, // set image URL
+    eventImgUrl: file.path,
   };
   const result = await EventService.createEventIntoDB(eventData, creatorId);
 
@@ -48,7 +56,6 @@ console.log(creatorId)
 const getAllEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-
 
   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
   const filters: IEventFilterRequest = {
@@ -152,49 +159,47 @@ const getEventById = catchAsync(async (req, res) => {
 });
 
 //update event
-const updateEvent = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const creatorId = req.user.id;
-  let eventData = {
-     ...req.body,
-      creatorId,
-  };
+// const updateEvent = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   const creatorId = req.user.id;
+//   let eventData = {
+//     ...req.body,
+//     creatorId,
+//   };
 
-  if(req.file){
+//   if (req.file) {
+//     const file = req.file as Express.Multer.File;
 
-    const file = req.file as Express.Multer.File;
-    
-    // Simplified mapping to IFile
-    const mappedFile: IFile = {
-      // fileName: file.filename,
-      orginalname: file.originalname,
-      encoding: file.encoding,
-      mimetype: file.mimetype,
-      destination: file.destination,
-      filename: file.filename,
-      path: file.path,
-      size: file.size,
-    };
-    // console.log(eventData);
-  
-    // Upload the file to Cloudinary
-    const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
-    eventData = {
-      ...req.body,
-      creatorId,
-      eventImgUrl: uploadedImage?.secure_url, // set image URL
-    };
-  }
+//     // Simplified mapping to IFile
+//     const mappedFile: IFile = {
+//       // fileName: file.filename,
+//       orginalname: file.originalname,
+//       encoding: file.encoding,
+//       mimetype: file.mimetype,
+//       destination: file.destination,
+//       filename: file.filename,
+//       path: file.path,
+//       size: file.size,
+//     };
+//     // console.log(eventData);
 
+//     // Upload the file to Cloudinary
+//     const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+//     eventData = {
+//       ...req.body,
+//       creatorId,
+//       eventImgUrl: uploadedImage?.secure_url, // set image URL
+//     };
+//   }
 
-  const result = await EventService.updateEventIntoDB(id, eventData);
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'Event updated successfully',
-    data: result,
-  });
-});
+//   const result = await EventService.updateEventIntoDB(id, eventData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: 'Event updated successfully',
+//     data: result,
+//   });
+// });
 
 // delete event
 const deleteFromDB = catchAsync(async (req, res) => {
@@ -293,14 +298,19 @@ const updateParticipantStatus = catchAsync(async (req, res) => {
   });
 });
 
+
+// const adminDeleteEvent = catchAsync(async(req,res)=> {
+//   const 
+// })
 export const EventController = {
   createEvent,
   getEvents,
   getAllEvents,
   getEventById,
-  updateEvent,
+  // updateEvent,
   deleteFromDB,
   handleJoinEvent,
   handleRequestEvent,
   updateParticipantStatus,
+  // adminDeleteEvent,
 };

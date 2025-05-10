@@ -70,7 +70,7 @@ const getAllEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 
             creator: true,
             reviews: true,
             invitations: true,
-            participations: true
+            participations: true,
         },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
@@ -141,7 +141,7 @@ const getEventsFromDB = (filters, options, creatorId) => __awaiter(void 0, void 
             creator: true,
             reviews: true,
             invitations: true,
-            participations: true
+            participations: true,
         },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
@@ -350,6 +350,14 @@ const updateParticipantStatus = (id, data) => __awaiter(void 0, void 0, void 0, 
     });
     return result;
 });
+const adminDeletedEventFromDB = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.event.delete({
+        where: {
+            id: eventId,
+        },
+    });
+    return result;
+});
 exports.EventService = {
     createEventIntoDB,
     getEventsFromDB,
@@ -360,4 +368,5 @@ exports.EventService = {
     joinToPublicEvent,
     requestToPaidEvent,
     updateParticipantStatus,
+    adminDeletedEventFromDB,
 };

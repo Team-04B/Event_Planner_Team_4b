@@ -56,8 +56,19 @@ const getMySentInvitaions = (0, catchAsync_1.catchAsync)((req, res, next) => __a
         data: result,
     });
 }));
+const getSingleInvitaion = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield invitations_service_1.InvitaionServices.getSingleInvitaionIntoDB(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.CREATED,
+        message: 'Invitaion retrived Successfully',
+        data: result,
+    });
+}));
 exports.InvitationController = {
     createInvitaion,
     getMyAllnvitaions,
-    getMySentInvitaions
+    getMySentInvitaions,
+    getSingleInvitaion
 };
