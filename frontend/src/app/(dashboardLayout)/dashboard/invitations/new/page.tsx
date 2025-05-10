@@ -3,7 +3,7 @@ import { getAllEventsByUserId } from "@/service/Events";
 import { getAllUser } from "@/service/user";
 
 const page = async () => {
-  const allusers = await getAllUser();
+  const allusers = await getAllUser({ undefined });
   const allEvents = await getAllEventsByUserId();
   const userDatas = allusers?.data;
   console.log(userDatas, "user data");

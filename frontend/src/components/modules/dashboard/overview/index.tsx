@@ -4,7 +4,15 @@ import { useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { PencilIcon, UserIcon, DollarSignIcon } from "lucide-react";
 
-export default function AnalyticsDashboard() {
+export default function AnalyticsDashboard({
+  totalEvnets,
+  totalAttendance,
+  totalRevenu,
+}: {
+  totalEvnets: number;
+  totalAttendance: number;
+  totalRevenu: number;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -138,11 +146,18 @@ export default function AnalyticsDashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="bg-purple-50 flex flex-col items-center justify-center py-4">
+          <div className="w-8 h-8 rounded-full bg-purple-400 flex items-center justify-center mb-2">
+            <DollarSignIcon className="h-4 w-4 text-white" />
+          </div>
+          <div className="text-3xl font-bold text-gray-800">${totalRevenu}</div>
+          <div className="text-purple-700 text-sm">Revenue</div>
+        </Card>
         <Card className="bg-emerald-50 flex flex-col items-center justify-center py-4">
           <div className="w-8 h-8 rounded-full bg-emerald-400 flex items-center justify-center mb-2">
             <PencilIcon className="h-4 w-4 text-white" />
           </div>
-          <div className="text-3xl font-bold text-gray-800">5</div>
+          <div className="text-3xl font-bold text-gray-800">{totalEvnets}</div>
           <div className="text-emerald-700 text-sm">Total Event</div>
         </Card>
 
@@ -150,16 +165,10 @@ export default function AnalyticsDashboard() {
           <div className="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center mb-2">
             <UserIcon className="h-4 w-4 text-white" />
           </div>
-          <div className="text-3xl font-bold text-gray-800">128</div>
-          <div className="text-blue-700 text-sm">Total User</div>
-        </Card>
-
-        <Card className="bg-purple-50 flex flex-col items-center justify-center py-4">
-          <div className="w-8 h-8 rounded-full bg-purple-400 flex items-center justify-center mb-2">
-            <DollarSignIcon className="h-4 w-4 text-white" />
+          <div className="text-3xl font-bold text-gray-800">
+            {totalAttendance}
           </div>
-          <div className="text-3xl font-bold text-gray-800">$8,540</div>
-          <div className="text-purple-700 text-sm">Revenue</div>
+          <div className="text-blue-700 text-sm">Total Attendance</div>
         </Card>
       </div>
     </div>
