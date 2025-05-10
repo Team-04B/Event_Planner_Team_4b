@@ -16,5 +16,14 @@ export default {
     reset_password_expires_in:process.env.RESET_PASS_TOKEN_EXPIRES_IN,
     reset_password_link:process.env.RESET_PASSWORD_LINK,
     email:process.env.EMAIL,
-    app_password:process.env.APP_PASSWORD
+    app_password:process.env.APP_PASSWORD,
+    ssl:{
+        storeId:process.env.STORE_ID,
+        storePass:process.env.STORE_PASS,
+        successUrl:process.env.PAYMENT_SUCCESS_URL,
+        cancelUrl:process.env.PAYMENT_CANCEL_URL,
+        failUrl:process.env.PAYMENT_FAILD_URL,
+        sslPaymentApi:process.env.SSL_PAYMENT_API,
+        sslValidationApi:process.env.SSL_VALIDATION_API,
+    }
 }

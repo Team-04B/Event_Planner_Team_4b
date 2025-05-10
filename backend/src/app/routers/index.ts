@@ -32,7 +32,7 @@ const moduleRoutes = [
         route:InvitationRoutes
     },
     {
-        path:'/payments',
+        path:'/payment',
         route:PaymentRoutes
     },
     {

@@ -62,7 +62,8 @@ const getAllEventsFromDB = async (
       creator:true,
       reviews:true,
       invitations:true,
-      participations:true
+      participations:true,
+      payments:true
     },
     orderBy:
       options.sortBy && options.sortOrder
@@ -154,7 +155,8 @@ const getEventsFromDB = async (
       creator:true,
       reviews:true,
       invitations:true,
-      participations:true
+      participations:true,
+      payments:true
     },
     orderBy:
       options.sortBy && options.sortOrder
