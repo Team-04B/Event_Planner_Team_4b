@@ -1,9 +1,9 @@
 import InvitationDetailPage from "@/components/modules/Invitations/InvitationDetailPage";
 
-const Page = ({ params }: { params: { id: string } }) => {
+const Page = () => {
   return (
     <div>
-      <InvitationDetailPage id={params.id} />
+      <InvitationDetailPage  />
     </div>
   );
 };

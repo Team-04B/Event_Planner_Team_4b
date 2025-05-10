@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 import { cookies } from "next/headers";
-
-
 export const CreateInvitaion = async (data:any) => {
 console.log(data)
   try {
@@ -89,6 +87,48 @@ export const getAllSentInvitaions= async () => {
     }
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/sent-invitaions`, {
       method: "GET",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const AcceptInvitaon= async (id:string) => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/invitaion/${id}/accept`, {
+      method: "PUT",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const DeclineInvitaion= async (id:string) => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/invitaion/${id}/decline`, {
+      method: "PUT",
       headers: {
         Authorization: token
       },
