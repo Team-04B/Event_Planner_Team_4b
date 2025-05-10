@@ -302,6 +302,8 @@ export function EditEventDialog({ eventId, open, onOpenChange, onEventUpdated }:
                         <Image
                           src={imagePreview || "/placeholder.svg"}
                           alt="Event preview"
+                          height={40}
+                          width={40}
                           className="h-full w-full object-cover"
                           onError={(e) => {
                             ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=128&width=256"

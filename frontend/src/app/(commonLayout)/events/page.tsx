@@ -1,6 +1,6 @@
 import AllEvents from "@/components/modules/Events/all events";
 
-const Events = () => {
+const EventsPage = () => {
   return (
     <div>
       <AllEvents />
@@ -8,4 +8,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default EventsPage;
