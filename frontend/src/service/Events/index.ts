@@ -291,3 +291,71 @@ export const requestPrivateEvent = async (eventId: string) => {
 
   return res.json();
 };
+
+// get participation status
+
+// export const getParticipationStatus = async (eventId: string) => {
+//   const cookieStore = await cookies();
+//   const accessToken = cookieStore.get("accessToken")?.value;
+
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/participation-status`,
+//     {
+//       method: "GET",
+//       headers: {
+//         Authorization: accessToken,
+//       },
+//       credentials: "include",
+//     }
+//   );
+
+//   if (!res.ok) {
+//     throw new Error("Failed to fetch participation status");
+//   }
+
+//   const result = await res.json();
+//   return result.data as "PENDING" | "APPROVED" | null;
+// };
+
+// ✅ CLIENT-SIDE VERSION (for use in hooks/components)
+
+export const getParticipationStatus = async (eventId: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/participation-status`,
+    {
+      method: "GET",
+      credentials: "include", // sends cookies if same-origin
+    }
+  );
+
+  
+
+  const result = await res.json();
+  return result.data as "PENDING" | "APPROVED" | null;
+};
+
+
+
+// ✅ SERVER-SIDE VERSION (for server actions or SSR)
+// import { cookies } from "next/headers";
+
+// export const getParticipationStatus = async (eventId: string) => {
+//   const cookieStore = cookies();
+//   const accessToken = cookieStore.get("accessToken")?.value;
+
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/participation-status`,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     }
+//   );
+
+//   if (!res.ok) {
+//     throw new Error("Failed to fetch participation status");
+//   }
+
+//   const result = await res.json();
+//   return result.data as "PENDING" | "APPROVED" | null;
+// };

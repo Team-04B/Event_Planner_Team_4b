@@ -8,8 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import EventReviewSection from "@/components/EventsModules/EventReviewSection";
 import { IEvent } from "@/commonTypes/commonTypes";
 import { Button } from "@/components/ui/button";
-import { joinPublicEvent, requestPrivateEvent } from "@/service/Events"; // ✅ Added requestPrivateEvent
-import { useEffect, useState } from "react";
+import { joinPublicEvent, requestPrivateEvent } from "@/service/Events"; 
+import { useState } from "react";
 
 type SingleEvent = {
   event: IEvent;
@@ -17,8 +17,6 @@ type SingleEvent = {
 };
 
 export default function SingleEvent({ event, currentUser }: SingleEvent) {
-  const [hasInteracted, setHasInteracted] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [responseMsg, setResponseMsg] = useState("");
 
@@ -28,16 +26,7 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
 
   console.log();
 
-  useEffect(() => {
-    const key = `${eventId}_${currentUser?.id}`;
-    const status = localStorage.getItem(key);
-    if (status === "requested" || status === "joined") {
-      setHasInteracted(true);
-    }
-  }, [eventId, currentUser?.id]);
-
-
-  // console.log("🚀 currentUser:", currentUser);
+  console.log("🚀 currentUser:", currentUser);
   if (!currentUser?.id) {
     return (
       <div className="text-center py-12">
@@ -49,87 +38,72 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
     );
   }
 
-const handleJoin = async () => {
-  setLoading(true);
-  setResponseMsg("");
-  try {
-    const res = await joinPublicEvent(eventId);
-    if (res.success) {
-      localStorage.setItem(`${eventId}_${currentUser.id}`, "joined");
-      setHasInteracted(true);
-      setResponseMsg(res.message || "Joined successfully!");
-    } else {
-      setResponseMsg(res.message || "Something went wrong.");
+  const handleJoin = async () => {
+    setLoading(true);
+    setResponseMsg("");
+    try {
+      const res = await joinPublicEvent(eventId);
+      if (res.success) {
+        setResponseMsg(res.message || "Joined successfully!");
+      } else {
+        setResponseMsg(res.message || "Something went wrong.");
+      }
+    } catch (error) {
+      setResponseMsg("An error occurred.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setResponseMsg("An error occurred.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const handleRequest = async () => {
-  setLoading(true);
-  setResponseMsg("");
-  try {
-    const res = await requestPrivateEvent(eventId);
-    if (res.success) {
-      localStorage.setItem(`${eventId}_${currentUser.id}`, "requested");
-      setHasInteracted(true);
-      setResponseMsg(res.message || "Requested successfully!");
-    } else {
-      setResponseMsg(res.message || "Something went wrong.");
+  const handleRequest = async () => {
+    setLoading(true);
+    setResponseMsg("");
+    try {
+      const res = await requestPrivateEvent(eventId);
+      if (res.success) {
+        setResponseMsg(res.message || "Requested successfully!");
+      } else {
+        setResponseMsg(res.message || "Something went wrong.");
+      }
+    } catch (error) {
+      setResponseMsg("An error occurred.");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    setResponseMsg("An error occurred.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   // ✅ Button rendering based on event type
- const renderActionButton = () => {
-   if (hasInteracted) {
-     return (
-       <Button disabled>{isPublic && isPaid ? "Requested" : "Joined"}</Button>
-     );
-   }
-
-   if (isPublic && !isPaid) {
-     return (
-       <Button disabled={loading} onClick={handleJoin}>
-         Join Free
-       </Button>
-     );
-   }
-
-   if (isPublic && isPaid) {
-     return (
-       <Button disabled={loading} onClick={handleJoin}>
-         Pay & Join
-       </Button>
-     );
-   }
-
-   if (!isPublic && !isPaid) {
-     return (
-       <Button disabled={loading} onClick={handleRequest}>
-         Request to Join
-       </Button>
-     );
-   }
-
-   if (!isPublic && isPaid) {
-     return (
-       <Button disabled={loading} onClick={handleRequest}>
-         Pay & Request
-       </Button>
-     );
-   }
-
-   return null;
- };
+  const renderActionButton = () => {
+    if (isPublic && !isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleJoin}>
+          Join Free
+        </Button>
+      );
+    }
+    if (isPublic && isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleJoin}>
+          Pay & Join
+        </Button>
+      );
+    }
+    if (!isPublic && !isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleRequest}>
+          Request to Join
+        </Button>
+      );
+    }
+    if (!isPublic && isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleRequest}>
+          Pay & Request
+        </Button>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="container mx-auto py-6 sm:py-8 px-4">
