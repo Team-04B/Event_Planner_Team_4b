@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import Image from "next/image";
 import { CalendarIcon, MapPinIcon, TicketIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -6,12 +8,129 @@ import { Card, CardContent } from "@/components/ui/card";
 import EventReviewSection from "@/components/EventsModules/EventReviewSection";
 import { IEvent } from "@/commonTypes/commonTypes";
 import { Button } from "@/components/ui/button";
+import { joinPublicEvent, requestPrivateEvent } from "@/service/Events"; // ✅ Added requestPrivateEvent
+import { useEffect, useState } from "react";
+
 type SingleEvent = {
   event: IEvent;
   currentUser: any;
 };
+
 export default function SingleEvent({ event, currentUser }: SingleEvent) {
-  
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [responseMsg, setResponseMsg] = useState("");
+
+  const eventId = event.id;
+  const isPublic = event.isPublic;
+  const isPaid = event.isPaid;
+
+  console.log();
+
+  useEffect(() => {
+    const key = `${eventId}_${currentUser?.id}`;
+    const status = localStorage.getItem(key);
+    if (status === "requested" || status === "joined") {
+      setHasInteracted(true);
+    }
+  }, [eventId, currentUser?.id]);
+
+
+  // console.log("🚀 currentUser:", currentUser);
+  if (!currentUser?.id) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-red-500">
+          You are not authorized!!
+        </h2>
+        <p className="mt-2 text-gray-600">Please login to view this event.</p>
+      </div>
+    );
+  }
+
+const handleJoin = async () => {
+  setLoading(true);
+  setResponseMsg("");
+  try {
+    const res = await joinPublicEvent(eventId);
+    if (res.success) {
+      localStorage.setItem(`${eventId}_${currentUser.id}`, "joined");
+      setHasInteracted(true);
+      setResponseMsg(res.message || "Joined successfully!");
+    } else {
+      setResponseMsg(res.message || "Something went wrong.");
+    }
+  } catch (error) {
+    setResponseMsg("An error occurred.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleRequest = async () => {
+  setLoading(true);
+  setResponseMsg("");
+  try {
+    const res = await requestPrivateEvent(eventId);
+    if (res.success) {
+      localStorage.setItem(`${eventId}_${currentUser.id}`, "requested");
+      setHasInteracted(true);
+      setResponseMsg(res.message || "Requested successfully!");
+    } else {
+      setResponseMsg(res.message || "Something went wrong.");
+    }
+  } catch (error) {
+    setResponseMsg("An error occurred.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  // ✅ Button rendering based on event type
+ const renderActionButton = () => {
+   if (hasInteracted) {
+     return (
+       <Button disabled>{isPublic && isPaid ? "Requested" : "Joined"}</Button>
+     );
+   }
+
+   if (isPublic && !isPaid) {
+     return (
+       <Button disabled={loading} onClick={handleJoin}>
+         Join Free
+       </Button>
+     );
+   }
+
+   if (isPublic && isPaid) {
+     return (
+       <Button disabled={loading} onClick={handleJoin}>
+         Pay & Join
+       </Button>
+     );
+   }
+
+   if (!isPublic && !isPaid) {
+     return (
+       <Button disabled={loading} onClick={handleRequest}>
+         Request to Join
+       </Button>
+     );
+   }
+
+   if (!isPublic && isPaid) {
+     return (
+       <Button disabled={loading} onClick={handleRequest}>
+         Pay & Request
+       </Button>
+     );
+   }
+
+   return null;
+ };
+
   return (
     <div className="container mx-auto py-6 sm:py-8 px-4">
       <div className="grid md:grid-cols-3 gap-6 md:gap-8">
@@ -49,13 +168,11 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
             <p className="text-gray-700">{event.description}</p>
           </div>
 
-          {/* join all buttons */}
-          <div className="flex flex-wrap gap-4">
-            <Button>Join Free</Button>
-            <Button>Pay & Join</Button>
-            <Button>Request to Join</Button>
-            <Button>Pay & Request</Button>
-          </div>
+          {/* ✅ Conditional action buttons */}
+          {renderActionButton()}
+          {responseMsg && (
+            <p className="text-sm text-gray-700">{responseMsg}</p>
+          )}
 
           <div className="mt-6 sm:mt-8">
             <EventReviewSection eventId={event.id} userId={currentUser.id} />

@@ -249,24 +249,45 @@ export const deleteEvent = async (eventId: string) => {
 
 // join public event
 export const joinPublicEvent = async (eventId: string) => {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+
+  if (!accessToken) {
+    throw new Error("No access token found in cookies.");
+  }
+
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/join`,
     {
       method: "POST",
+      headers: {
+        Authorization: accessToken,
+      },
       credentials: "include",
     }
   );
+
   return res.json();
 };
-
 // join paid event
 export const requestPrivateEvent = async (eventId: string) => {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+
+  if (!accessToken) {
+    throw new Error("No access token found in cookies.");
+  }
+
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/request`,
     {
       method: "POST",
+      headers: {
+        Authorization: accessToken,
+      },
       credentials: "include",
     }
   );
+
   return res.json();
 };
