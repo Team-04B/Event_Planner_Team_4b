@@ -28,7 +28,7 @@ const auth = (...roles: string[]) => {
       }
 
       req.user = varifiedUser;
-      console.log(varifiedUser,'auth')
+      // console.log(varifiedUser,'auth')
 
       next();
     } catch (error) {

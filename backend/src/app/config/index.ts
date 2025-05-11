@@ -20,4 +20,7 @@ export default {
   reset_password_link: process.env.RESET_PASSWORD_LINK,
   email: process.env.EMAIL,
   app_password: process.env.APP_PASSWORD,
+  email_pass: process.env.EMAIL_PASS!,
+  email_user: process.env.EMAIL_USER!,
+  owner_email: process.env.OWNER_EMAIL,
 };
