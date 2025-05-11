@@ -322,27 +322,6 @@ const formatDate = (date: string | Date) => {
                 />
               </div>
             </div>
-
-            {selectedEvent?.isPaid && (
-              <div className="space-y-4">
-                <div className="border-t pt-4">
-                  <h3 className="text-lg font-medium mb-2">Payment Settings</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="payment">Require Payment</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Require the invitee to pay before confirming attendance
-                      </p>
-                    </div>
-                    <Switch
-                      id="payment"
-                      checked={formData.requirePayment}
-                      onCheckedChange={(checked) => handleChange("requirePayment", checked)}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button variant="outline" type="button" 

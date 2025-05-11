@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Filter, MapPin, MoreHorizontal, XCircle } from "lucide-react"
+import { Calendar, ChevronLeft, ChevronRight, Filter, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { getAllInvitaions } from "@/service/Invitations"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Link from "next/link"
 
@@ -71,8 +70,6 @@ export default function DashboardContent() {
   // Add a state for pagination cache to avoid refetching
   const [paginationCache, setPaginationCache] = useState<Record<number, Invitation[]>>({})
 
-
-
   useEffect(() => {
     const fetchInvitations = async () => {
       // Check if we already have this page in cache
@@ -106,7 +103,6 @@ export default function DashboardContent() {
 
     fetchInvitations()
   }, [currentPage, pageSize, paginationCache])
-
 
   useEffect(() => {
     // Apply frontend filtering
@@ -335,7 +331,6 @@ export default function DashboardContent() {
                 <TableHead className="w-[250px]">Date & Venue</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Payment</TableHead>
-                <TableHead>Payment Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -377,94 +372,29 @@ export default function DashboardContent() {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      {invitation.paid ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                          Payable Balance
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                          Not Payable
-                        </Badge>
-                      )}
                       {invitation.event.isPaid && (
-                        <div className="text-sm text-muted-foreground">
-                          Fee: ${(invitation.event.fee / 100).toFixed(2)}
-                        </div>
+                        <>
+                          <Badge
+                            variant="outline"
+                            className={
+                              invitation.paid
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : "bg-red-50 text-red-700 border-red-200"
+                            }
+                          >
+                            {invitation.paid ? "Paid" : "Unpaid"}
+                          </Badge>
+                          <div className="text-sm text-muted-foreground">
+                            Fee: ${(invitation.event.fee / 100).toFixed(2)}
+                          </div>
+                        </>
                       )}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    {invitation?.paid ? (
-                      <Badge
-                        variant="outline"
-                        className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
-                      >
-                        <CheckCircle className="w-4 h-4" /> Paid
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1"
-                      >
-                        <XCircle className="w-4 h-4" /> Not Paid
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {invitation.status === "PENDING" ? (
-                      <div className="flex justify-end gap-2">
-                        <Button size="sm">Accept</Button>
-                        <Button variant="outline" size="sm">
-                          Decline
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View</Link>
-                        </Button>
-                      </div>
-                    ) : invitation.status === "ACCEPTED" && invitation.event.isPaid && !invitation.paid ? (
-                      <div className="flex justify-end gap-2">
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                          Pay Now
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View</Link>
-                        </Button>
-                      </div>
-                    ) : invitation.status === "ACCEPTED" && invitation.paid ? (
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm" disabled>
-                          Accepted
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View Attachment</Link>
-                        </Button>
-                      </div>
-                    ) : invitation.status === "DECLINED" ? (
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm" disabled>
-                          Declined
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View Attachment</Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Link href={""}>Contact Organizer</Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>Add to Calendar</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
+                   <Button  >
+                   <Link href={`/dashboard/myinvitaions/${invitation?.id}`}>View Invitaion</Link>
+                   </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -498,7 +428,6 @@ export default function DashboardContent() {
 
           {/* Page Numbers */}
           <div className="flex items-center">{renderPaginationNumbers()}</div>
-
 
           {/* Custom Next Button */}
           <Button

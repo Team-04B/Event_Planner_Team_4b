@@ -1,4 +1,4 @@
-import { Invitation } from '@prisma/client';
+import { Invitation, InvitationStatus } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 import { IPaginationOptions } from '../../app/interface/pagination';
 import { paginationHelper } from '../../app/helper/paginationHelper';
@@ -127,9 +127,43 @@ const getSingleInvitaionIntoDB =async (id:string)=>{
   return result;
 }
 
+
+
+
+const acceptInvitaionInDB = async (id: string) => {
+  // Ensure the invitation exists
+  await prisma.invitation.findUniqueOrThrow({
+    where: { id },
+  });
+
+  const result = await prisma.invitation.update({
+    where: { id },
+    data: {
+      status: InvitationStatus.ACCEPTED,
+    },
+  });
+  return result
+}
+const declineInvitaionInDB = async (id: string) => {
+  // Ensure the invitation exists
+  await prisma.invitation.findUniqueOrThrow({
+    where: { id },
+  });
+
+  const result = await prisma.invitation.update({
+    where: { id },
+    data: {
+      status: InvitationStatus.DECLINED,
+    },
+  });
+  return result
+}
+
 export const InvitaionServices = {
   createInvitaionDB,
   getMyAllnvitaionsFromDB,
   getMyInvitedOnvitationsFromDB,
-  getSingleInvitaionIntoDB
+  getSingleInvitaionIntoDB,
+  acceptInvitaionInDB,
+  declineInvitaionInDB
 };
