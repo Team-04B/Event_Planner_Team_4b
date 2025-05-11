@@ -10,25 +10,25 @@ export default function StatsSection() {
 
   const stats = [
     {
-      icon: <Calendar className="h-8 w-8 text-purple-600" />,
+      icon: <Calendar className="h-8 w-8 text-black" />,
       value: "10,000+",
       label: "Events Hosted",
       description: "Successful events created on our platform",
     },
     {
-      icon: <Users className="h-8 w-8 text-purple-600" />,
+      icon: <Users className="h-8 w-8 text-black" />,
       value: "50,000+",
       label: "Active Users",
       description: "Event creators and participants",
     },
     {
-      icon: <CreditCard className="h-8 w-8 text-purple-600" />,
+      icon: <CreditCard className="h-8 w-8 text-black" />,
       value: "$2M+",
       label: "Payments Processed",
       description: "Secure transactions for paid events",
     },
     {
-      icon: <Star className="h-8 w-8 text-purple-600" />,
+      icon: <Star className="h-8 w-8 text-black" />,
       value: "99%",
       label: "Satisfaction Rate",
       description: "From event organizers and attendees",
@@ -67,8 +67,8 @@ export default function StatsSection() {
                 variants={itemVariants}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
-                <div className="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-purple-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-                <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-50">
+                <div className="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-gray-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                <div className="relative mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                   {stat.icon}
                 </div>
                 <h3 className="mb-2 text-3xl font-bold text-gray-900">{stat.value}</h3>

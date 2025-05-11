@@ -8,7 +8,7 @@ import { CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-// import { StepIndicator } from "@/components/ui/step-indicator"
+import { StepIndicator } from "@/components/ui/step-indicator"
 
 export default function EventTypesSection() {
   const [activeTab, setActiveTab] = useState("public-free")
@@ -19,7 +19,7 @@ export default function EventTypesSection() {
       title: "Public Free Events",
       description:
         "Open to everyone with instant access. Perfect for community gatherings, meetups, and public workshops.",
-      color: "green",
+      color: "white",
       features: ["Visible to all users", "One-click registration", "No payment required", "Instant approval"],
       image: "/placeholder.svg?height=400&width=600",
       example: "Community Workshop",
@@ -29,7 +29,7 @@ export default function EventTypesSection() {
       title: "Public Paid Events",
       description:
         "Open to everyone with payment required. Ideal for conferences, premium workshops, and ticketed performances.",
-      color: "blue",
+      color: "gray",
       features: [
         "Visible to all users",
         "Integrated payment processing",
@@ -44,7 +44,7 @@ export default function EventTypesSection() {
       title: "Private Free Events",
       description:
         "Invitation or approval required, but no payment needed. Perfect for team meetings, private gatherings, and exclusive communities.",
-      color: "amber",
+      color: "light",
       features: [
         "Visible to logged-in users",
         "Request to join required",
@@ -59,7 +59,7 @@ export default function EventTypesSection() {
       title: "Private Paid Events",
       description:
         "Invitation or approval required with payment. Ideal for exclusive workshops, premium masterclasses, and VIP experiences.",
-      color: "purple",
+      color: "black",
       features: [
         "Visible to logged-in users",
         "Request and payment required",
@@ -73,25 +73,25 @@ export default function EventTypesSection() {
 
   const getColorClass = (color: string, type: "bg" | "text" | "hover-bg") => {
     const colorMap = {
-      green: {
-        bg: "bg-green-100",
-        text: "text-green-800",
-        "hover-bg": "hover:bg-green-200",
+      white: {
+        bg: "bg-white",
+        text: "text-black",
+        "hover-bg": "hover:bg-gray-100",
       },
-      blue: {
-        bg: "bg-blue-100",
-        text: "text-blue-800",
-        "hover-bg": "hover:bg-blue-200",
+      gray: {
+        bg: "bg-gray-200",
+        text: "text-black",
+        "hover-bg": "hover:bg-gray-300",
       },
-      amber: {
-        bg: "bg-amber-100",
-        text: "text-amber-800",
-        "hover-bg": "hover:bg-amber-200",
+      light: {
+        bg: "bg-gray-100",
+        text: "text-black",
+        "hover-bg": "hover:bg-gray-200",
       },
-      purple: {
-        bg: "bg-purple-100",
-        text: "text-purple-800",
-        "hover-bg": "hover:bg-purple-200",
+      black: {
+        bg: "bg-black",
+        text: "text-white",
+        "hover-bg": "hover:bg-gray-900",
       },
     }
 
@@ -108,7 +108,7 @@ export default function EventTypesSection() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
         >
-          <Badge className="mb-4 bg-purple-100 text-purple-800">Event Types</Badge>
+          <Badge className="mb-4 bg-black text-white">Event Types</Badge>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
             Find Your Perfect Event Format
           </h2>
@@ -139,11 +139,11 @@ export default function EventTypesSection() {
             <div className="relative">
               {/* Step indicator */}
               <div className="absolute -left-16 top-1/2 hidden -translate-y-1/2 transform md:block">
-                {/* <StepIndicator
+                <StepIndicator
                   steps={4}
                   currentStep={eventTypes.findIndex((type) => type.id === activeTab)}
                   orientation="vertical"
-                /> */}
+                />
               </div>
 
               <motion.div
