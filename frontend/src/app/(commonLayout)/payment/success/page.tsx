@@ -1,9 +1,44 @@
+"use client"
 import Link from "next/link"
 import { CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function PaymentSuccessPage() {
+
+    const searchParams = useSearchParams()
+    const [message, setMessage] = useState("Validating your payment...")
+
+  useEffect(() => {
+    const val_id = searchParams?.get("val_id")
+    const tran_id = searchParams?.get("tran_id")
+
+    if (val_id && tran_id) {
+      fetch(`http://localhost:5000/api/payment/inp`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ val_id, tran_id }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "success") {
+            setMessage("🎉 Payment successful and verified!")
+          } else {
+            setMessage("⚠️ Payment verification failed. Please contact support.")
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          setMessage("❌ An error occurred during validation.")
+        })
+    } else {
+      setMessage("Invalid payment redirect. No val_id or tran_id found.")
+    }
+  }, [searchParams])
   return (
     <div className="container flex items-center justify-center min-h-[80vh] px-4">
       <Card className="w-full max-w-md">

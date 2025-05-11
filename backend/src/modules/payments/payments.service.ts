@@ -27,11 +27,11 @@ const initPayment = async (payload:any,userId:string) => {
         store_passwd:config.ssl.storePass, 
         total_amount: event.fee,
         currency: 'BDT',
-        tran_id: event.creatorId, // use unique tran_id for each api call
+        tran_id: userId+event.id, // use unique tran_id for each api call
         success_url: config.ssl.successUrl,
         fail_url: config.ssl.failUrl,
         cancel_url: config.ssl.cancelUrl,
-        ipn_url: 'http://localhost:3030/ipn',
+        ipn_url: config.ssl.sslValidationApi,
         shipping_method: 'N/A',
         product_name: event.title,
         product_category: 'Event',
@@ -115,7 +115,7 @@ const validationPayment = async(query:any) => {
     }
     const response = await axios({
         method:"GET",
-        url:`${config.ssl.sslValidationApi}?val_id=${query.val_id}&store_id=${config.ssl.storeId}&store_passwd${config.ssl.storePass}&format=json`
+        url:`${config.ssl.sslValidationApi}?val_id=${query.val_id}&store_id=${config.ssl.storeId}&store_passwd=${config.ssl.storePass}&format=json`
     })
     if(await response?.data?.status !== "VALID"){
         return {

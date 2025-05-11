@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/initpayment',auth(Role.ADMIN,Role.USER),PaymentController.initPayment)
 
 
-router.get('/ipn',auth(Role.USER,Role.ADMIN),PaymentController.validationPayment)
+router.get('/ipn',PaymentController.validationPayment)
 
 export const PaymentRoutes = router
