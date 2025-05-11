@@ -8,8 +8,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import EventReviewSection from "@/components/EventsModules/EventReviewSection";
 import { IEvent } from "@/commonTypes/commonTypes";
 import { Button } from "@/components/ui/button";
-import { joinPublicEvent, requestPrivateEvent } from "@/service/Events"; 
+import { joinPublicEvent, requestPrivateEvent } from "@/service/Events";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type SingleEvent = {
   event: IEvent;
@@ -18,7 +19,6 @@ type SingleEvent = {
 
 export default function SingleEvent({ event, currentUser }: SingleEvent) {
   const [loading, setLoading] = useState(false);
-  const [responseMsg, setResponseMsg] = useState("");
 
   const eventId = event.id;
   const isPublic = event.isPublic;
@@ -40,16 +40,20 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
 
   const handleJoin = async () => {
     setLoading(true);
-    setResponseMsg("");
+
     try {
       const res = await joinPublicEvent(eventId);
       if (res.success) {
-        setResponseMsg(res.message || "Joined successfully!");
+        toast.success(res.message || "Joined successfully!");
       } else {
-        setResponseMsg(res.message || "Something went wrong.");
+        toast.error(res.message || "Something went wrong.");
       }
-    } catch (error) {
-      setResponseMsg("An error occurred.");
+    } catch (error: any) {
+      if (error instanceof Error) {
+        toast.error(error.message || "An error occurred.");
+      } else {
+        toast.error("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -57,16 +61,20 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
 
   const handleRequest = async () => {
     setLoading(true);
-    setResponseMsg("");
     try {
       const res = await requestPrivateEvent(eventId);
+
       if (res.success) {
-        setResponseMsg(res.message || "Requested successfully!");
+        toast.success(res.message || "Requested successfully!");
       } else {
-        setResponseMsg(res.message || "Something went wrong.");
+        toast.error(res.message || "Something went wrong.");
       }
-    } catch (error) {
-      setResponseMsg("An error occurred.");
+    } catch (error: any) {
+      if (error instanceof Error) {
+        toast.error(error.message || "An error occurred.");
+      } else {
+        toast.error("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -143,10 +151,8 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
           </div>
 
           {/* ✅ Conditional action buttons */}
+          {/* ✅ Conditional action buttons */}
           {renderActionButton()}
-          {responseMsg && (
-            <p className="text-sm text-gray-700">{responseMsg}</p>
-          )}
 
           <div className="mt-6 sm:mt-8">
             <EventReviewSection eventId={event.id} userId={currentUser.id} />
