@@ -20,7 +20,7 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
-import { getSingleInvitaion } from "@/service/Invitations"
+import { AcceptInvitaon, getSingleInvitaion } from "@/service/Invitations"
 import { useParams } from "next/navigation"
 
 // Types based on the real data model
@@ -59,9 +59,9 @@ interface Invitation {
 }
 
 export default function InvitationDetailPage() {
-const param  = useParams()
- const id = param?.id as string;
- console.log(id)
+ const param =useParams()
+ const id =param?.id as string;
+ 
   const [invitation, setInvitation] = useState<Invitation | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -139,6 +139,22 @@ const param  = useParams()
     return timeline
   }
 
+  // all actions ---------------------------------------
+
+  const HandleAcceptInvitaion = async (id: string) => {
+    try {
+      const res = await AcceptInvitaon(id)
+      console.log(res)
+      if (res?.success) {
+        // Refresh the invitation data to get updated status
+        const updatedInvitation = await getSingleInvitaion(id)
+        setInvitation(updatedInvitation?.data)
+      }
+    } catch (error) {
+      console.error("Error accepting invitation:", error)
+    }
+  }
+
   // Format datetime for timeline
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -177,7 +193,7 @@ const param  = useParams()
   }
 
   const timeline = generateTimeline(invitation)
-
+console.log(invitation)
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center gap-2">
@@ -360,7 +376,7 @@ const param  = useParams()
                 <h3 className="text-sm font-medium">Quick Actions</h3>
                 {invitation.status === "PENDING" && (
                   <>
-                    <Button className="w-full" variant="default">
+                    <Button onClick={() => HandleAcceptInvitaion(invitation?.id)} className="w-full" variant="default">
                       <CheckIcon className="mr-2 h-4 w-4" />
                       Accept Invitation
                     </Button>
@@ -370,8 +386,8 @@ const param  = useParams()
                     </Button>
                   </>
                 )}
-                {invitation.event.isPaid && !invitation.paid && (
-                  <Button className="w-full" variant={invitation.status === "PENDING" ? "outline" : "default"}>
+                {invitation.status === "ACCEPTED" && invitation.event.isPaid && (
+                  <Button className="w-full" variant="default">
                     <DollarSignIcon className="mr-2 h-4 w-4" />
                     Make Payment
                   </Button>

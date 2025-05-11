@@ -48,10 +48,32 @@ const getSingleInvitaion= catchAsync(async (req, res) => {
     data: result,
   });
 });
+const acceptInvitaion= catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await InvitaionServices.acceptInvitaionInDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'Invitaion accepted Successfully',
+    data: result,
+  });
+});
+const declineInvitaion= catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await InvitaionServices.declineInvitaionInDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.CREATED,
+    message: 'Invitaion decline Successfully',
+    data: result,
+  });
+});
 
 export const InvitationController = {
   createInvitaion,
   getMyAllnvitaions,
   getMySentInvitaions,
-  getSingleInvitaion
+  getSingleInvitaion,
+  acceptInvitaion,
+  declineInvitaion
 };
