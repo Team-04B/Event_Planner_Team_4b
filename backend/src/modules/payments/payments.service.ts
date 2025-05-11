@@ -28,7 +28,7 @@ const initPayment = async (payload:any,userId:string) => {
         total_amount: event.fee,
         currency: 'BDT',
         tran_id: userId+event.id, // use unique tran_id for each api call
-        success_url: config.ssl.successUrl,
+        success_url: `${config.ssl.successUrl}/${userId+event.id}`,
         fail_url: config.ssl.failUrl,
         cancel_url: config.ssl.cancelUrl,
         ipn_url: config.ssl.sslValidationApi,
@@ -94,7 +94,7 @@ const initPayment = async (payload:any,userId:string) => {
     console.log(paymentUrl,'2')
     return paymentUrl
     
-    } catch (error) {
+    } catch (error:{message:string}) {
         throw new ApiError(httpStatus.BAD_REQUEST,`Payment Error Occured${error?.message}`)
     }
     // const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
@@ -139,7 +139,13 @@ const validationPayment = async(query:any) => {
     })
 }
 
+const paymentSuccess = async(tran_id:string) => {
+    console.log(tran_id,'helloasdfasdfasdfsadfs')
+    return tran_id
+}
+
 export const PaymentService = {
     initPayment,
-    validationPayment
+    validationPayment,
+    paymentSuccess
 }

@@ -10,4 +10,6 @@ router.post('/initpayment',auth(Role.ADMIN,Role.USER),PaymentController.initPaym
 
 router.get('/ipn',PaymentController.validationPayment)
 
+router.post('/success/:tran_id',PaymentController.paymentSuccess)
+
 export const PaymentRoutes = router
