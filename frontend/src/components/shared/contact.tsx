@@ -206,7 +206,7 @@ export default function Contact() {
             </h3>
             <p className="text-gray-600">
               To create an event, log in to your account, navigate to your
-              dashboard, and click on "Create Event." Fill out the event details
+              dashboard, and click on &quot;Create Event.&quot; Fill out the event details
               form and submit.
             </p>
           </div>

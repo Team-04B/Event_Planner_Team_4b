@@ -1,23 +1,22 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Calendar, Search, Users } from "lucide-react"
+import { ArrowRight, Calendar, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+// import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
 export default function HeroSection() {
-  const [searchQuery, setSearchQuery] = useState("")
+  // const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-purple-900 via-purple-800 to-indigo-900 py-20 md:py-28">
+    <section className="relative overflow-hidden bg-black py-20 text-white md:py-28">
       {/* Animated background elements */}
       <div className="absolute inset-0 z-0">
         <motion.div
-          className="absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-purple-500 opacity-10 blur-3xl"
+          className="absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-white opacity-5 "
           animate={{
             x: [0, 30, 0],
             y: [0, 30, 0],
@@ -29,7 +28,7 @@ export default function HeroSection() {
           }}
         />
         <motion.div
-          className="absolute bottom-[10%] right-[10%] h-96 w-96 rounded-full bg-indigo-500 opacity-10 blur-3xl"
+          className="absolute bottom-[10%] right-[10%] h-96 w-96 rounded-full bg-white opacity-5 blur-3xl"
           animate={{
             x: [0, -40, 0],
             y: [0, -40, 0],
@@ -54,7 +53,7 @@ export default function HeroSection() {
             }}
             animate={{
               y: [0, -100],
-              opacity: [0.2, 0],
+              opacity: [0.4, 0],
             }}
             transition={{
               duration: 10 + Math.random() * 10,
@@ -76,17 +75,17 @@ export default function HeroSection() {
             <Badge className="mb-4 bg-white/20 text-white hover:bg-white/30">Discover • Connect • Experience</Badge>
             <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
               Where Memorable Events{" "}
-              <span className="bg-gradient-to-r from-purple-200 via-pink-200 to-amber-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-gray-200 to-gray-300 bg-clip-text text-transparent">
                 Come to Life
               </span>
             </h1>
-            <p className="mb-8 text-xl text-purple-100 md:text-2xl">
+            <p className="mb-8 text-xl text-gray-300 md:text-2xl">
               Create, discover, and join events that matter to you. <br className="hidden md:block" />
               Your all-in-one platform for meaningful connections.
             </p>
-
+{/* 
             <div className="mx-auto mb-10 max-w-3xl rounded-xl bg-white/10 p-2 backdrop-blur-sm md:p-3">
-              <div className="flex flex-col gap-3 md:flex-row">
+              <div className="flex flex-col gap-3 ">
                 <div className="relative flex-grow">
                   <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
                   <Input
@@ -97,15 +96,15 @@ export default function HeroSection() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Button size="lg" className="h-12 bg-purple-600 text-white hover:bg-purple-700 md:h-14">
+                <Button size="lg" className="h-12 bg-black text-white hover:bg-gray-900 md:h-14">
                   Find Events
                 </Button>
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button size="lg" className="group bg-white text-purple-800 hover:bg-gray-100" asChild>
-                <Link href="/create-event">
+            <div className="flex flex-col justify-start gap-4 sm:flex-row">
+              <Button size="lg" className="group bg-white text-black hover:bg-gray-100" asChild>
+                <Link href="/dashboard/create-event">
                   Create an Event
                   <motion.span
                     className="ml-2"
@@ -116,7 +115,7 @@ export default function HeroSection() {
                   </motion.span>
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="outline" className="border-white text-black hover:text-white hover:bg-white/10" asChild>
                 <Link href="/events">
                   Explore Events <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -132,7 +131,7 @@ export default function HeroSection() {
           >
             <div className="relative overflow-hidden rounded-2xl shadow-2xl">
               <Image
-                src="/placeholder.svg?height=800&width=600"
+                src="/images/experience.png?height=800&width=600"
                 alt="Event platform preview"
                 width={600}
                 height={800}
@@ -141,9 +140,9 @@ export default function HeroSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0"></div>
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="rounded-lg bg-white/10 p-4 backdrop-blur-md">
+                <div className="rounded-lg bg-black/30 p-4 backdrop-blur-md">
                   <div className="mb-2 flex items-center justify-between">
-                    <Badge className="bg-green-500 text-white hover:bg-green-600">Live Now</Badge>
+                    <Badge className="bg-white text-black hover:bg-gray-200">Live Now</Badge>
                     <div className="flex items-center text-white">
                       <Users className="mr-1 h-4 w-4" />
                       <span className="text-sm">1.2k attending</span>
@@ -166,10 +165,10 @@ export default function HeroSection() {
               transition={{ delay: 0.6, duration: 0.5 }}
             >
               <div className="flex items-center space-x-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-green-600"
+                    className="h-5 w-5 text-black"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -194,10 +193,10 @@ export default function HeroSection() {
               transition={{ delay: 0.8, duration: 0.5 }}
             >
               <div className="flex items-center space-x-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-purple-600"
+                    className="h-5 w-5 text-black"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -236,7 +235,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent"></div>
     </section>
   )
 }

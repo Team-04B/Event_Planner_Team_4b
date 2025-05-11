@@ -24,6 +24,7 @@ export const sendContactMail = async ({
     });
 
     return res.json();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return { success: false, error: error.message || "Unknown error" };
   }
