@@ -1,470 +1,522 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Bell } from "lucide-react"
+import Image from "next/image"
+import { Calendar, CheckCircle, ChevronLeft, ChevronRight, Filter, MapPin, MoreHorizontal, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useMobile } from "@/hooks/use-mobile"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { DialogTitle } from "@/components/ui/dialog"
-import { useAppSelector } from "@/redux/hook"
-import { currentUser, logOut } from "@/redux/userSlice/userSlice"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 import { getAllInvitaions } from "@/service/Invitations"
-import { logout } from "@/service/AuthService"
-import { useDispatch } from "react-redux"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import Link from "next/link"
 
-interface Notification {
+interface Invitation {
   id: string
-  title: string
-  message: string
-  time: string
-  read: boolean
-  type: "invitation" | "reminder" | "update"
   eventId: string
-  status: string
+  userEmail: string
+  invitedById: string
+  invitationNote: string
+  status: "PENDING" | "ACCEPTED" | "DECLINED"
   paid: boolean
-  venue?: string
-  date?: string
+  createdAt: string
+  event: {
+    id: string
+    title: string
+    description: string
+    dateTime: string
+    eventImgUrl: string
+    venue: string
+    isPublic: boolean
+    isPaid: boolean
+    fee: number
+    creatorId: string
+    createdAt: string
+    updatedAt: string
+  }
+  invitedUser: {
+    id: string
+    name: string
+    email: string
+    password: string
+    role: string
+    createdAt: string
+    updatedAt: string
+  }
 }
 
-export default function Navbar() {
-  const user = useAppSelector(currentUser)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [invitations, setInvitations] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const dispatch = useDispatch()
-  const pathname = usePathname()
-
-  // Track viewed notifications
-  const [viewedNotifications, setViewedNotifications] = useState<string[]>([])
-
-  // Track if notification panel is open
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [notificationPanelOpen, setNotificationPanelOpen] = useState(false)
-
-  const handleLogout = () => {
-    logout()
-    dispatch(logOut())
+interface InvitationsResponse {
+  meta: {
+    page: number
+    limit: number
+    total: number
   }
+  data: Invitation[]
+}
+
+export default function DashboardContent() {
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [pageSize, setPageSize] = useState(10)
+
+  const [allInvitations, setAllInvitations] = useState<Invitation[]>([])
+  const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 })
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredInvitations, setFilteredInvitations] = useState<Invitation[]>([])
+
+  // Add a state for pagination cache to avoid refetching
+  const [paginationCache, setPaginationCache] = useState<Record<number, Invitation[]>>({})
 
   useEffect(() => {
     const fetchInvitations = async () => {
-      if (!user) return
+      // Check if we already have this page in cache
+      if (paginationCache[currentPage]) {
+        setAllInvitations(paginationCache[currentPage])
+        setLoading(false)
+        return
+      }
 
-      setIsLoading(true)
+      setLoading(true)
       try {
-        const invitationData = await getAllInvitaions(null, null)
-        setInvitations(invitationData?.data?.data || [])
+        const response = await getAllInvitaions(currentPage, pageSize)
+        const invitationsData = response?.data as InvitationsResponse
+
+        if (invitationsData) {
+          setAllInvitations(invitationsData.data)
+          setMeta(invitationsData.meta)
+
+          // Update cache with this page's data
+          setPaginationCache((prev) => ({
+            ...prev,
+            [currentPage]: invitationsData.data,
+          }))
+        }
       } catch (error) {
         console.error("Error fetching invitations:", error)
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
 
     fetchInvitations()
-  }, [user])
+  }, [currentPage, pageSize, paginationCache])
 
-  // Add scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true)
-      } else {
-        setScrolled(false)
-      }
+    // Apply frontend filtering
+    let filtered = [...allInvitations]
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((invitation) => invitation.status === statusFilter)
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (invitation) =>
+          invitation.event.title.toLowerCase().includes(query) ||
+          invitation.event.venue.toLowerCase().includes(query) ||
+          invitation.invitationNote.toLowerCase().includes(query),
+      )
+    }
 
-  const notifications = invitations.map((invitation) => ({
-    id: invitation.id,
-    title: `Event Invitation: ${invitation.event.title}`,
-    message: invitation.invitationNote || `You've been invited to ${invitation.event.title}`,
-    time: new Date(invitation.createdAt).toLocaleDateString(),
-    read: false,
-    type: "invitation" as const,
-    eventId: invitation.eventId,
-    status: invitation.status,
-    paid: invitation.paid,
-    venue: invitation.event.venue,
-    date: new Date(invitation.event.dateTime).toLocaleDateString(),
-  }))
+    setFilteredInvitations(filtered)
+  }, [statusFilter, searchQuery, allInvitations])
 
-  const isMobile = useMobile()
-
-  // Calculate unread count based on viewed status
-  const unreadCount = notifications.filter((n) => n.status === "PENDING" && !viewedNotifications.includes(n.id)).length
-
-  // Function to mark all as viewed when opening notifications
-  const markAllAsViewed = () => {
-    const ids = notifications.map((notification) => notification.id)
-    setViewedNotifications((prev) => [...new Set([...prev, ...ids])])
+  // Update the handlePageChange function to use state instead of URL
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
   }
 
-  // Handle notification panel open state
-  const handleNotificationPanelOpen = (open: boolean) => {
-    setNotificationPanelOpen(open)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
 
-    // Only mark as viewed when the panel is opened, not when closed
-    if (open) {
-      markAllAsViewed()
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800"
+      case "ACCEPTED":
+        return "bg-green-100 text-green-800"
+      case "DECLINED":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
+  }
+
+  const totalPages = Math.ceil(meta.total / meta.limit) || 1 // Ensure at least 1 page
+
+  // Improved pagination rendering with better handling of edge cases
+  const renderPaginationNumbers = () => {
+    // If there are 7 or fewer pages, show all page numbers
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+        <Button
+          key={pageNum}
+          variant={currentPage === pageNum ? "default" : "outline"}
+          size="sm"
+          className="h-8 w-8"
+          onClick={() => handlePageChange(pageNum)}
+        >
+          {pageNum}
+        </Button>
+      ))
+    }
+
+    // For more than 7 pages, use a more complex pagination display
+    const pageNumbers = []
+
+    // Always show first page
+    pageNumbers.push(
+      <Button
+        key={1}
+        variant={currentPage === 1 ? "default" : "outline"}
+        size="sm"
+        className="h-8 w-8"
+        onClick={() => handlePageChange(1)}
+      >
+        1
+      </Button>,
+    )
+
+    // Calculate the range of pages to show
+    let startPage = Math.max(2, currentPage - 2)
+    let endPage = Math.min(totalPages - 1, startPage + 4)
+
+    // Adjust if we're near the end
+    if (endPage - startPage < 4) {
+      startPage = Math.max(2, totalPages - 5)
+      endPage = totalPages - 1
+    }
+
+    // Add ellipsis after first page if needed
+    if (startPage > 2) {
+      pageNumbers.push(
+        <span key="ellipsis-start" className="px-2">
+          ...
+        </span>,
+      )
+    }
+
+    // Add middle pages
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <Button
+          key={i}
+          variant={currentPage === i ? "default" : "outline"}
+          size="sm"
+          className="h-8 w-8"
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </Button>,
+      )
+    }
+
+    // Add ellipsis before last page if needed
+    if (endPage < totalPages - 1) {
+      pageNumbers.push(
+        <span key="ellipsis-end" className="px-2">
+          ...
+        </span>,
+      )
+    }
+
+    // Always show last page
+    pageNumbers.push(
+      <Button
+        key={totalPages}
+        variant={currentPage === totalPages ? "default" : "outline"}
+        size="sm"
+        className="h-8 w-8"
+        onClick={() => handlePageChange(totalPages)}
+      >
+        {totalPages}
+      </Button>,
+    )
+
+    return pageNumbers
   }
 
   return (
-    <nav
-      className={`w-full py-4 px-6 flex items-center justify-between border-b z-50 transition-all duration-300 ${
-        scrolled ? "fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-sm" : "relative bg-white"
-      }`}
-    >
-      <Link href="/" className="text-xl font-bold">
-        EvenTora
-      </Link>
-
-      {isMobile ? (
-        <div className="flex items-center gap-2">
-          {user && (
-            <NotificationsMobile
-              notifications={notifications}
-              unreadCount={unreadCount}
-              isLoading={isLoading}
-              onOpenChange={handleNotificationPanelOpen}
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Input
+              placeholder="Search events..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
             />
-          )}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="ml-2">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M1.5 3C1.22386 3 1 3.22386 1 3.5C1 3.77614 1.22386 4 1.5 4H13.5C13.7761 4 14 3.77614 14 3.5C14 3.22386 13.7761 3 13.5 3H1.5ZM1 7.5C1 7.22386 1.22386 7 1.5 7H13.5C13.7761 7 14 7.22386 14 7.5C14 7.77614 13.7761 8 13.5 8H1.5C1.22386 8 1 7.77614 1 7.5ZM1 11.5C1 11.2239 1.22386 11 1.5 11H13.5C13.7761 11 14 11.2239 14 11.5C14 11.7761 13.7761 12 13.5 12H1.5C1.22386 12 1 11.7761 1 11.5Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <VisuallyHidden>
-                <DialogTitle>Navigation Menu</DialogTitle>
-              </VisuallyHidden>
-              <div className="flex flex-col gap-6 mt-6">
-                <Link
-                  href="/"
-                  className={`text-lg font-medium transition-colors ${
-                    pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
-                  }`}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/events"
-                  className={`text-lg font-medium transition-colors ${
-                    pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
-                  }`}
-                >
-                  Events
-                </Link>
-                <Link
-                  href="/about"
-                  className={`text-lg font-medium transition-colors ${
-                    pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
-                  }`}
-                >
-                  About
-                </Link>
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className={`text-lg font-medium transition-colors ${
-                        pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
-                      }`}
-                    >
-                      Dashboard
-                    </Link>
-                    <Button onClick={handleLogout} variant="outline" className="justify-start">
-                      Logout
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="outline" className="justify-start">
-                      <Link href="/login">Login</Link>
-                    </Button>
-                    <Button className="justify-start">
-                      <Link href="/register">Sign up</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="ACCEPTED">Accepted</SelectItem>
+              <SelectItem value="DECLINED">Declined</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="w-full overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Event</TableHead>
+                <TableHead>Date & Venue</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gray-200 rounded-md animate-pulse" />
+                      <div className="space-y-2">
+                        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-2">
+                      <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+                      <div className="h-3 w-32 bg-gray-200 rounded animate-pulse" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-6 w-20 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-6 w-16 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-8 w-24 bg-gray-200 rounded animate-pulse" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : filteredInvitations.length > 0 ? (
+        <div className="w-full overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[300px]">Event</TableHead>
+                <TableHead className="w-[250px]">Date & Venue</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Payment Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredInvitations.map((invitation) => (
+                <TableRow key={invitation.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0">
+                        <Image
+                          src={invitation.event.eventImgUrl || "/placeholder.svg"}
+                          alt={invitation.event.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium">{invitation.event.title}</div>
+                        <div className="text-sm text-muted-foreground line-clamp-1">
+                          {invitation.invitationNote || invitation.event.description}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-center text-sm">
+                        <Calendar className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                        {formatDate(invitation.event.dateTime)}
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                        {invitation.event.venue}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(invitation.status)}>{invitation.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      {invitation.paid ? (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Payable Balance
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Not Payable
+                        </Badge>
+                      )}
+                      {invitation.event.isPaid && (
+                        <div className="text-sm text-muted-foreground">
+                          Fee: ${(invitation.event.fee / 100).toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {invitation?.paid ? (
+                      <Badge
+                        variant="outline"
+                        className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Paid
+                      </Badge>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="bg-red-50 text-red-700 border-red-200 flex items-center gap-1"
+                      >
+                        <XCircle className="w-4 h-4" /> Not Paid
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {invitation.status === "PENDING" ? (
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm">Accept</Button>
+                        <Button variant="outline" size="sm">
+                          Decline
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View</Link>
+                        </Button>
+                      </div>
+                    ) : invitation.status === "ACCEPTED" && invitation.event.isPaid && !invitation.paid ? (
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                          Pay Now
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View</Link>
+                        </Button>
+                      </div>
+                    ) : invitation.status === "ACCEPTED" && invitation.paid ? (
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" disabled>
+                          Accepted
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View Attachment</Link>
+                        </Button>
+                      </div>
+                    ) : invitation.status === "DECLINED" ? (
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" disabled>
+                          Declined
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/myinvitaions/${invitation.id}`}>View Attachment</Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Link href={""}>Contact Organizer</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Add to Calendar</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       ) : (
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            href="/events"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
-            }`}
-          >
-            Events
-          </Link>
-          <Link
-            href="/about"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
-            }`}
-          >
-            About
-          </Link>
-
-          {user ? (
-            <>
-              <Link
-                href="/dashboard"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Button onClick={handleLogout} variant="outline" size="sm">
-                Logout
-              </Button>
-              <NotificationsDesktop
-                notifications={notifications}
-                unreadCount={unreadCount}
-                isLoading={isLoading}
-                onOpenChange={handleNotificationPanelOpen}
-              />
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button size="sm">
-                <Link href="/register">Sign up</Link>
-              </Button>
-            </>
-          )}
+        <div className="text-center py-12 border rounded-lg">
+          <h3 className="text-lg font-medium">No invitations found</h3>
+          <p className="text-muted-foreground mt-1">
+            {searchQuery || statusFilter !== "all"
+              ? "Try adjusting your filters"
+              : "You don't have any invitations yet"}
+          </p>
         </div>
       )}
-    </nav>
-  )
-}
 
-interface NotificationsDesktopProps {
-  notifications: Notification[]
-  unreadCount: number
-  isLoading: boolean
-  onOpenChange: (open: boolean) => void
-}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {/* Custom Previous Button */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className="h-8 w-8"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="sr-only">Previous page</span>
+          </Button>
 
-function NotificationsDesktop({ notifications, unreadCount, isLoading, onOpenChange }: NotificationsDesktopProps) {
-  return (
-    <Popover onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
-      <Button variant="outline" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between border-b p-3">
-          <h3 className="font-medium">Invitations</h3>
+          {/* Page Numbers */}
+          <div className="flex items-center">{renderPaginationNumbers()}</div>
+
+          {/* Custom Next Button */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            className="h-8 w-8"
+          >
+            <ChevronRight className="h-4 w-4" />
+            <span className="sr-only">Next page</span>
+          </Button>
         </div>
-        <div className="max-h-80 overflow-auto">
-          {isLoading ? (
-            <div className="p-4 text-center">Loading invitations...</div>
-          ) : notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 border-b last:border-0 ${notification.read ? "" : "bg-slate-50"} hover:bg-slate-100 transition-colors`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notification.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
+      )}
 
-                <div className="mt-2 text-xs flex flex-wrap gap-2 mb-2">
-                  {notification.venue && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {notification.venue}
-                    </span>
-                  )}
-
-                  {notification.date && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                        <line x1="16" x2="16" y1="2" y2="6" />
-                        <line x1="8" x2="8" y1="2" y2="6" />
-                        <line x1="3" x2="21" y1="10" y2="10" />
-                      </svg>
-                      {notification.date}
-                    </span>
-                  )}
-                </div>
-
-                <Link
-                  href={`/dashboard/myinvitaions/${notification?.id}`}
-                  className="inline-block text-xs font-medium text-primary hover:underline transition-colors"
-                >
-                  View Invitation Details →
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">No invitations found</div>
-          )}
+      {/* Page info */}
+      {totalPages > 0 && (
+        <div className="text-center text-sm text-muted-foreground">
+          Page {currentPage} of {totalPages}
         </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
-
-interface NotificationsMobileProps extends Omit<NotificationsDesktopProps, "onOpenChange"> {
-  onOpenChange: (open: boolean) => void
-}
-
-function NotificationsMobile({ notifications, unreadCount, isLoading, onOpenChange }: NotificationsMobileProps) {
-  return (
-    <Sheet onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-             
-            </span>
-          )}
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="overflow-y-auto">
-        <div className="flex items-center justify-between border-b pb-3 mt-6">
-          <h3 className="font-medium">Invitations</h3>
-        </div>
-        <div className="mt-4 space-y-4">
-          {isLoading ? (
-            <div className="p-4 text-center">Loading invitations...</div>
-          ) : notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 border rounded-lg ${notification.read ? "" : "bg-slate-50"} hover:bg-slate-100 transition-colors`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notification.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
-
-                <div className="mt-2 text-xs flex flex-wrap gap-2 mb-2">
-                  {notification.venue && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {notification.venue}
-                    </span>
-                  )}
-
-                  {notification.date && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                        <line x1="16" x2="16" y1="2" y2="6" />
-                        <line x1="8" x2="8" y1="2" y2="6" />
-                        <line x1="3" x2="21" y1="10" y2="10" />
-                      </svg>
-                      {notification.date}
-                    </span>
-                  )}
-                </div>
-
-                <Link
-                  href={`/dashboard/myinvitaions/${notification?.id}`}
-                  className="inline-block text-xs font-medium text-primary hover:underline transition-colors"
-                >
-                  View Invitation Details →
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">No invitations found</div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
+      )}
+    </div>
   )
 }
