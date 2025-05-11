@@ -16,7 +16,7 @@ import { getAllInvitaions } from "@/service/Invitations"
 import { logout } from "@/service/AuthService"
 import { useDispatch } from "react-redux"
 
-interface Notification {
+type Notification ={
   id: string
   title: string
   message: string

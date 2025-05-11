@@ -42,7 +42,7 @@ type Invitation = {
   createdAt: string
 }
 
-type Event = {
+export type Event = {
   id: string
   title: string
   description: string
@@ -61,8 +61,8 @@ type Event = {
   participations: any[]
 }
 
-export default function FeaturedEventsSection({ events }: { events: { events: Event[] } }) {
-  const featuredEvents = events?.events || []
+export default function FeaturedEventsSection({ events }:  { events: Event[] } ) {
+  const featuredEvents = events|| []
   const [currentSlide, setCurrentSlide] = useState(0)
   const [autoplay, setAutoplay] = useState(true)
   const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop")

@@ -2,7 +2,7 @@
 import CtaSection from "@/components/sections/cta-section";
 import EventTypesSection from "@/components/sections/event-types-section";
 import FaqSection from "@/components/sections/faq-section";
-import FeaturedEventsSection from "@/components/sections/featured-events-section";
+import FeaturedEventsSection, { Event } from "@/components/sections/featured-events-section";
 import HeroSection from "@/components/sections/hero-section";
 import HowItWorksSection from "@/components/sections/how-it-works-section";
 import NewsletterSection from "@/components/sections/newsletter-section";
@@ -11,7 +11,8 @@ import TestimonialsSection from "@/components/sections/testimonials-section";
 import { Loader2 } from "lucide-react";
 import { Suspense } from "react";
 
-const HomePage = (events:any) => {
+const HomePage = ({events}:{events:Event[]}) => {
+console.log(events)
     return (
       <div className="flex min-h-screen w-full flex-col bg-white">
 

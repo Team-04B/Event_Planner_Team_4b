@@ -1,16 +1,15 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Calendar, Search, Users } from "lucide-react"
+import { ArrowRight, Calendar, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+// import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
 export default function HeroSection() {
-  const [searchQuery, setSearchQuery] = useState("")
+  // const [searchQuery, setSearchQuery] = useState("")
 
   return (
     <section className="relative overflow-hidden bg-black py-20 text-white md:py-28">
