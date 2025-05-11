@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { sendContactMail } from "@/service/contact";
 import {
   MapPinIcon,
   PhoneIcon,
@@ -11,6 +11,7 @@ import {
   TwitterIcon,
   InstagramIcon,
 } from "lucide-react";
+import { useState } from "react";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -19,7 +20,6 @@ export default function Contact() {
     subject: "",
     message: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [responseMsg, setResponseMsg] = useState("");
 
@@ -35,38 +35,31 @@ export default function Contact() {
     setResponseMsg("");
 
     const html = `
-      <h2>New Contact Message</h2>
-      <p><strong>Name:</strong> ${form.name}</p>
-      <p><strong>Email:</strong> ${form.email}</p>
-      <p><strong>Subject:</strong> ${form.subject}</p>
-      <p><strong>Message:</strong><br/>${form.message}</p>
-    `;
+    <h2>New Contact Message</h2>
+    <p><strong>Name:</strong> ${form.name}</p>
+    <p><strong>Email:</strong> ${form.email}</p>
+    <p><strong>Subject:</strong> ${form.subject}</p>
+    <p><strong>Message:</strong><br/>${form.message}</p>
+  `;
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from: form.name, // as per backend update
-          to: "your-receiving-email@example.com", // backend will handle it if fixed
-          subject: form.subject || "Message from Website",
-          html,
-        }),
-      });
+    const res = await sendContactMail({
+      name: form.name,
+      subject: form.subject,
+      message: html,
+      email: form.email,
+    });
 
-      const data = await res.json();
-      if (res.ok) {
-        setResponseMsg("✅ Message sent successfully!");
-        setForm({ name: "", email: "", subject: "", message: "" });
-      } else {
-        setResponseMsg(data.error || "❌ Failed to send message.");
-      }
-    } catch (err) {
-      console.error("Email send error:", err);
-      setResponseMsg("❌ Network error. Please try again.");
-    } finally {
-      setLoading(false);
+    if (res.success) {
+      setResponseMsg("Message sent successfully!");
+      setForm({ name: "", email: "", subject: "", message: "" });
+  
+    } else {
+      setResponseMsg(
+        res.error || "Failed to send message. Please try again later."
+      );
     }
+
+    setLoading(false);
   };
 
   return (
@@ -74,42 +67,44 @@ export default function Contact() {
       <div className="max-w-3xl mx-auto text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
         <p className="text-lg text-muted-foreground">
-          Have questions or need assistance? We're here to help!
+          Have questions or need assistance? We are here to help! Reach out to
+          our team using any of the methods below.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-8 rounded-2xl shadow-lg">
-        {/* Form Section */}
-        <div className="md:pr-6 border-b md:border-b-0 md:border-r border-gray-200">
+        {/* Left Side: Form */}
+        <div className="pr-0 md:pr-6 border-b md:border-b-0 md:border-r border-gray-200">
           <h2 className="text-2xl font-semibold mb-6">Send Us a Message</h2>
           <form className="space-y-5" onSubmit={handleSubmit}>
-            <InputField
-              label="Your Name"
-              id="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-              required
-              placeholder="John Doe"
-            />
-            <InputField
-              label="Email Address"
-              id="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              placeholder="john@example.com"
-            />
-            <InputField
-              label="Subject"
-              id="subject"
-              type="text"
-              value={form.subject}
-              onChange={handleChange}
-              required
-              placeholder="How can we help you?"
-            />
+            {["name", "email", "subject"].map((field) => (
+              <div key={field}>
+                <label
+                  htmlFor={field}
+                  className="text-sm font-medium text-gray-700 block mb-1"
+                >
+                  {field === "email"
+                    ? "Email Address"
+                    : field.charAt(0).toUpperCase() + field.slice(1)}
+                </label>
+                <input
+                  id={field}
+                  name={field}
+                  type={field === "email" ? "email" : "text"}
+                  required
+                  value={form[field as keyof typeof form]}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  placeholder={
+                    field === "name"
+                      ? "John Doe"
+                      : field === "email"
+                      ? "john@example.com"
+                      : "How can we help you?"
+                  }
+                />
+              </div>
+            ))}
             <div>
               <label
                 htmlFor="message"
@@ -122,9 +117,9 @@ export default function Contact() {
                 name="message"
                 rows={5}
                 required
-                placeholder="Your message here..."
                 value={form.message}
                 onChange={handleChange}
+                placeholder="Your message here..."
                 className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
               ></textarea>
             </div>
@@ -139,14 +134,14 @@ export default function Contact() {
           </form>
         </div>
 
-        {/* Info Section */}
-        <div className="md:pl-6">
+        {/* Right Side: Info & Socials */}
+        <div className="pl-0 md:pl-6">
           <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
           <div className="space-y-4 mb-8">
             <ContactInfo
               icon={<MapPinIcon className="h-5 w-5 text-purple-600" />}
               title="Address"
-              text="123 Event Street, Suite 456, San Francisco, CA 94103"
+              text="123 Event Street, Suite 456, San Francisco, CA 94103, United States"
             />
             <ContactInfo
               icon={<PhoneIcon className="h-5 w-5 text-purple-600" />}
@@ -165,23 +160,25 @@ export default function Contact() {
             />
           </div>
 
-          <h2 className="text-xl font-semibold mb-4">Connect With Us</h2>
-          <div className="flex space-x-4">
-            <SocialLink
-              href="https://facebook.com"
-              label="Facebook"
-              icon={<FacebookIcon className="h-5 w-5" />}
-            />
-            <SocialLink
-              href="https://twitter.com"
-              label="Twitter"
-              icon={<TwitterIcon className="h-5 w-5" />}
-            />
-            <SocialLink
-              href="https://instagram.com"
-              label="Instagram"
-              icon={<InstagramIcon className="h-5 w-5" />}
-            />
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Connect With Us</h2>
+            <div className="flex space-x-4">
+              <SocialLink
+                href="https://facebook.com"
+                label="Facebook"
+                icon={<FacebookIcon className="h-5 w-5" />}
+              />
+              <SocialLink
+                href="https://twitter.com"
+                label="Twitter"
+                icon={<TwitterIcon className="h-5 w-5" />}
+              />
+              <SocialLink
+                href="https://instagram.com"
+                label="Instagram"
+                icon={<InstagramIcon className="h-5 w-5" />}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -189,46 +186,7 @@ export default function Contact() {
   );
 }
 
-// Reusable input field
-function InputField({
-  label,
-  id,
-  type,
-  value,
-  onChange,
-  required = false,
-  placeholder = "",
-}: {
-  label: string;
-  id: string;
-  type: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  placeholder?: string;
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="text-sm font-medium text-gray-700 block mb-1"
-      >
-        {label}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        required={required}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
-      />
-    </div>
-  );
-}
-
+// Reusable Contact Info
 function ContactInfo({
   icon,
   title,
@@ -249,6 +207,7 @@ function ContactInfo({
   );
 }
 
+// Social Link
 function SocialLink({
   href,
   label,

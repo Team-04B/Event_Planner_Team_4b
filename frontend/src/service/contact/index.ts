@@ -1,29 +1,30 @@
-"use client";
+"use server";
 
 export const sendContactMail = async ({
   name,
   subject,
-  html,
+  message,
+  email,
 }: {
   name: string;
   subject: string;
-  html: string;
+  message: string;
+  email: string;
 }) => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/sendMail`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: name,
-        to: "your-receiving-email@example.com",
-        subject: subject || "Message from Website",
-        html,
+        email,
+        name,
+        subject,
+        message,
       }),
     });
 
     return res.json();
   } catch (error: any) {
-    console.error("Mail send error:", error);
     return { success: false, error: error.message || "Unknown error" };
   }
 };
