@@ -27,6 +27,7 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
   console.log();
 
   console.log("🚀 currentUser:", currentUser);
+  
   if (!currentUser?.id) {
     return (
       <div className="text-center py-12">

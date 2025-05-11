@@ -17,7 +17,7 @@ export default function AllEvents() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [,setError] = useState("");
+  const [, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   // Pagination state
@@ -80,7 +80,6 @@ export default function AllEvents() {
     // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some((value) => value);
 
-
     if (hasActiveFilters) {
       result = result.filter((event) => {
         if (filters.publicFree && event.isPublic && !event.isPaid) return true;
@@ -129,7 +128,7 @@ export default function AllEvents() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
+      <div className="mb-8 mx-auto max-w-2xl text-center">
         <h1 className="text-3xl font-bold">Discover Events</h1>
         <p className="text-muted-foreground mt-1">
           Find and join amazing events
