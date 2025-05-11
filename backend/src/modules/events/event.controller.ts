@@ -239,6 +239,22 @@ const handleRequestEvent = catchAsync(async (req, res) => {
   });
 });
 
+// GET /events/:id/participation-status
+const getParticipationStatus = catchAsync(async (req, res) => {
+  const eventId = req.params.id;
+  const userId = req.user?.id;
+
+  if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
+
+  const result = await EventService.getParticipationStatus(eventId, userId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Participation status fetched',
+    data: result,
+  });
+});
+
 // update Participant Status
 const updateParticipantStatus = catchAsync(async (req, res) => {
   const { participantId } = req.params;
@@ -268,6 +284,7 @@ export const EventController = {
   deleteFromDB,
   handleJoinEvent,
   handleRequestEvent,
+  getParticipationStatus,
   updateParticipantStatus,
   // adminDeleteEvent,
 };

@@ -76,6 +76,14 @@ router.post(
   EventController.handleRequestEvent
 );
 
+// get participation status
+router.get(
+  '/:id/participation-status',
+  auth(Role.USER),
+  EventController.getParticipationStatus
+);
+
+
 // reviews routes
 router.post(
   '/:id/reviews',
