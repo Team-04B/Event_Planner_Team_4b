@@ -126,7 +126,6 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          /
           <SidebarMenuItem>
             <Link href="/dashboard/profile">
               <div className=" mb-3 pl-2 flex items-center gap-3">
