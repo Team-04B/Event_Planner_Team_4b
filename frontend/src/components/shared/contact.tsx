@@ -1,104 +1,272 @@
-"use server";
+"use client";
 
-import nodemailer from "nodemailer";
-import { z } from "zod";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  MapPinIcon,
+  PhoneIcon,
+  MailIcon,
+  ClockIcon,
+  FacebookIcon,
+  TwitterIcon,
+  InstagramIcon,
+} from "lucide-react";
 
-// Define the form schema for validation
-const contactFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  subject: z
-    .string()
-    .min(5, { message: "Subject must be at least 5 characters" }),
-  message: z
-    .string()
-    .min(10, { message: "Message must be at least 10 characters" }),
-});
-
-type ContactFormData = z.infer<typeof contactFormSchema>;
-
-// Create a transporter for sending emails
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
-    },
+export default function Contact() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
-};
 
-export async function sendContactEmail(formData: FormData) {
-  try {
-    // Extract form data
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const subject = formData.get("subject") as string;
-    const message = formData.get("message") as string;
+  const [loading, setLoading] = useState(false);
+  const [responseMsg, setResponseMsg] = useState("");
 
-    // Validate form data
-    const result = contactFormSchema.safeParse({
-      name,
-      email,
-      subject,
-      message,
-    });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    if (!result.success) {
-      // Return validation errors
-      return {
-        success: false,
-        errors: result.error.flatten().fieldErrors,
-        message: "Please check the form for errors",
-      };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setResponseMsg("");
+
+    const html = `
+      <h2>New Contact Message</h2>
+      <p><strong>Name:</strong> ${form.name}</p>
+      <p><strong>Email:</strong> ${form.email}</p>
+      <p><strong>Subject:</strong> ${form.subject}</p>
+      <p><strong>Message:</strong><br/>${form.message}</p>
+    `;
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: form.name, // as per backend update
+          to: "your-receiving-email@example.com", // backend will handle it if fixed
+          subject: form.subject || "Message from Website",
+          html,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setResponseMsg("✅ Message sent successfully!");
+        setForm({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setResponseMsg(data.error || "❌ Failed to send message.");
+      }
+    } catch (err) {
+      console.error("Email send error:", err);
+      setResponseMsg("❌ Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Create email content
-    const mailOptions = {
-      from: `"EventHub Contact" <${process.env.SMTP_USER}>`,
-      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
-      replyTo: email,
-      subject: `Contact Form: ${subject}`,
-      text: `
-        Name: ${name}
-        Email: ${email}
-        
-        Message:
-        ${message}
-      `,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #7c3aed;">New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <div style="margin-top: 20px;">
-            <p><strong>Message:</strong></p>
-            <p style="white-space: pre-line;">${message}</p>
+  return (
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-3xl mx-auto text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+        <p className="text-lg text-muted-foreground">
+          Have questions or need assistance? We're here to help!
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-8 rounded-2xl shadow-lg">
+        {/* Form Section */}
+        <div className="md:pr-6 border-b md:border-b-0 md:border-r border-gray-200">
+          <h2 className="text-2xl font-semibold mb-6">Send Us a Message</h2>
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <InputField
+              label="Your Name"
+              id="name"
+              type="text"
+              value={form.name}
+              onChange={handleChange}
+              required
+              placeholder="John Doe"
+            />
+            <InputField
+              label="Email Address"
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              placeholder="john@example.com"
+            />
+            <InputField
+              label="Subject"
+              id="subject"
+              type="text"
+              value={form.subject}
+              onChange={handleChange}
+              required
+              placeholder="How can we help you?"
+            />
+            <div>
+              <label
+                htmlFor="message"
+                className="text-sm font-medium text-gray-700 block mb-1"
+              >
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows={5}
+                required
+                placeholder="Your message here..."
+                value={form.message}
+                onChange={handleChange}
+                className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              ></textarea>
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Sending..." : "Send Message"}
+            </Button>
+            {responseMsg && (
+              <p className="text-sm mt-2 text-center text-gray-700">
+                {responseMsg}
+              </p>
+            )}
+          </form>
+        </div>
+
+        {/* Info Section */}
+        <div className="md:pl-6">
+          <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
+          <div className="space-y-4 mb-8">
+            <ContactInfo
+              icon={<MapPinIcon className="h-5 w-5 text-purple-600" />}
+              title="Address"
+              text="123 Event Street, Suite 456, San Francisco, CA 94103"
+            />
+            <ContactInfo
+              icon={<PhoneIcon className="h-5 w-5 text-purple-600" />}
+              title="Phone"
+              text="+1 (555) 123-4567"
+            />
+            <ContactInfo
+              icon={<MailIcon className="h-5 w-5 text-purple-600" />}
+              title="Email"
+              text="support@eventhub.com"
+            />
+            <ContactInfo
+              icon={<ClockIcon className="h-5 w-5 text-purple-600" />}
+              title="Business Hours"
+              text={`Mon-Fri: 9 AM - 6 PM\nSat: 10 AM - 4 PM\nSun: Closed`}
+            />
           </div>
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
-            <p>This email was sent from the EventHub contact form.</p>
+
+          <h2 className="text-xl font-semibold mb-4">Connect With Us</h2>
+          <div className="flex space-x-4">
+            <SocialLink
+              href="https://facebook.com"
+              label="Facebook"
+              icon={<FacebookIcon className="h-5 w-5" />}
+            />
+            <SocialLink
+              href="https://twitter.com"
+              label="Twitter"
+              icon={<TwitterIcon className="h-5 w-5" />}
+            />
+            <SocialLink
+              href="https://instagram.com"
+              label="Instagram"
+              icon={<InstagramIcon className="h-5 w-5" />}
+            />
           </div>
         </div>
-      `,
-    };
+      </div>
+    </div>
+  );
+}
 
-    // Send the email
-    const transporter = createTransporter();
-    await transporter.sendMail(mailOptions);
+// Reusable input field
+function InputField({
+  label,
+  id,
+  type,
+  value,
+  onChange,
+  required = false,
+  placeholder = "",
+}: {
+  label: string;
+  id: string;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="text-sm font-medium text-gray-700 block mb-1"
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        required={required}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none"
+      />
+    </div>
+  );
+}
 
-    return {
-      success: true,
-      message:
-        "Your message has been sent successfully! We'll get back to you soon.",
-    };
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return {
-      success: false,
-      message: "Failed to send your message. Please try again later.",
-    };
-  }
+function ContactInfo({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="flex items-start">
+      <div className="mr-3 mt-1">{icon}</div>
+      <div>
+        <h3 className="font-medium">{title}</h3>
+        <p className="text-gray-600 whitespace-pre-line">{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function SocialLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      className="bg-gray-100 hover:bg-purple-100 text-gray-800 p-3 rounded-full transition-colors"
+    >
+      {icon}
+    </a>
+  );
 }

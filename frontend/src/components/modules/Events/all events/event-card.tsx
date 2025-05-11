@@ -37,7 +37,7 @@ export function EventCard({ event }: { event: Event }) {
 
   return (
     <Card className="overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow p-0">
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-48 w-full overflow-hidden p-4">
         <Image
           src={
             event.eventImgUrl ||
@@ -47,8 +47,8 @@ export function EventCard({ event }: { event: Event }) {
           }
           alt={event.title}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover"
+          // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          // className="object-cover"
           priority
         />
 
