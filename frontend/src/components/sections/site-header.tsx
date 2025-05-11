@@ -30,7 +30,7 @@ export function SiteHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
           <Link href="/" className="flex items-center">
-            <span className={cn("text-xl font-bold transition-colors", scrolled ? "text-purple-600" : "text-white")}>
+            <span className={cn("text-xl font-bold transition-colors", scrolled ? "text-black" : "text-white")}>
               EventPlanner
             </span>
           </Link>
@@ -47,7 +47,7 @@ export function SiteHeader() {
               <Link
                 href={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s+/g, "-")}`}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-purple-600",
+                  "text-sm font-medium transition-colors hover:text-gray-900",
                   scrolled ? "text-gray-600" : "text-white",
                 )}
               >
@@ -67,7 +67,7 @@ export function SiteHeader() {
             variant="ghost"
             className={cn(
               "transition-colors",
-              scrolled ? "text-gray-600 hover:text-purple-600" : "text-white hover:bg-white/10 hover:text-white",
+              scrolled ? "text-gray-600 hover:text-black" : "text-white hover:bg-white/10 hover:text-white",
             )}
           >
             Log In
@@ -75,7 +75,7 @@ export function SiteHeader() {
           <Button
             className={cn(
               "transition-colors",
-              scrolled ? "bg-purple-600 text-white hover:bg-purple-700" : "bg-white text-purple-600 hover:bg-gray-100",
+              scrolled ? "bg-black text-white hover:bg-gray-900" : "bg-white text-black hover:bg-gray-100",
             )}
           >
             Sign Up
@@ -113,7 +113,7 @@ export function SiteHeader() {
                 <Link
                   key={item}
                   href={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s+/g, "-")}`}
-                  className="text-sm font-medium text-gray-700 hover:text-purple-700"
+                  className="text-sm font-medium text-gray-700 hover:text-black"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item}
@@ -123,7 +123,7 @@ export function SiteHeader() {
                 <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-100">
                   Log In
                 </Button>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">Sign Up</Button>
+                <Button className="w-full bg-black hover:bg-gray-900">Sign Up</Button>
               </div>
             </nav>
           </motion.div>

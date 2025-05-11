@@ -65,7 +65,7 @@ export function SiteFooter() {
         >
           <motion.div className="lg:col-span-2" variants={itemVariants}>
             <Link href="/" className="mb-4 inline-block">
-              <span className="text-xl font-bold text-purple-600">EventPlanner</span>
+              <span className="text-xl font-bold text-black">EventPlanner</span>
             </Link>
             <p className="mb-4 max-w-md text-gray-600">
               Creating meaningful connections through exceptional events. Our platform makes it easy to create,
@@ -81,7 +81,7 @@ export function SiteFooter() {
                 <Link
                   key={index}
                   href="#"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-purple-100 hover:text-purple-600"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 hover:text-black"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -90,13 +90,13 @@ export function SiteFooter() {
             </div>
           </motion.div>
 
-          {footerLinks.map((column) => (
+          {footerLinks.map((column, columnIndex) => (
             <motion.div key={column.title} variants={itemVariants}>
               <h3 className="mb-4 text-lg font-semibold text-gray-900">{column.title}</h3>
               <ul className="space-y-2">
-                {column.links.map((link) => (
+                {column.links.map((link, linkIndex) => (
                   <li key={link.name}>
-                    <Link href={link.href} className="text-gray-600 hover:text-purple-600">
+                    <Link href={link.href} className="text-gray-600 hover:text-black">
                       {link.name}
                     </Link>
                   </li>
@@ -118,13 +118,13 @@ export function SiteFooter() {
               © {new Date().getFullYear()} EventPlanner. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <Link href="/terms" className="text-sm text-gray-600 hover:text-purple-600">
+              <Link href="/terms" className="text-sm text-gray-600 hover:text-black">
                 Terms of Service
               </Link>
-              <Link href="/privacy" className="text-sm text-gray-600 hover:text-purple-600">
+              <Link href="/privacy" className="text-sm text-gray-600 hover:text-black">
                 Privacy Policy
               </Link>
-              <Link href="/cookies" className="text-sm text-gray-600 hover:text-purple-600">
+              <Link href="/cookies" className="text-sm text-gray-600 hover:text-black">
                 Cookie Policy
               </Link>
             </div>

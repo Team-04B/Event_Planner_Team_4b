@@ -1,8 +1,9 @@
-import HeroSection from "@/components/homeComponents/heroSection/HeroSection";
+
 import CtaSection from "@/components/sections/cta-section";
 import EventTypesSection from "@/components/sections/event-types-section";
 import FaqSection from "@/components/sections/faq-section";
 import FeaturedEventsSection from "@/components/sections/featured-events-section";
+import HeroSection from "@/components/sections/hero-section";
 import HowItWorksSection from "@/components/sections/how-it-works-section";
 import NewsletterSection from "@/components/sections/newsletter-section";
 import StatsSection from "@/components/sections/stats-section";
@@ -10,7 +11,7 @@ import TestimonialsSection from "@/components/sections/testimonials-section";
 import { Loader2 } from "lucide-react";
 import { Suspense } from "react";
 
-const HomePage = () => {
+const HomePage = (events:any) => {
     return (
       <div className="flex min-h-screen w-full flex-col bg-white">
 
@@ -21,7 +22,7 @@ const HomePage = () => {
         </Suspense>
 
         <Suspense fallback={<Loader2 />}>
-          <FeaturedEventsSection />
+          <FeaturedEventsSection events={events} />
         </Suspense>
 
         <Suspense fallback={<Loader2 />}>

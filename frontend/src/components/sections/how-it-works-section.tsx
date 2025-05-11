@@ -16,21 +16,21 @@ export default function HowItWorksSection() {
       description:
         "Create public or private events with optional registration fees. Customize every aspect of your event.",
       icon: <Calendar className="h-8 w-8 text-white" />,
-      color: "bg-purple-600",
+      color: "bg-black",
       steps: ["Set event visibility (public/private)", "Add optional registration fee", "Customize event details"],
     },
     {
       title: "Discover & Join",
       description: "Browse upcoming events, filter by your interests, and join with just a few clicks.",
-      icon: <Search className="h-8 w-8 text-white" />,
-      color: "bg-pink-600",
+      icon: <Search className="h-8 w-8 text-black" />,
+      color: "bg-white",
       steps: ["Browse events by category", "Request access to private events", "Complete payment for paid events"],
     },
     {
       title: "Manage & Connect",
       description: "Approve participants, send invitations, and build your community around shared interests.",
       icon: <Users className="h-8 w-8 text-white" />,
-      color: "bg-indigo-600",
+      color: "bg-black",
       steps: ["Approve or reject requests", "Send direct invitations", "Engage with participants"],
     },
   ]
@@ -54,8 +54,8 @@ export default function HowItWorksSection() {
     <section className="relative overflow-hidden py-20">
       {/* Background elements */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute left-0 top-0 h-64 w-64 rounded-full bg-purple-100 opacity-30 blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-indigo-100 opacity-30 blur-3xl"></div>
+        <div className="absolute left-0 top-0 h-64 w-64 rounded-full bg-gray-100 opacity-30 blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-gray-100 opacity-30 blur-3xl"></div>
       </div>
 
       <div className="container mx-auto px-4">
@@ -66,7 +66,7 @@ export default function HowItWorksSection() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
         >
-          <Badge className="mb-4 bg-purple-100 text-purple-800">Simple Process</Badge>
+          <Badge className="mb-4 bg-black text-white">Simple Process</Badge>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">How It Works</h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600">
             Our platform makes it easy to create, discover, and participate in events that matter to you
@@ -87,7 +87,7 @@ export default function HowItWorksSection() {
               <motion.div key={index} className="relative" variants={itemVariants}>
                 <div className="relative z-10 flex flex-col items-center text-center">
                   <div
-                    className={`relative mb-6 flex h-20 w-20 items-center justify-center rounded-full ${step.color}`}
+                    className={`relative mb-6 flex h-20 w-20 items-center justify-center rounded-full ${step.color} border border-gray-200`}
                   >
                     {step.icon}
                     <div className="absolute -right-1 -top-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-lg font-bold text-gray-900 shadow-md">
@@ -105,7 +105,7 @@ export default function HowItWorksSection() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: 0.5 + i * 0.1 }}
                       >
-                        <CheckCircle className="mr-2 h-5 w-5 flex-shrink-0 text-purple-500" />
+                        <CheckCircle className="mr-2 h-5 w-5 flex-shrink-0 text-black" />
                         <span className="text-gray-600">{item}</span>
                       </motion.li>
                     ))}
@@ -123,7 +123,7 @@ export default function HowItWorksSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+          <Button size="lg" className="bg-black hover:bg-gray-900">
             Get Started Now
           </Button>
         </motion.div>

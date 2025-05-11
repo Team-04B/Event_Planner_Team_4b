@@ -51,7 +51,7 @@ export default function FaqSection() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
         >
-          <Badge className="mb-4 bg-purple-100 text-purple-800">FAQ</Badge>
+          <Badge className="mb-4 bg-black text-white">FAQ</Badge>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
             Frequently Asked Questions
           </h2>

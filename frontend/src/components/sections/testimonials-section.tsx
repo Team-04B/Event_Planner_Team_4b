@@ -1,5 +1,4 @@
 "use client"
-/* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
@@ -80,11 +79,11 @@ export default function TestimonialsSection() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-purple-900 to-indigo-900 py-20 text-white">
+    <section className="relative overflow-hidden bg-black py-20 text-white">
       {/* Animated background elements */}
       <div className="absolute inset-0 z-0">
         <motion.div
-          className="absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-purple-500 opacity-10 blur-3xl"
+          className="absolute left-[10%] top-[20%] h-64 w-64 rounded-full bg-white opacity-5 blur-3xl"
           animate={{
             x: [0, 30, 0],
             y: [0, 30, 0],
@@ -96,7 +95,7 @@ export default function TestimonialsSection() {
           }}
         />
         <motion.div
-          className="absolute bottom-[10%] right-[10%] h-96 w-96 rounded-full bg-indigo-500 opacity-10 blur-3xl"
+          className="absolute bottom-[10%] right-[10%] h-96 w-96 rounded-full bg-white opacity-5 blur-3xl"
           animate={{
             x: [0, -40, 0],
             y: [0, -40, 0],
@@ -119,7 +118,7 @@ export default function TestimonialsSection() {
         >
           <Badge className="mb-4 bg-white/20 text-white hover:bg-white/30">Testimonials</Badge>
           <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">What Our Users Say</h2>
-          <p className="mx-auto max-w-2xl text-lg text-purple-100">
+          <p className="mx-auto max-w-2xl text-lg text-gray-300">
             Join thousands of satisfied users who are creating and discovering amazing events
           </p>
         </motion.div>
@@ -140,7 +139,7 @@ export default function TestimonialsSection() {
                     <Star
                       key={i}
                       className={`h-6 w-6 ${
-                        i < testimonials[activeIndex].rating ? "fill-yellow-500 text-yellow-500" : "text-gray-400"
+                        i < testimonials[activeIndex].rating ? "fill-white text-white" : "text-gray-600"
                       }`}
                     />
                   ))}
@@ -158,7 +157,7 @@ export default function TestimonialsSection() {
                     />
                   </div>
                   <h4 className="text-lg font-semibold">{testimonials[activeIndex].name}</h4>
-                  <p className="text-purple-200">{testimonials[activeIndex].role}</p>
+                  <p className="text-gray-300">{testimonials[activeIndex].role}</p>
                 </div>
               </motion.div>
             </AnimatePresence>

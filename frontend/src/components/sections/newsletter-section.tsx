@@ -31,7 +31,7 @@ export default function NewsletterSection() {
     <section className="py-20">
       <div className="container mx-auto px-4">
         <motion.div
-          className="mx-auto max-w-4xl overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 shadow-xl"
+          className="mx-auto max-w-4xl overflow-hidden rounded-2xl bg-black shadow-xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -65,7 +65,7 @@ export default function NewsletterSection() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                  <Button type="submit" className="bg-white text-purple-600 hover:bg-white/90" size="lg">
+                  <Button type="submit" className="bg-white text-black hover:bg-white/90" size="lg">
                     Subscribe <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </form>

@@ -171,9 +171,10 @@ export default function Navbar() {
           <Link href="/events" className="text-sm font-medium">
             Events
           </Link>
-          <Link href="/about" className="text-lg font-medium">
-                  About
-                </Link>
+          <Link href="/about" className="text-sm font-medium">
+            About
+          </Link>
+       
           {user ? (
             <>
               <Link href="/dashboard" className="text-sm font-medium">
