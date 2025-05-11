@@ -126,20 +126,23 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
+          /
           <SidebarMenuItem>
-            <div className=" mb-3 pl-2 flex items-center gap-3">
-              <Image
-                className="rounded-lg"
-                src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-                width={35}
-                height={25}
-                alt="profile image"
-              />
-              <h2 className="font-medium">{name || "Not found"}</h2>
-            </div>
+            <Link href="/dashboard/profile">
+              <div className=" mb-3 pl-2 flex items-center gap-3">
+                <Image
+                  className="rounded-lg"
+                  src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                  width={35}
+                  height={25}
+                  alt="profile image"
+                />
+                <h2 className="font-medium">{name || "Not found"}</h2>
+              </div>
+            </Link>
             {user?.role === "USER" && (
               <SidebarMenuButton>
-                <Link href="/dashboard/createevent">
+                <Link href="/dashboard/create-event">
                   <h2 className="flex items-center gap-1">
                     <Plus fontSize={700} size={20} /> Create Event.
                   </h2>
