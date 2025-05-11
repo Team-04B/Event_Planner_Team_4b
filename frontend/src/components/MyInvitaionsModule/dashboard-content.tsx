@@ -71,6 +71,8 @@ export default function DashboardContent() {
   // Add a state for pagination cache to avoid refetching
   const [paginationCache, setPaginationCache] = useState<Record<number, Invitation[]>>({})
 
+
+
   useEffect(() => {
     const fetchInvitations = async () => {
       // Check if we already have this page in cache
@@ -104,6 +106,7 @@ export default function DashboardContent() {
 
     fetchInvitations()
   }, [currentPage, pageSize, paginationCache])
+
 
   useEffect(() => {
     // Apply frontend filtering
@@ -279,7 +282,6 @@ export default function DashboardContent() {
           </Select>
         </div>
       </div>
-
       {loading ? (
         <div className="w-full overflow-auto">
           <Table>
@@ -496,6 +498,7 @@ export default function DashboardContent() {
 
           {/* Page Numbers */}
           <div className="flex items-center">{renderPaginationNumbers()}</div>
+
 
           {/* Custom Next Button */}
           <Button
