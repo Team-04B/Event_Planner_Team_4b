@@ -1,4 +1,5 @@
 import { TReactChildrenType } from "@/commonTypes/commonTypes";
+import { SiteFooter } from "@/components/sections/site-footer";
 import Navbar from "@/components/shared/Navbar";
 
 const CommonLayout = ({children}:TReactChildrenType) => {
@@ -10,6 +11,8 @@ const CommonLayout = ({children}:TReactChildrenType) => {
             {children}
             <footer>
             {/* <Footer/> */}
+      <SiteFooter />
+            
         </footer>   
         </>
     )
