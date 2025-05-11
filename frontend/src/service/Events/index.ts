@@ -173,42 +173,44 @@ export const getEventById = async (eventId: string) => {
       data: null,
     };
   }
-}
+};
 
 export const updateEvent = async (eventId: string, eventData: FormData) => {
   try {
-    const cookieStore = cookies()
-    const accessToken = (await cookieStore).get("accessToken")?.value
+    const cookieStore = cookies();
+    const accessToken = (await cookieStore).get("accessToken")?.value;
 
     if (!accessToken) {
-      throw new Error("No access token found in cookies.")
+      throw new Error("No access token found in cookies.");
     }
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`, {
-      method: "PATCH",
-      headers: {
-        // "Content-Type": "application/json",
-        Authorization: accessToken,
-      },
-      body: eventData,
-      credentials: "include",
-    })
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`,
+      {
+        method: "PATCH",
+        headers: {
+          // "Content-Type": "application/json",
+          Authorization: accessToken,
+        },
+        body: eventData,
+        credentials: "include",
+      }
+    );
 
     if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`)
+      throw new Error(`API request failed with status ${res.status}`);
     }
 
-    const data = await res.json()
-    return data
+    const data = await res.json();
+    return data;
   } catch (error: any) {
-    console.error("Event update error:", error)
+    console.error("Event update error:", error);
     return {
       success: false,
       error: error.message || "Unknown error",
-    }
+    };
   }
-}
-
+};
 
 export const deleteEvent = async (eventId: string) => {
   try {
@@ -243,4 +245,28 @@ export const deleteEvent = async (eventId: string) => {
       error: error.message || "Unknown error",
     };
   }
+};
+
+// join public event
+export const joinPublicEvent = async (eventId: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/join`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+  return res.json();
+};
+
+// join paid event
+export const requestPrivateEvent = async (eventId: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/request`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+  return res.json();
 };

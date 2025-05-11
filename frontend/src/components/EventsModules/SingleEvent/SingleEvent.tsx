@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Image from "next/image"
-import { CalendarIcon, MapPinIcon, TicketIcon } from "lucide-react"
-import { format } from "date-fns"
-import { Card, CardContent } from "@/components/ui/card"
-import EventReviewSection from "@/components/EventsModules/EventReviewSection"
-import { IEvent } from "@/commonTypes/commonTypes"
+import Image from "next/image";
+import { CalendarIcon, MapPinIcon, TicketIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Card, CardContent } from "@/components/ui/card";
+import EventReviewSection from "@/components/EventsModules/EventReviewSection";
+import { IEvent } from "@/commonTypes/commonTypes";
+import { Button } from "@/components/ui/button";
 type SingleEvent = {
-event:IEvent;
-currentUser:any;
-}
-export default function SingleEvent({event,currentUser}:SingleEvent) {
-
+  event: IEvent;
+  currentUser: any;
+};
+export default function SingleEvent({ event, currentUser }: SingleEvent) {
+  
   return (
     <div className="container mx-auto py-6 sm:py-8 px-4">
       <div className="grid md:grid-cols-3 gap-6 md:gap-8">
@@ -48,6 +49,14 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
             <p className="text-gray-700">{event.description}</p>
           </div>
 
+          {/* join all buttons */}
+          <div className="flex flex-wrap gap-4">
+            <Button>Join Free</Button>
+            <Button>Pay & Join</Button>
+            <Button>Request to Join</Button>
+            <Button>Pay & Request</Button>
+          </div>
+
           <div className="mt-6 sm:mt-8">
             <EventReviewSection eventId={event.id} userId={currentUser.id} />
           </div>
@@ -60,8 +69,12 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500">Date and Time</p>
-                  <p className="font-medium">{format(new Date(event.dateTime), "PPP")}</p>
-                  <p className="font-medium">{format(new Date(event.dateTime), "p")}</p>
+                  <p className="font-medium">
+                    {format(new Date(event.dateTime), "PPP")}
+                  </p>
+                  <p className="font-medium">
+                    {format(new Date(event.dateTime), "p")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
@@ -69,11 +82,15 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Price</p>
-                  <p className="font-medium">{event.isPaid ? `$${event.fee?.toFixed(2)}` : "Free"}</p>
+                  <p className="font-medium">
+                    {event.isPaid ? `$${event.fee?.toFixed(2)}` : "Free"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Visibility</p>
-                  <p className="font-medium">{event.isPublic ? "Public" : "Private"}</p>
+                  <p className="font-medium">
+                    {event.isPublic ? "Public" : "Private"}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -81,5 +98,5 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
         </div>
       </div>
     </div>
-  )
+  );
 }
