@@ -20,27 +20,33 @@ const event_service_1 = require("./event.service");
 const pick_1 = __importDefault(require("../../app/shared/pick"));
 const event_constant_1 = require("./event.constant");
 const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
-const fileUploader_1 = require("../../app/helper/fileUploader");
 // create event
 const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const file = req.file as Express.Multer.File;
     const file = req.file;
+    console.log(file);
+    if (!file) {
+        throw new Error('Image file is required');
+    }
     const creatorId = req.user.id;
-    console.log(creatorId);
-    // Simplified mapping to IFile
-    const mappedFile = {
-        // fileName: file.filename,
-        orginalname: file.originalname,
-        encoding: file.encoding,
-        mimetype: file.mimetype,
-        destination: file.destination,
-        filename: file.filename,
-        path: file.path,
-        size: file.size,
-    };
+    // console.log(creatorId)
+    //   // Simplified mapping to IFile
+    //   const mappedFile: IFile = {
+    //     // fileName: file.filename,
+    //     orginalname: file.originalname,
+    //     encoding: file.encoding,
+    //     mimetype: file.mimetype,
+    //     destination: file.destination,
+    //     filename: file.filename,
+    //     path: file.path,
+    //     size: file.size,
+    //   };
     // console.log(eventData);
     // Upload the file to Cloudinary
-    const uploadedImage = yield fileUploader_1.fileUploder.uploadToCloudinary(mappedFile);
-    const eventData = Object.assign(Object.assign({}, req.body), { eventImgUrl: uploadedImage === null || uploadedImage === void 0 ? void 0 : uploadedImage.secure_url });
+    // const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+    const eventData = Object.assign(Object.assign({}, req.body), { 
+        // eventImgUrl: uploadedImage?.secure_url, // set image URL
+        eventImgUrl: file.path });
     const result = yield event_service_1.EventService.createEventIntoDB(eventData, creatorId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -134,36 +140,43 @@ const getEventById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
     });
 }));
 //update event
-const updateEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const creatorId = req.user.id;
-    let eventData = Object.assign(Object.assign({}, req.body), { creatorId });
-    if (req.file) {
-        const file = req.file;
-        // Simplified mapping to IFile
-        const mappedFile = {
-            // fileName: file.filename,
-            orginalname: file.originalname,
-            encoding: file.encoding,
-            mimetype: file.mimetype,
-            destination: file.destination,
-            filename: file.filename,
-            path: file.path,
-            size: file.size,
-        };
-        // console.log(eventData);
-        // Upload the file to Cloudinary
-        const uploadedImage = yield fileUploader_1.fileUploder.uploadToCloudinary(mappedFile);
-        eventData = Object.assign(Object.assign({}, req.body), { creatorId, eventImgUrl: uploadedImage === null || uploadedImage === void 0 ? void 0 : uploadedImage.secure_url });
-    }
-    const result = yield event_service_1.EventService.updateEventIntoDB(id, eventData);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_1.default.OK,
-        message: 'Event updated successfully',
-        data: result,
-    });
-}));
+// const updateEvent = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   const creatorId = req.user.id;
+//   let eventData = {
+//     ...req.body,
+//     creatorId,
+//   };
+//   if (req.file) {
+//     const file = req.file as Express.Multer.File;
+//     // Simplified mapping to IFile
+//     const mappedFile: IFile = {
+//       // fileName: file.filename,
+//       orginalname: file.originalname,
+//       encoding: file.encoding,
+//       mimetype: file.mimetype,
+//       destination: file.destination,
+//       filename: file.filename,
+//       path: file.path,
+//       size: file.size,
+//     };
+//     // console.log(eventData);
+//     // Upload the file to Cloudinary
+//     const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+//     eventData = {
+//       ...req.body,
+//       creatorId,
+//       eventImgUrl: uploadedImage?.secure_url, // set image URL
+//     };
+//   }
+//   const result = await EventService.updateEventIntoDB(id, eventData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: 'Event updated successfully',
+//     data: result,
+//   });
+// });
 // delete event
 const deleteFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -248,14 +261,18 @@ const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awa
         data: result,
     });
 }));
+// const adminDeleteEvent = catchAsync(async(req,res)=> {
+//   const 
+// })
 exports.EventController = {
     createEvent,
     getEvents,
     getAllEvents,
     getEventById,
-    updateEvent,
+    // updateEvent,
     deleteFromDB,
     handleJoinEvent,
     handleRequestEvent,
     updateParticipantStatus,
+    // adminDeleteEvent,
 };
