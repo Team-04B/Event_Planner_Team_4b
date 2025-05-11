@@ -85,12 +85,14 @@ const adminItem = [
     icon: CalendarDays,
   },
 ];
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  name: string;
+}
+export function AppSidebar({ name, ...props }: AppSidebarProps) {
   const user = useAppSelector(currentUser);
 
   // const token = useAppSelector(currentToken)';
-  const [userdata, setData] = React.useState<any>(null);
+  // const [userdata, setData] = React.useState<any>(null);
   // React.useEffect(() => {
   //   if (!user?.id || !token) return;
   //   fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${user?.id}`, {
@@ -133,15 +135,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 height={25}
                 alt="profile image"
               />
-              <h2 className="font-medium">
-                {userdata?.name ? userdata?.name : "Not found"}
-              </h2>
+              <h2 className="font-medium">{name || "Not found"}</h2>
             </div>
             {user?.role === "USER" && (
               <SidebarMenuButton>
                 <Link href="/dashboard/createevent">
                   <h2 className="flex items-center gap-1">
-                    '' <Plus fontSize={700} size={20} /> Create Event.
+                    <Plus fontSize={700} size={20} /> Create Event.
                   </h2>
                 </Link>
                 ;
