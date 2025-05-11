@@ -12,4 +12,10 @@ router.post(
   ParticipationController.updateParticipantStatus
 );
 
+router.get(
+  '/:id/participation-status',
+  auth(Role.USER),
+  ParticipationController.getMyPendingInvitations
+);
+
 export const ParticipationRoutes = router;

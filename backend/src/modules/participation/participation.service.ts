@@ -16,6 +16,22 @@ const respondToInvitation = async (id: string, data: Partial<Invitation>) => {
   return result;
 };
 
+// get pending invitations
+const getPendingInvitationsByUser = async (userId: string) => {
+  const invitations = await prisma.participation.findMany({
+    where: {
+      userId,
+      status: 'PENDING',
+    },
+    include: {
+      event: true,
+    },
+  });
+
+  return invitations;
+};
+
 export const ParticipationService = {
   respondToInvitation,
+  getPendingInvitationsByUser,
 };

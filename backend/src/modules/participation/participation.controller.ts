@@ -19,6 +19,15 @@ const updateParticipantStatus = catchAsync(async (req, res) => {
   });
 });
 
+// get pending invitations
+const getMyPendingInvitations = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+  const invitations =
+    await ParticipationService.getPendingInvitationsByUser(userId);
+  res.status(httpStatus.OK).json(invitations);
+});
+
 export const ParticipationController = {
   updateParticipantStatus,
+  getMyPendingInvitations,
 };
