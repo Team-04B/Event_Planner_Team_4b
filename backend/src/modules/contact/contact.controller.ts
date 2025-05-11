@@ -29,7 +29,10 @@ export const handleSendEmail = async (req: Request, res: Response) => {
       name
     );
 
-    res.status(200).json({ message: 'Email sent successfully' });
+    res.status(200).json({
+      success: true,
+      message: 'Email sent successfully',
+    });
   } catch (error) {
     console.error('Error in handleSendEmail:', error);
     res.status(500).json({ error: 'Failed to send email' });
