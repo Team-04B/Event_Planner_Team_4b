@@ -52,7 +52,6 @@ export default function Contact() {
     if (res.success) {
       setResponseMsg("Message sent successfully!");
       setForm({ name: "", email: "", subject: "", message: "" });
-  
     } else {
       setResponseMsg(
         res.error || "Failed to send message. Please try again later."
@@ -141,17 +140,17 @@ export default function Contact() {
             <ContactInfo
               icon={<MapPinIcon className="h-5 w-5 text-purple-600" />}
               title="Address"
-              text="123 Event Street, Suite 456, San Francisco, CA 94103, United States"
+              text="Tangail,Dhaka,Bangladesh"
             />
             <ContactInfo
               icon={<PhoneIcon className="h-5 w-5 text-purple-600" />}
               title="Phone"
-              text="+1 (555) 123-4567"
+              text="+8801642550487"
             />
             <ContactInfo
               icon={<MailIcon className="h-5 w-5 text-purple-600" />}
               title="Email"
-              text="support@eventhub.com"
+              text="rifatswd@gmail.com"
             />
             <ContactInfo
               icon={<ClockIcon className="h-5 w-5 text-purple-600" />}
@@ -179,6 +178,64 @@ export default function Contact() {
                 icon={<InstagramIcon className="h-5 w-5" />}
               />
             </div>
+          </div>
+        </div>
+      </div>
+      {/* Map */}
+      <div className="h-96 bg-gray-200 rounded-lg overflow-hidden">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29213.406191530657!2d89.8986944!3d24.2513454!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x37567bf8b9b37c37%3A0x6b9d60fa13e54271!2sTangail!5e0!3m2!1sen!2sbd!4v1715420887935!5m2!1sen!2sbd"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="mt-16">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Frequently Asked Questions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-3">
+              How do I create an event?
+            </h3>
+            <p className="text-gray-600">
+              To create an event, log in to your account, navigate to your
+              dashboard, and click on "Create Event." Fill out the event details
+              form and submit.
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-3">
+              Can I charge for my events?
+            </h3>
+            <p className="text-gray-600">
+              Yes, you can set a registration fee for your events. We offer
+              secure payment processing for both public and private paid events.
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-3">
+              How do I manage event participants?
+            </h3>
+            <p className="text-gray-600">
+              You can manage participants through your event dashboard. Approve
+              or reject join requests, ban participants, and send invitations.
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-3">
+              What is the difference between public and private events?
+            </h3>
+            <p className="text-gray-600">
+              Public events are visible to everyone, while private events
+              require approval to join. Both can be free or paid.
+            </p>
           </div>
         </div>
       </div>
