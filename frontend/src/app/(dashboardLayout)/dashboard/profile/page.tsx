@@ -1,10 +1,12 @@
 import Profile from "@/components/modules/dashboard/profile";
+import { getMeFoDb } from "@/service/AuthService";
 import React from "react";
 
-const ProfilePage = () => {
+const ProfilePage = async () => {
+  const { data } = await getMeFoDb();
   return (
-    <div>
-      <Profile />
+    <div className="flex justify-center items-center">
+      <Profile datas={data} />
     </div>
   );
 };

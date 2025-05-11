@@ -70,42 +70,42 @@ const data = {
 const adminItem = [
   {
     title: "Overview",
-    url: "/dashboard",
+    url: "/dashboard/admin",
     icon: SquareTerminal,
     isActive: true,
   },
   {
-    title: "My Event",
-    url: "/dashboard/myevent",
+    title: "All User",
+    url: "/dashboard/admin/users",
     icon: CalendarDays,
   },
   {
-    title: "Pending Invitations",
-    url: "/dashboard/pendinginvitations",
-    icon: Clock,
+    title: "All Events",
+    url: "/dashboard/admin/events",
+    icon: CalendarDays,
   },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAppSelector(currentUser);
-  const token = useAppSelector(currentToken);
+
+  // const token = useAppSelector(currentToken)';
   const [userdata, setData] = React.useState<any>(null);
-  console.log(userdata, token);
-  React.useEffect(() => {
-    if (!user?.id || !token) return;
-    fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${user?.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setData(data?.data));
-  }, [user?.id, token]);
+  // React.useEffect(() => {
+  //   if (!user?.id || !token) return;
+  //   fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${user?.id}`, {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: `${token}`,
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => setData(data?.data));
+  // }, [user?.id, token]);
   const userRole = {
-    ADMIN: "USER",
-    USER: "ADMIN",
+    ADMIN: "ADMIN",
+    USER: "USER",
   };
 
   let sidebarItem: any = [];
@@ -141,8 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton>
                 <Link href="/dashboard/createevent">
                   <h2 className="flex items-center gap-1">
-                    {" "}
-                    <Plus fontSize={700} size={20} /> Create Event.
+                    '' <Plus fontSize={700} size={20} /> Create Event.
                   </h2>
                 </Link>
                 ;

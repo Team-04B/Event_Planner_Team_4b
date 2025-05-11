@@ -42,20 +42,15 @@ const getAllUsersInToDb = async (query: Record<string, unknown>) => {
   };
 };
 const getSingleUsersInToDb = async (id: string) => {
-  const result = await prisma.user.findFirstOrThrow({
+  const result = await prisma.user.findUniqueOrThrow({
     where: {
       id: id,
     },
     select: {
       name: true,
       email: true,
-      events: true,
       id: true,
-      invitations: true,
-      participations: true,
-      payments: true,
       createdAt: true,
-      reviews: true,
       role: true,
       updatedAt: true,
     },
@@ -70,7 +65,7 @@ const updateUserInToDb = async (id: string, payload: Partial<User>) => {
     select: {
       name: true,
       email: true,
-      events: true,
+      // events: true,
       id: true,
       invitations: true,
       participations: true,

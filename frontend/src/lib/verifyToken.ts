@@ -16,7 +16,6 @@ export const isTokenExpired = async (token: string): Promise<boolean> => {
     return true;
   }
 };
-
 export const getValidToken = async (): Promise<string> => {
   const cookieStore = await cookies();
 
