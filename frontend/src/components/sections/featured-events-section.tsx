@@ -61,13 +61,48 @@ type Event = {
   participations: any[]
 }
 
-export default function FeaturedEventsSection({ events }: { events: {events:Event[]} }) {
+export default function FeaturedEventsSection({ events }: { events: { events: Event[] } }) {
   const featuredEvents = events?.events || []
-  console.log(featuredEvents)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [autoplay, setAutoplay] = useState(true)
+  const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop")
   const autoplayRef = useRef<NodeJS.Timeout | null>(null)
-  const maxSlides = Math.ceil(featuredEvents.length / 3)
+
+  // Get the number of cards to display based on screen size
+  const getVisibleCount = () => {
+    return screenSize === "mobile" ? 1 : screenSize === "tablet" ? 2 : 3
+  }
+
+  // Calculate max slides based on screen size
+  const maxSlides = Math.ceil(featuredEvents.length / getVisibleCount())
+
+  // Detect screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      if (width < 768) {
+        setScreenSize("mobile")
+      } else if (width < 1024) {
+        setScreenSize("tablet")
+      } else {
+        setScreenSize("desktop")
+      }
+    }
+
+    // Initial call
+    handleResize()
+
+    // Add event listener
+    window.addEventListener("resize", handleResize)
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  // Reset current slide when screen size changes to prevent empty slides
+  useEffect(() => {
+    setCurrentSlide(0)
+  }, [screenSize])
 
   const startAutoplay = () => {
     if (autoplayRef.current) clearInterval(autoplayRef.current)
@@ -95,7 +130,11 @@ export default function FeaturedEventsSection({ events }: { events: {events:Even
   // If there are no events, don't render the section
   if (!featuredEvents.length) return null
 
-  const visibleEvents = featuredEvents.slice(currentSlide * 3, Math.min((currentSlide + 1) * 3, featuredEvents.length))
+  // Get visible events based on current slide and screen size
+  const visibleEvents = featuredEvents.slice(
+    currentSlide * getVisibleCount(),
+    Math.min((currentSlide + 1) * getVisibleCount(), featuredEvents.length),
+  )
 
   // Calculate average rating for each event
   const getAverageRating = (reviews: Review[]) => {
@@ -131,8 +170,8 @@ export default function FeaturedEventsSection({ events }: { events: {events:Even
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+                transition={{ duration: 0.6 }}
+                className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
               >
                 {visibleEvents.map((event, index) => {
                   const eventDate = new Date(event.dateTime)
@@ -146,8 +185,9 @@ export default function FeaturedEventsSection({ events }: { events: {events:Even
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
                       whileHover={{ y: -10 }}
+             
                     >
-                      <Card className="group h-full overflow-hidden transition-all hover:shadow-md">
+                      <Card className="group h-full w-full overflow-hidden transition-all hover:shadow-md">
                         <div className="relative h-48 w-full overflow-hidden">
                           <Image
                             src={event.eventImgUrl || "/placeholder.svg?height=400&width=600"}
