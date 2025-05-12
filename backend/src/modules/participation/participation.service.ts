@@ -8,6 +8,7 @@ const respondToInvitation = async (id: string, data: Partial<Invitation>) => {
       id,
     },
   });
+  
 
   const result = await prisma.invitation.update({
     where: { id },
