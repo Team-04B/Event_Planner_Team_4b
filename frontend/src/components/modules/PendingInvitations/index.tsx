@@ -215,7 +215,7 @@ export default function PendingInvitationsPage() {
             No Pending Invitations
           </h2>
           <p className="text-gray-500 max-w-md mx-auto">
-            You don't have any pending event invitations at the moment. When
+            You do not have any pending event invitations at the moment. When
             someone invites you to an event, it will appear here.
           </p>
         </div>
@@ -269,7 +269,7 @@ export default function PendingInvitationsPage() {
 
               <CardContent className="space-y-4">
                 {/* Inviter information */}
-                <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-md">
+                {/* <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-md">
                   <Avatar className="h-10 w-10 border border-gray-200">
                     <AvatarImage
                       src={inv.inviter?.avatarUrl || "/placeholder.svg"}
@@ -286,7 +286,7 @@ export default function PendingInvitationsPage() {
                       {inv?.email || "No email provided"}
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -310,9 +310,9 @@ export default function PendingInvitationsPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 line-clamp-2">
+                {/* <p className="text-sm text-gray-600 line-clamp-2">
                   {inv.event.description}
-                </p>
+                </p> */}
 
                 <Badge
                   variant="outline"
@@ -454,7 +454,7 @@ export default function PendingInvitationsPage() {
                 <div className="text-sm">
                   <p className="font-medium">This is a paid event</p>
                   <p>
-                    You'll need to pay ${confirmDialog.invitation.event.fee} to
+                    You will need to pay ${confirmDialog.invitation.event.fee} to
                     complete your registration after accepting.
                   </p>
                 </div>
