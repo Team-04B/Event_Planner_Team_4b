@@ -21,7 +21,7 @@ export default function EventTypesSection() {
         "Open to everyone with instant access. Perfect for community gatherings, meetups, and public workshops.",
       color: "white",
       features: ["Visible to all users", "One-click registration", "No payment required", "Instant approval"],
-      image: "/placeholder.svg?height=400&width=600",
+      image: "/images/public1.jpg?height=400&width=600",
       example: "Community Workshop",
     },
     {
@@ -36,7 +36,7 @@ export default function EventTypesSection() {
         "Secure transaction handling",
         "Approval after payment",
       ],
-      image: "/placeholder.svg?height=400&width=600",
+      image: "/images/publicpaid.jpg?height=400&width=600",
       example: "Industry Conference",
     },
     {
@@ -51,7 +51,7 @@ export default function EventTypesSection() {
         "Host approval needed",
         "Direct invitations available",
       ],
-      image: "/placeholder.svg?height=400&width=600",
+      image: "/images/private1.jpg?height=400&width=600",
       example: "Team Retreat",
     },
     {
@@ -66,7 +66,7 @@ export default function EventTypesSection() {
         "Two-step verification",
         "Premium experience management",
       ],
-      image: "/placeholder.svg?height=400&width=600",
+      image: "/images/private2.jpg?height=400&width=600",
       example: "Executive Masterclass",
     },
   ]
@@ -179,7 +179,7 @@ export default function EventTypesSection() {
                           )} ${getColorClass(type.color, "hover-bg")}`}
                           asChild
                         >
-                          <Link href={`/events?type=${type.id}`}>Browse {type.title}</Link>
+                          <Link href={`/events`}>Browse {type.title}</Link>
                         </Button>
                       </div>
                       <div className="relative hidden overflow-hidden rounded-xl md:block">
