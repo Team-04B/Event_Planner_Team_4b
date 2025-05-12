@@ -506,6 +506,47 @@ const adminDeletedEventFromDB = async (eventId: string) => {
   return result;
 };
 
+const dataNeedForDashboardInToDb = async (userId: string) => {
+  const totalEvents = await prisma.event.count({
+    where: {
+      creatorId: userId,
+    },
+  });
+
+  const events = await prisma.event.findMany({
+    where: {
+      creatorId: userId,
+    },
+
+    select: {
+      participations: true,
+    },
+  });
+
+  const totalParticipants = events.reduce(
+    (sum, event) => sum + event.participations.length,
+    0
+  );
+  const totalRevenues = await prisma.payment.aggregate({
+    _sum: {
+      amount: true,
+    },
+    where: {
+      event: {
+        creatorId: userId,
+      },
+      status: 'SUCCESS',
+    },
+  });
+
+  const totalRevenue = totalRevenues._sum.amount || 0;
+
+  return {
+    totalEvents,
+    totalRevenue,
+    totalParticipants,
+  };
+};
 export const EventService = {
   createEventIntoDB,
   getEventsFromDB,
@@ -517,6 +558,6 @@ export const EventService = {
   requestToPaidEvent,
   getParticipationStatus,
   updateParticipantStatus,
-  getAllEventsFromDB,
   adminDeletedEventFromDB,
+  dataNeedForDashboardInToDb,
 };
