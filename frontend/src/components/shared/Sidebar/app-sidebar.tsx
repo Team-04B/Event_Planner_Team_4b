@@ -45,8 +45,8 @@ const data = {
       icon: UserPlus,
     },
     {
-      title: "Pending Invitations",
-      url: "/dashboard/pendinginvitations",
+      title: "Participation Request",
+      url: "/dashboard/participation",
       icon: Clock,
     },
     {
