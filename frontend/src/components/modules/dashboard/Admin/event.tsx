@@ -1,16 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
 import {
   Calendar,
-  ChevronDown,
-  ChevronUp,
-  Edit,
-  Eye,
   Filter,
   MapPin,
   MoreHorizontal,
-  Plus,
   Search,
   Trash2,
   Users,
@@ -48,7 +44,7 @@ export function EventManagementTable({ eventData }: any) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const handileClickDeleteEvent = async (id: string) => {
-    const deleteEvents = await deleteEvent(id);
+   await deleteEvent(id);
   };
   const renderStatusBadge = (status: string) => {
     switch (status) {

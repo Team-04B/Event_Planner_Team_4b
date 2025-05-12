@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -20,7 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { User } from "@/commonTypes/commonTypes";
 import { deleteUser } from "@/service/user";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -37,7 +37,7 @@ export function UserManagementTable({ userData, meta }: any) {
   const limit = Number(searchParams.get("limit")) || 10;
 
   const handleClickDeleteUser = async (id: string) => {
-    const userDelete = await deleteUser(id);
+     await deleteUser(id);
   };
 
   const handleClickSearchQuery = (value: string) => {

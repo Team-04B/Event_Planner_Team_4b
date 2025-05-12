@@ -1,4 +1,3 @@
-import { User } from "@/commonTypes/commonTypes";
 import { UserManagementTable } from "@/components/modules/dashboard/Admin/user";
 import { getAllUser } from "@/service/user";
 type TSearchParams = Promise<{ [key: string]: string | string[] | undefined }>;

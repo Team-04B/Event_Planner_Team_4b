@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import * as React from "react";
@@ -5,7 +6,6 @@ import {
   CalendarDays,
   Clock,
   Plus,
-  Settings,
   SquareTerminal,
   UserPlus,
 } from "lucide-react";
@@ -21,7 +21,7 @@ import {
 import { NavMain } from "./nav-main";
 import Link from "next/link";
 import { useAppSelector } from "@/redux/hook";
-import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
+import { currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
 import { LogoutModal } from "@/components/modules/Login/LogoutModal";
 

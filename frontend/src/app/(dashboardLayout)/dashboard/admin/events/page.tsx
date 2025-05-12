@@ -56,7 +56,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getAllEventsByUserId,
   deleteEvent,
-  getAllEventsDb,
+  getAllEvents,
 } from "@/service/Events";
 import DeleteModal from "@/components/modules/Events/myEvents/DeleteModal";
 import { EventDetailsDialog } from "@/components/modules/Events/myEvents/ViewEventsDetails";
@@ -151,7 +151,7 @@ export default function EventManagementPage() {
         }
 
         // Call API with filter parameters
-        const response = await getAllEventsDb(filterParams);
+        const response = await getAllEvents(filterParams);
 
         if (response.success && response.data) {
           // Use the appropriate data based on the active tab

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { cookies } from "next/headers";
@@ -154,7 +155,7 @@ export const deleteEvent = async (eventId: string) => {
 // Join Public Event
 export const joinPublicEvent = async (eventId: string) => {
   const cookieStore = cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
+  const accessToken = (await cookieStore).get("accessToken")?.value;
   if (!accessToken) throw new Error("No access token found in cookies.");
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/join`, {
