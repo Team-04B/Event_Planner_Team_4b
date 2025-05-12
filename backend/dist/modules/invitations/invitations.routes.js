@@ -12,4 +12,6 @@ const router = express_1.default.Router();
 router.get('/', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.getMyAllnvitaions);
 router.get('/invitaion/:id', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.getSingleInvitaion);
 router.get('/sent-invitaions', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.getMySentInvitaions);
+router.put('/invitaion/:id/accept', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.acceptInvitaion);
+router.put('/invitaion/:id/decline', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.declineInvitaion);
 exports.InvitationRoutes = router;

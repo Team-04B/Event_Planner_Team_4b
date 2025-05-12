@@ -12,6 +12,7 @@ const invitations_routes_1 = require("../../modules/invitations/invitations.rout
 const payments_routes_1 = require("../../modules/payments/payments.routes");
 const reviews_routes_1 = require("../../modules/reviews/reviews.routes");
 const admin_routes_1 = require("../../modules/admin/admin.routes");
+const contact_route_1 = require("../../modules/contact/contact.route");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
@@ -35,7 +36,7 @@ const moduleRoutes = [
         route: invitations_routes_1.InvitationRoutes
     },
     {
-        path: '/payments',
+        path: '/payment',
         route: payments_routes_1.PaymentRoutes
     },
     {
@@ -45,7 +46,11 @@ const moduleRoutes = [
     {
         path: '/admin',
         route: admin_routes_1.AdminRoutes
-    }
+    },
+    {
+        path: '/sendMail',
+        route: contact_route_1.MailRoutes,
+    },
 ];
-moduleRoutes.forEach(route => router.use(route.path, route.route));
+moduleRoutes.forEach((route) => router.use(route.path, route.route));
 exports.default = router;

@@ -25,8 +25,15 @@ router.post(
   EventController.createEvent
 );
 
-//get all events
-router.get('/', EventController.getEvents);
+// get all events
+router.get('/all', EventController.getAllEvents);
+
+//get all events by user
+router.get(
+  '/',
+  auth(Role.USER, Role.ADMIN),
+  EventController.getAllEventsByUserId
+);
 
 // get event by id
 

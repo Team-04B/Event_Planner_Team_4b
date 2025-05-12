@@ -4,6 +4,7 @@
 import { getValidToken } from "@/lib/verifyToken";
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { FieldValues } from "react-hook-form";
 
 export const registerUser = async (userData: FieldValues) => {
@@ -158,4 +159,16 @@ export const getNewToken = async () => {
   } catch (error: any) {
     return Error(error);
   }
+};
+
+
+export const checkAuthGuard = async() => {
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get("accessToken")?.value;
+
+  if (!accessToken) {
+    return NextResponse.redirect(new URL("/login", process.env.NEXT_PUBLIC_BASE_URL));
+  }
+
+  return accessToken;
 };

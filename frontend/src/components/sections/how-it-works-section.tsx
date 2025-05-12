@@ -74,8 +74,7 @@ export default function HowItWorksSection() {
         </motion.div>
 
         <div className="relative" ref={ref}>
-          {/* Connection line */}
-          <div className="absolute left-1/2 top-24 hidden h-[calc(100%-120px)] w-1 -translate-x-1/2 bg-gray-200 md:block"></div>
+    
 
           <motion.div
             className="grid gap-12 md:grid-cols-3"

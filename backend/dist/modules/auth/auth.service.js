@@ -27,6 +27,9 @@ const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, functi
     if (!name || !email || !password) {
         throw new ApiError_1.default(http_status_1.default.NON_AUTHORITATIVE_INFORMATION, 'Missing required fields');
     }
+    const isExistUser = yield prisma_1.default.user.findFirst({
+        where: { email: email },
+    });
     // const isExistUser = await prisma.user.findFirst({
     //   where: { email: email },
     // });
@@ -44,7 +47,6 @@ const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, functi
             password: hasPassword,
         },
     });
-    console.log(registeredUser, 'register user');
     if (!registeredUser.id) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'user create problem');
     }

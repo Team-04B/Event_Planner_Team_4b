@@ -59,10 +59,11 @@ const getAllEventsFromDB = async (
   const allEvents = await prisma.event.findMany({
     where: whereConditions,
     include: {
-      creator: true,
-      reviews: true,
-      invitations: true,
-      participations: true,
+      creator:true,
+      reviews:true,
+      invitations:true,
+      participations:true,
+      payments:true
     },
     orderBy:
       options.sortBy && options.sortOrder
@@ -150,11 +151,12 @@ const getEventsFromDB = async (
   // Fetch all events
   const allEvents = await prisma.event.findMany({
     where: whereConditions,
-    include: {
-      creator: true,
-      reviews: true,
-      invitations: true,
-      participations: true,
+    include:{
+      creator:true,
+      reviews:true,
+      invitations:true,
+      participations:true,
+      payments:true
     },
     orderBy:
       options.sortBy && options.sortOrder

@@ -21,7 +21,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
 import { AcceptInvitaon, getSingleInvitaion } from "@/service/Invitations"
-import { useParams } from "next/navigation"
+
 
 // Types based on the real data model
 interface Invitation {
@@ -58,10 +58,9 @@ interface Invitation {
   }
 }
 
-export default function InvitationDetailPage() {
- const param =useParams()
- const id =param?.id as string;
+export default function InvitationDetailPage({id}:{id:string}) {
  
+
   const [invitation, setInvitation] = useState<Invitation | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
