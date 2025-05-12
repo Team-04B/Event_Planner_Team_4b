@@ -1,17 +1,15 @@
-import InvitationsPage from "@/pages/InvitationPage/InvitationsPage"
-import { getAllSentInvitaions } from "@/service/Invitations"
+import InvitationsPage from "@/pages/InvitationPage/InvitationsPage";
+import { getAllSentInvitaions } from "@/service/Invitations";
 
-
-
-const page =async () => {
- const Invitations = await getAllSentInvitaions()
-         const InvitationsData = Invitations?.data
-         console.log(Invitations)
+const page = async () => {
+  const Invitations = await getAllSentInvitaions();
+  const InvitationsData = Invitations?.data;
+  console.log(Invitations);
   return (
     <div>
-    <InvitationsPage InvitationsData={InvitationsData} />
+      <InvitationsPage InvitationsData={InvitationsData} />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

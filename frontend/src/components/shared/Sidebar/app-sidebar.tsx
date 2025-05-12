@@ -46,7 +46,7 @@ const data = {
     },
     {
       title: "Pending Invitations",
-      url: "/dashboard/pendinginvitations",
+      url: "/dashboard/pending-invitations",
       icon: Clock,
     },
     {
