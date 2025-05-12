@@ -255,22 +255,7 @@ const getParticipationStatus = catchAsync(async (req, res) => {
   });
 });
 
-// update Participant Status
-const updateParticipantStatus = catchAsync(async (req, res) => {
-  const { participantId } = req.params;
-  // console.log(req.body);
-  const result = await EventService.updateParticipantStatus(
-    participantId,
-    req.body
-  );
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: `Participation ${req.body.status.toLowerCase()} successfully`,
-    data: result,
-  });
-});
 
 // const adminDeleteEvent = catchAsync(async(req,res)=> {
 //   const
@@ -285,6 +270,5 @@ export const EventController = {
   handleJoinEvent,
   handleRequestEvent,
   getParticipationStatus,
-  updateParticipantStatus,
   // adminDeleteEvent,
 };

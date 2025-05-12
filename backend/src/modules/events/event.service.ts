@@ -404,23 +404,7 @@ const getParticipationStatus = async (eventId: string, userId: string) => {
   return result;
 };
 
-// update Participant Status
-const updateParticipantStatus = async (
-  id: string,
-  data: Partial<Participation>
-) => {
-  await prisma.participation.findUniqueOrThrow({
-    where: {
-      id,
-    },
-  });
 
-  const result = await prisma.participation.update({
-    where: { id },
-    data,
-  });
-  return result;
-};
 
 const adminDeletedEventFromDB = async (eventId: string) => {
   const result = await prisma.event.delete({
@@ -441,6 +425,5 @@ export const EventService = {
   joinToPublicEvent,
   requestToPaidEvent,
   getParticipationStatus,
-  updateParticipantStatus,
   adminDeletedEventFromDB,
 };

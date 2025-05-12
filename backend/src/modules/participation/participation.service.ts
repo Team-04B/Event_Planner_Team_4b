@@ -1,4 +1,4 @@
-import { Invitation } from '@prisma/client';
+import { Invitation, Participation } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 
 // respond invitation
@@ -31,7 +31,26 @@ const getPendingInvitationsByUser = async (userId: string) => {
   return invitations;
 };
 
+// update Participant Status
+const updateParticipantStatus = async (
+  id: string,
+  data: Partial<Participation>
+) => {
+  await prisma.participation.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.participation.update({
+    where: { id },
+    data,
+  });
+  return result;
+};
+
 export const ParticipationService = {
   respondToInvitation,
   getPendingInvitationsByUser,
+  updateParticipantStatus,
 };

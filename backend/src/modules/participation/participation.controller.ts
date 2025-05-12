@@ -27,7 +27,25 @@ const getMyPendingInvitations = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).json(invitations);
 });
 
+// update Participant Status
+const handleParticipantStatus = catchAsync(async (req, res) => {
+  const { participantId } = req.params;
+  // console.log(req.body);
+  const result = await ParticipationService.updateParticipantStatus(
+    participantId,
+    req.body
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: `Participation ${req.body.status.toLowerCase()} successfully`,
+    data: result,
+  });
+});
+
 export const ParticipationController = {
   updateParticipantStatus,
   getMyPendingInvitations,
+  handleParticipantStatus,
 };

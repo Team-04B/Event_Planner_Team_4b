@@ -59,12 +59,6 @@ router.delete('/:id', auth(Role.USER), EventController.deleteFromDB);
 // admin delete event
 router.delete('/deleteEvent', auth(Role.ADMIN));
 
-// updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
-router.patch(
-  '/:id/participants/:participantId/status',
-  auth(Role.USER),
-  EventController.updateParticipantStatus
-);
 
 // Public events
 router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent);

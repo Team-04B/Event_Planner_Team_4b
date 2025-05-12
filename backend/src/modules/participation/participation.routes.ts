@@ -12,10 +12,19 @@ router.post(
   ParticipationController.updateParticipantStatus
 );
 
+// get pending invitations
 router.get(
-  '/:id/participation-status',
+  '/participation-status',
   auth(Role.USER),
   ParticipationController.getMyPendingInvitations
+);
+
+
+// updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
+router.patch(
+  '/participants/:participantId/status',
+  auth(Role.USER),
+  ParticipationController.handleParticipantStatus
 );
 
 export const ParticipationRoutes = router;
