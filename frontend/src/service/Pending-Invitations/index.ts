@@ -63,7 +63,7 @@ export const respondToParticipation = async (
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_API}/participants/${id}/respond`,
+    `${process.env.NEXT_PUBLIC_BASE_API}/participants/${id}/status`,
     {
       method: "POST",
       headers: {
