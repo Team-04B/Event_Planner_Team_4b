@@ -22,7 +22,7 @@ router.get(
 
 // updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
 router.patch(
-  '/participants/:participantId/status',
+  '/:participantId/respond',
   auth(Role.USER),
   ParticipationController.handleParticipantStatus
 );
