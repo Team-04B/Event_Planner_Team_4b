@@ -1,4 +1,4 @@
-# EventOra (Event Planner & Participation System)
+# EvenTora (Event Planner & Participation System)
 
 A secure, full-featured event management web platform developed by **Team #4b**. EvenTora empowers users to create, discover, and manage public and private events with flexible participation flows, payment integration, and strong community moderation.
 
@@ -179,6 +179,7 @@ cp .env.example .env
 # Run the development server
 npm run dev
 
+```
 
 ## Contributors
 
