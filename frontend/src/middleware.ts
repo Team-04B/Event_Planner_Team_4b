@@ -12,8 +12,8 @@ const roleBasedPrivateRoutes = {
 };
 
 const roleDashboardPaths = {
-  USER: "/dashboard",
-  ADMIN: "/dashboard",
+  USER: "/dashboard/user-overview",
+  ADMIN: "/dashboard/admin",
 };
 
 interface DecodedToken {
