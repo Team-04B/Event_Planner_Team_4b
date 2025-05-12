@@ -122,6 +122,23 @@ const validationPayment = async(query:any) => {
     //         message:"Payment Failed!"
     //     }
     // }
+    const payment = await prisma.payment.findFirst({
+        where:{
+            transactionId:query.tran_id
+        },
+        include:{
+            user:true,
+            event:true
+        }
+    })
+
+    if(!payment){
+        throw new ApiError(httpStatus.BAD_REQUEST,'Payment not found!')
+    }
+
+
+
+
 
     await prisma.$transaction(async(tx)=> {
         await tx.payment.updateMany({
@@ -134,6 +151,15 @@ const validationPayment = async(query:any) => {
             }
         })
 
+        await tx.invitation.updateMany({
+            where:{
+                userEmail:payment?.user?.email,
+                eventId:payment.event.id
+            },
+            data:{
+                paid:true
+            }
+        })
         // return {
         //     message: "Payment success!"
         // }
