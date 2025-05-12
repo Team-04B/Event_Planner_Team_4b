@@ -140,12 +140,20 @@ A secure, full-featured event management web platform developed by **Team #4b**.
 - ⚙️ **Backend Repository:** [https://github.com/Team-04B/Event_Planner_Team_4b/tree/main/backend](https://github.com/Team-04B/Event_Planner_Team_4b/tree/main/backend)
 
 ---
+## 📸 Screenshots
 
-## Screenshots
+### Homepage
+![Homepage Screenshot](./assets/homepage.png)
 
-> *(Add screenshots or screen recordings showcasing the UI and flows.)*
+### Dashboard View
+![Dashboard Screenshot](https://i.imgur.com/xyz1234.png)
 
 ---
+
+## 🎥 Demo Video
+
+[![Watch the demo](https://img.youtube.com/vi/abcdEFGH123/maxresdefault.jpg)](https://drive.google.com/drive/u/0/folders/1E_UKALN95kuyVWY_GGo6iV5xBKP7EwY9)
+
 
 ## Getting Started
 
