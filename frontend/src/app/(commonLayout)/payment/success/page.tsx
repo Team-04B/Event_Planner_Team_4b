@@ -9,14 +9,14 @@ import { useEffect, useState } from "react"
 export default function PaymentSuccessPage() {
 
     const searchParams = useSearchParams()
-    const [message, setMessage] = useState("Validating your payment...")
+    const [,setMessage] = useState("Validating your payment...")
 
   useEffect(() => {
     // const val_id = searchParams?.get("val_id")
     const tran_id = searchParams?.get("tran_id")
 
     if (tran_id) {
-      fetch(`http://localhost:5000/api/payment/inp`, {
+      fetch(`${process.env.NEXT_PUBLIC_BASE_API}/payment/inp`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -18,7 +18,6 @@ event:IEvent;
 currentUser:any;
 }
 export default function SingleEvent({event,currentUser}:SingleEvent) {
-  const [isLoading, setIsLoading] = useState(false)
   // const router = useRouter()
   const token = useAppSelector(currentToken)
 
@@ -117,7 +116,7 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
 
   const handleJoinEvent = async (eventId:string) => {
     try {
-      setIsLoading(true)
+      setLoading(true)
 
       // if (!token) {
       //   router.push("/login?redirect=" + encodeURIComponent(window.location.pathname))
@@ -144,7 +143,7 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
       console.error(err)
       alert("Something went wrong while joining the event.")
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
   return (
