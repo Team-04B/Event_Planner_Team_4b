@@ -396,7 +396,7 @@ console.log(invitation)
                       <CheckIcon className="mr-2 h-4 w-4" />
                       Accept Invitation
                     </Button>
-                    <Button className="w-full" variant="outline">
+                    <Button onClick={()=>HandleDeclineInvitaion(invitation.id)} className="w-full" variant="outline">
                       <XIcon className="mr-2 h-4 w-4" />
                       Decline Invitation
                     </Button>
