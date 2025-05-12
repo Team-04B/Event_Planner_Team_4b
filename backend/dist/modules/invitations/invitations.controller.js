@@ -20,8 +20,10 @@ const invitations_service_1 = require("./invitations.service");
 const pick_1 = __importDefault(require("../../app/shared/pick"));
 // create reviews
 const createInvitaion = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { id } = req.params;
-    const result = yield invitations_service_1.InvitaionServices.createInvitaionDB(id, req.body);
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    const result = yield invitations_service_1.InvitaionServices.createInvitaionDB(id, req.body, userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
@@ -29,12 +31,34 @@ const createInvitaion = (0, catchAsync_1.catchAsync)((req, res, next) => __await
         data: result,
     });
 }));
-// create reviews
+// get reviews
 const getMyAllnvitaions = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const email = (_a = req.user) === null || _a === void 0 ? void 0 : _a.email;
+    const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = yield invitations_service_1.InvitaionServices.getMyAllnvitaionsFromDB(options, email);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.CREATED,
+        message: 'Invitaion retrived Successfully',
+        data: result,
+    });
+}));
+const getMySentInvitaions = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const id = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-    const result = yield invitations_service_1.InvitaionServices.getMyAllnvitaionsFromDB(options, id);
+    const result = yield invitations_service_1.InvitaionServices.getMyInvitedOnvitationsFromDB(options, id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.CREATED,
+        message: 'Invitaions retrived Successfully',
+        data: result,
+    });
+}));
+const getSingleInvitaion = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield invitations_service_1.InvitaionServices.getSingleInvitaionIntoDB(id);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
@@ -45,4 +69,6 @@ const getMyAllnvitaions = (0, catchAsync_1.catchAsync)((req, res, next) => __awa
 exports.InvitationController = {
     createInvitaion,
     getMyAllnvitaions,
+    getMySentInvitaions,
+    getSingleInvitaion
 };

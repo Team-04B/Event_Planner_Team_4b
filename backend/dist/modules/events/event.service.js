@@ -30,17 +30,18 @@ const event_constant_1 = require("./event.constant");
 const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
 const http_status_1 = __importDefault(require("http-status"));
 // create event into db
-const createEventIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+const createEventIntoDB = (payload, creatorId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.event.create({
-        data: payload,
+        data: Object.assign(Object.assign({}, payload), { creatorId }),
     });
     return result;
 });
-// get all events from db
-const getEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 0, function* () {
+// getAll events from db
+const getAllEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
     const andConditions = [];
+    // Search term filter
     if (searchTerm) {
         andConditions.push({
             OR: event_constant_1.eventSearchableFields.map((field) => ({
@@ -51,38 +52,122 @@ const getEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 0, 
             })),
         });
     }
+    // Other filters
     if (Object.keys(filterData).length > 0) {
         andConditions.push({
-            AND: Object.keys(filterData).map((key) => {
-                return {
-                    [key]: {
-                        equals: filterData[key],
-                    },
-                };
-            }),
+            AND: Object.keys(filterData).map((key) => ({
+                [key]: {
+                    equals: filterData[key],
+                },
+            })),
         });
     }
     const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
-    const result = yield prisma_1.default.event.findMany({
+    // Fetch all events
+    const allEvents = yield prisma_1.default.event.findMany({
         where: whereConditions,
-        skip,
-        take: limit,
+        include: {
+            creator: true,
+            reviews: true,
+            invitations: true,
+            participations: true,
+        },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
             : {
                 createdAt: 'desc',
             },
     });
-    const total = yield prisma_1.default.event.count({
-        where: whereConditions,
-    });
+    // Today's date
+    const now = new Date();
+    // Segment the events
+    const completedEvents = allEvents.filter((event) => new Date(event.dateTime) < now);
+    const upcomingEvents = allEvents.filter((event) => new Date(event.dateTime) >= now);
+    // Paginate the allEvents list
+    const paginatedData = allEvents.slice(skip, skip + limit);
     return {
         meta: {
             page,
             limit,
-            total,
+            total: allEvents.length,
         },
-        data: result,
+        data: {
+            paginatedData,
+            completed: completedEvents,
+            upcoming: upcomingEvents,
+            all: allEvents,
+        },
+    };
+});
+// get all events from db by creatorId
+const getEventsFromDB = (filters, options, creatorId) => __awaiter(void 0, void 0, void 0, function* () {
+    const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
+    const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
+    const andConditions = [];
+    // Search term filter
+    if (searchTerm) {
+        andConditions.push({
+            OR: event_constant_1.eventSearchableFields.map((field) => ({
+                [field]: {
+                    contains: searchTerm,
+                    mode: 'insensitive',
+                },
+            })),
+        });
+    }
+    // Other filters
+    if (Object.keys(filterData).length > 0) {
+        andConditions.push({
+            AND: Object.keys(filterData).map((key) => ({
+                [key]: {
+                    equals: filterData[key],
+                },
+            })),
+        });
+    }
+    // Filter by creatorId
+    if (creatorId) {
+        andConditions.push({
+            creatorId: {
+                equals: creatorId,
+            },
+        });
+    }
+    const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
+    // Fetch all events
+    const allEvents = yield prisma_1.default.event.findMany({
+        where: whereConditions,
+        include: {
+            creator: true,
+            reviews: true,
+            invitations: true,
+            participations: true,
+        },
+        orderBy: options.sortBy && options.sortOrder
+            ? { [options.sortBy]: options.sortOrder }
+            : {
+                createdAt: 'desc',
+            },
+    });
+    // Today's date
+    const now = new Date();
+    // Segment the events
+    const completedEvents = allEvents.filter((event) => new Date(event.dateTime) < now);
+    const upcomingEvents = allEvents.filter((event) => new Date(event.dateTime) >= now);
+    // Paginate the allEvents list
+    const paginatedData = allEvents.slice(skip, skip + limit);
+    return {
+        meta: {
+            page,
+            limit,
+            total: allEvents.length,
+        },
+        data: {
+            paginatedData,
+            completed: completedEvents,
+            upcoming: upcomingEvents,
+            all: allEvents,
+        },
     };
 });
 // get event by id from db
@@ -90,6 +175,11 @@ const getEventByIdFromDB = (id) => __awaiter(void 0, void 0, void 0, function* (
     const result = yield prisma_1.default.event.findUnique({
         where: {
             id,
+        },
+        include: {
+            creator: true,
+            participations: true,
+            invitations: true,
         },
     });
     return result;
@@ -211,6 +301,7 @@ const deleteEventFromDB = (id) => __awaiter(void 0, void 0, void 0, function* ()
 //   return createParticipation;
 // };
 //
+// join public event
 const joinToPublicEvent = (eventId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const event = yield prisma_1.default.event.findUnique({ where: { id: eventId } });
     if (!event)
@@ -259,13 +350,23 @@ const updateParticipantStatus = (id, data) => __awaiter(void 0, void 0, void 0, 
     });
     return result;
 });
+const adminDeletedEventFromDB = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.event.delete({
+        where: {
+            id: eventId,
+        },
+    });
+    return result;
+});
 exports.EventService = {
     createEventIntoDB,
     getEventsFromDB,
+    getAllEventsFromDB,
     getEventByIdFromDB,
     updateEventIntoDB,
     deleteEventFromDB,
     joinToPublicEvent,
     requestToPaidEvent,
     updateParticipantStatus,
+    adminDeletedEventFromDB,
 };

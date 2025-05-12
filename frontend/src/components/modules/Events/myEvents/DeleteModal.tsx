@@ -2,7 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2Icon } from "lucide-react";
 
-const DeleteModal = ({deleteDialogOpen,setDeleteDialogOpen,confirmDelete,loading}) => {
+interface DeleteModalProps {
+  deleteDialogOpen: boolean;
+  setDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  confirmDelete: () => Promise<void>;
+  loading: boolean;
+}
+
+const DeleteModal = ({deleteDialogOpen,setDeleteDialogOpen,confirmDelete,loading}:DeleteModalProps) => {
     return (
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>

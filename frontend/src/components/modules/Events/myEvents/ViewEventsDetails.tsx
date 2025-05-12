@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getEventById } from "@/service/Events"
+import Image from "next/image"
 
 interface EventDetailsDialogProps {
   eventId: string | null
@@ -130,14 +131,17 @@ export function EventDetailsDialog({ eventId, open, onOpenChange }: EventDetails
               <TabsContent value="details" className="space-y-4">
                 {event.eventImgUrl && (
                   <div className="rounded-lg overflow-hidden h-64 w-full">
-                    <img 
-                      src={event.eventImgUrl || "/placeholder.svg"} 
-                      alt={event.title} 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg?height=400&width=800"
-                      }}
-                    />
+                    <Image
+                    src={event.eventImgUrl || "/placeholder.svg"}
+                    alt={event.title || "Event Image"}
+                    width={400}
+                    height={300}
+                    className="w-full h-full object-cover"
+                    onError={({ currentTarget }) => {
+                      currentTarget.src = "/placeholder.svg";
+                    }}
+                    unoptimized={event.eventImgUrl?.startsWith("http") ? false : true}
+                  />
                   </div>
                 )}
 

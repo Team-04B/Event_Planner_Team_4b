@@ -1,5 +1,5 @@
 "use client";
-
+import { z } from "zod"
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -20,10 +20,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/redux/hook";
-import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
 import { createEvent } from "@/service/Events";
-import { EventFormData } from "@/types/eventType";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -32,7 +29,7 @@ import { eventFormSchema } from "./createEventValidations";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const CreateEvent = () => {
-  const form = useForm<EventFormData>({
+  const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       title: "",
@@ -50,13 +47,10 @@ const CreateEvent = () => {
     control,
     watch,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
     setValue,
   } = form;
-
-  const user = useAppSelector(currentUser);
-  console.log(user);
-  const token = useAppSelector(currentToken);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const eventData = {
@@ -69,21 +63,21 @@ const CreateEvent = () => {
 
       fee: data.fee
         ? typeof data.fee === "string"
-          ? parseFloat(data.fee.replace(/[^\d.-]/g, "")) 
-          : data.fee 
-        : null, 
+          ? parseFloat(data.fee.replace(/[^\d.-]/g, ""))
+          : data.fee
+        : null,
     };
 
     const formData = new FormData();
     formData.append("data", JSON.stringify(eventData));
     formData.append("file", data.image);
-    console.log(eventData);
 
     try {
-      const res = await createEvent(formData, token);
+      const res = await createEvent(formData);
       console.log(res);
       if (res.success) {
         toast.success(res.message);
+        reset();
       } else {
         toast.error(res.message);
       }

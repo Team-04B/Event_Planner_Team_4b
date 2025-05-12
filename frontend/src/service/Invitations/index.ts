@@ -1,5 +1,6 @@
 "use server";
 import { getValidToken } from "@/lib/verifyToken";
+import { cookies } from "next/headers";
 
 // export const GetAllBlog = async () => {
 //   try {
@@ -78,13 +79,13 @@ export const CreateInvitaion = async (data: any) => {
 
 // get all Invitation
 
-export const getAllInvitaions = async () => {
+export const getAllInvitaions = async (page:any, limit:any) => {
   const token = await getValidToken();
   try {
     if (!token) {
       throw new Error("Access token not found");
     }
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations?limit=${limit}&page=${page}`, {
       method: "GET",
       headers: {
         Authorization: token,
@@ -97,3 +98,90 @@ export const getAllInvitaions = async () => {
     console.log(error);
   }
 };
+export const getSingleInvitaion= async (id:string) => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/invitaion/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+// get all Invitation 
+
+export const getAllSentInvitaions= async () => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/sent-invitaions`, {
+      method: "GET",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const AcceptInvitaon= async (id:string) => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/invitaion/${id}/accept`, {
+      method: "PUT",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const DeclineInvitaion= async (id:string) => {
+  try {
+    const token = (await cookies()).get("accessToken")?.value;
+    if (!token) {
+      throw new Error("Access token not found");
+    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/invitations/invitaion/${id}/decline`, {
+      method: "PUT",
+      headers: {
+        Authorization: token
+      },
+      credentials: "include",
+    },
+    );
+    const result = await res.json();
+    console.log(result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+  

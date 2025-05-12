@@ -23,6 +23,9 @@ const registerUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
         success: true,
         statusCode: http_status_1.default.CREATED,
         message: 'User Register Successfully',
+        data: {
+            accessToken: result,
+        },
     });
 }));
 const logingUser = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

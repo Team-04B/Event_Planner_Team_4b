@@ -10,4 +10,6 @@ const auth_1 = __importDefault(require("../../app/middleWares/auth"));
 const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 router.get('/', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.getMyAllnvitaions);
+router.get('/invitaion/:id', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.getSingleInvitaion);
+router.get('/sent-invitaions', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.getMySentInvitaions);
 exports.InvitationRoutes = router;

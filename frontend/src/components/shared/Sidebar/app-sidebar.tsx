@@ -2,21 +2,11 @@
 
 import * as React from "react";
 import {
-  Bot,
   CalendarDays,
   Clock,
-  Frame,
-  HeartPulse,
-  LifeBuoy,
-  ListOrdered,
-  Map,
-  MessageSquare,
-  PieChart,
   Plus,
-  Send,
   Settings,
   SquareTerminal,
-  User,
   UserPlus,
 } from "lucide-react";
 import {
@@ -50,14 +40,14 @@ const data = {
       icon: CalendarDays,
     },
     {
+      title: "My Invitaions",
+      url: "/dashboard/myinvitaions",
+      icon: UserPlus,
+    },
+    {
       title: "Pending Invitations",
       url: "/dashboard/pendinginvitations",
       icon: Clock,
-    },
-    {
-      title: "My Reviews",
-      url: "/dashboard/reviews",
-      icon: MessageSquare,
     },
     {
       title: "Invite People",

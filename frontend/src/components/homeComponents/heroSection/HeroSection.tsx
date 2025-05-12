@@ -37,7 +37,7 @@ const HeroSection = () => {
       {/* Paragraph */}
       <p className="max-w-2xl mx-auto   font-bold mt-6 text-xl text-[#666C79]">
         Easily plan, manage, and publish events — all in one platform. Whether
-        you're hosting a public gathering or a private experience, everything
+        you&apos;re hosting a public gathering or a private experience, everything
         from registration to payments and participant management.
       </p>
 

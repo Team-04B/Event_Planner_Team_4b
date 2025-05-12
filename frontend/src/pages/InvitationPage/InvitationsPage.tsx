@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useState } from "react"
@@ -258,9 +259,7 @@ const invitations = InvitationsData?.data;
                             )}
                           </div>
                           <div className="flex justify-end gap-2">
-                            <Button variant="outline" size="sm" asChild>
-                              <Link href={`/dashboard/invitations/${invitation.id}`}>View</Link>
-                            </Button>
+                            
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-8 w-8">

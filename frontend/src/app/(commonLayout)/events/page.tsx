@@ -1,5 +1,11 @@
-const Events = () => {
-  return <div></div>;
+import AllEvents from "@/components/modules/Events/all events";
+
+const EventsPage = () => {
+  return (
+    <div>
+      <AllEvents />
+    </div>
+  );
 };
 
-export default Events;
+export default EventsPage;

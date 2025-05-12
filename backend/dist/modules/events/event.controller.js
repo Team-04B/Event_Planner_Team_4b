@@ -22,9 +22,32 @@ const event_constant_1 = require("./event.constant");
 const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
 // create event
 const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const eventData = req.body;
+    // const file = req.file as Express.Multer.File;
+    const file = req.file;
+    console.log(file);
+    if (!file) {
+        throw new Error('Image file is required');
+    }
+    const creatorId = req.user.id;
+    // console.log(creatorId)
+    //   // Simplified mapping to IFile
+    //   const mappedFile: IFile = {
+    //     // fileName: file.filename,
+    //     orginalname: file.originalname,
+    //     encoding: file.encoding,
+    //     mimetype: file.mimetype,
+    //     destination: file.destination,
+    //     filename: file.filename,
+    //     path: file.path,
+    //     size: file.size,
+    //   };
     // console.log(eventData);
-    const result = yield event_service_1.EventService.createEventIntoDB(eventData);
+    // Upload the file to Cloudinary
+    // const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+    const eventData = Object.assign(Object.assign({}, req.body), { 
+        // eventImgUrl: uploadedImage?.secure_url, // set image URL
+        eventImgUrl: file.path });
+    const result = yield event_service_1.EventService.createEventIntoDB(eventData, creatorId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
@@ -32,10 +55,47 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+// get all events - public
+const getAllEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
+    const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
+    const filters = {
+        isPublic: rawFilters.isPublic === 'true'
+            ? true
+            : rawFilters.isPublic === 'false'
+                ? false
+                : undefined,
+        isPaid: rawFilters.isPaid === 'true'
+            ? true
+            : rawFilters.isPaid === 'false'
+                ? false
+                : undefined,
+        searchTerm: typeof rawFilters.searchTerm === 'string'
+            ? rawFilters.searchTerm
+            : undefined,
+    };
+    // If filters are empty, set them to undefined to fetch all events
+    if (Object.keys(filters).length === 0 ||
+        Object.values(filters).every((value) => value === undefined)) {
+        filters.isPublic = undefined;
+        filters.isPaid = undefined;
+        filters.searchTerm = undefined;
+    }
+    const result = yield event_service_1.EventService.getAllEventsFromDB(filters, options);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'Event retrieved successfully',
+        meta: result.meta,
+        data: result.data,
+    });
+}));
 // get all event
 const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    // const user = req.user;
     // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
     const filters = {
         isPublic: rawFilters.isPublic === 'true'
@@ -80,16 +140,43 @@ const getEventById = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
     });
 }));
 //update event
-const updateEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield event_service_1.EventService.updateEventIntoDB(id, req.body);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_1.default.OK,
-        message: 'Event updated successfully',
-        data: result,
-    });
-}));
+// const updateEvent = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   const creatorId = req.user.id;
+//   let eventData = {
+//     ...req.body,
+//     creatorId,
+//   };
+//   if (req.file) {
+//     const file = req.file as Express.Multer.File;
+//     // Simplified mapping to IFile
+//     const mappedFile: IFile = {
+//       // fileName: file.filename,
+//       orginalname: file.originalname,
+//       encoding: file.encoding,
+//       mimetype: file.mimetype,
+//       destination: file.destination,
+//       filename: file.filename,
+//       path: file.path,
+//       size: file.size,
+//     };
+//     // console.log(eventData);
+//     // Upload the file to Cloudinary
+//     const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+//     eventData = {
+//       ...req.body,
+//       creatorId,
+//       eventImgUrl: uploadedImage?.secure_url, // set image URL
+//     };
+//   }
+//   const result = await EventService.updateEventIntoDB(id, eventData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: 'Event updated successfully',
+//     data: result,
+//   });
+// });
 // delete event
 const deleteFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -139,7 +226,7 @@ const handleJoinEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
     if (!userId)
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'User ID missing');
     const result = yield event_service_1.EventService.joinToPublicEvent(eventId, userId);
-    console.log(result);
+    // console.log(result);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
@@ -174,13 +261,18 @@ const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awa
         data: result,
     });
 }));
+// const adminDeleteEvent = catchAsync(async(req,res)=> {
+//   const 
+// })
 exports.EventController = {
     createEvent,
     getEvents,
+    getAllEvents,
     getEventById,
-    updateEvent,
+    // updateEvent,
     deleteFromDB,
     handleJoinEvent,
     handleRequestEvent,
     updateParticipantStatus,
+    // adminDeleteEvent,
 };

@@ -23,11 +23,13 @@ model User {
   events         Event[]         @relation("User")
   participations Participation[]
   invitations    Invitation[]    @relation("InvitedUser")
+  sentInvitations Invitation[]   @relation("Inviter")
   reviews        Review[]
   payments       Payment[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
+
 
 model Event {
   id             String          @id @default(uuid())
@@ -61,16 +63,22 @@ model Participation {
 }
 
 model Invitation {
-  id          String           @id @default(uuid())
-  event       Event            @relation("EventInvitations", fields: [eventId], references: [id])
-  eventId     String
-  invitedUser User             @relation("InvitedUser", fields: [userEmail], references: [email])
+  id             String           @id @default(uuid())
+  event          Event            @relation("EventInvitations", fields: [eventId], references: [id])
+  eventId        String
+
+  invitedUser    User             @relation("InvitedUser", fields: [userEmail], references: [email])
+  userEmail      String
+
+  invitedBy      User             @relation("Inviter", fields: [invitedById], references: [id])
+  invitedById    String
+
   invitationNote String
-  userEmail      String 
-  status      InvitationStatus @default(PENDING)
-  paid        Boolean          @default(false)
-  createdAt   DateTime         @default(now())
+  status         InvitationStatus @default(PENDING)
+  paid           Boolean          @default(false)
+  createdAt      DateTime         @default(now())
 }
+
 
 model Review {
   id        String   @id @default(uuid())

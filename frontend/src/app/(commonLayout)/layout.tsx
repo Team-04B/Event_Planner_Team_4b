@@ -1,6 +1,6 @@
 import { TReactChildrenType } from "@/commonTypes/commonTypes";
+import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
-import { Footer } from "react-day-picker";
 
 const CommonLayout = ({children}:TReactChildrenType) => {
     return (
@@ -10,7 +10,7 @@ const CommonLayout = ({children}:TReactChildrenType) => {
        </header>
             {children}
             <footer>
-            {/* <Footer/> */}
+            <Footer/>
         </footer>   
         </>
     )

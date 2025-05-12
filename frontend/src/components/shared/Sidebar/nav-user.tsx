@@ -1,22 +1,16 @@
 "use client";
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -25,13 +19,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { usePathname, useRouter } from "next/navigation";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-
-  const router = useRouter();
-  const pathname = usePathname();
 
   return (
     <SidebarMenu>

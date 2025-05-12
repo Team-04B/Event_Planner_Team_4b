@@ -9,7 +9,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const authRegisterInToDB = async (payload: Partial<User>) => {
   const { name, email, password } = payload;
-  console.log(payload);
+  // console.log(payload);
   // Optional: Add validation checks here.
   if (!name || !email || !password) {
     throw new ApiError(
@@ -22,9 +22,15 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
     where: { email: email },
   });
 
-  if (isExistUser) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
-  }
+  // const isExistUser = await prisma.user.findFirst({
+  //   where: { email: email },
+  // });
+
+
+
+  // if (isExistUser) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
+  // }
 
   const hasPassword = await bcrypt.hash(password, 10);
   if (!hasPassword) {
@@ -43,6 +49,7 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
   }
   const jwtPayload = {
     id: registeredUser.id,
+    name: registeredUser.name,
     email: registeredUser.email,
     role: registeredUser.role,
   };
@@ -84,6 +91,7 @@ const authLogingInToDb = async (payload: Partial<User>) => {
   }
   const jwtPayload = {
     id: isExistUser.id,
+    name: isExistUser.name,
     email: isExistUser.email,
     role: isExistUser.role,
   };
@@ -121,6 +129,7 @@ const refeshTokenInToForDb = async (paylood: string) => {
   }
   const jwtPayload = {
     id: isExistUser.id,
+    name: isExistUser.name,
     email: isExistUser.email,
     role: isExistUser.role,
   };

@@ -65,6 +65,10 @@ const getAllReviewFromDB = (id) => __awaiter(void 0, void 0, void 0, function* (
     const result = prisma_1.default.review.findMany({
         where: {
             eventId: id
+        },
+        include: {
+            event: true,
+            user: true
         }
     });
     return result;

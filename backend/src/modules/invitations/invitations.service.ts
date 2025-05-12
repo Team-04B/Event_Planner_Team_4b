@@ -1,10 +1,10 @@
-import { Invitation } from '@prisma/client';
+import { Invitation, InvitationStatus } from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 import { IPaginationOptions } from '../../app/interface/pagination';
 import { paginationHelper } from '../../app/helper/paginationHelper';
 
 // create Invitaion
-const createInvitaionDB = async (id: string, data: any) => {
+const createInvitaionDB = async (id: string, data: any,userId:string) => {
 console.log(id,{data})
   await prisma.event.findUniqueOrThrow({
     where: {
@@ -14,6 +14,7 @@ console.log(id,{data})
 
   const result = await prisma.invitation.create({
     data: {
+     invitedById:userId,
       eventId: id,
       userEmail: data.userEmail,
       paid: data?.paid,
@@ -35,13 +36,13 @@ console.log(id,{data})
 //  }
 const getMyAllnvitaionsFromDB = async (
   options: IPaginationOptions,
-  userEmail: string
+  email: string
 ) => {
   const { limit, page, skip } = paginationHelper.calculatePagination(options);
 
   const result = await prisma.invitation.findMany({
     where: {
-      userEmail: userEmail,
+      userEmail: email,
     },
     skip,
     take: limit,
@@ -51,11 +52,54 @@ const getMyAllnvitaionsFromDB = async (
         : {
             createdAt: 'desc',
           },
+          include: {
+            event: true, 
+            invitedUser:true
+          },
   });
 
   const total = await prisma.invitation.count({
     where: {
-      userEmail: userEmail,
+      userEmail: email,
+    },
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+const getMyInvitedOnvitationsFromDB = async (
+  options: IPaginationOptions,
+  id: string
+) => {
+  const { limit, page, skip } = paginationHelper.calculatePagination(options);
+
+  const result = await prisma.invitation.findMany({
+    where: {
+      invitedById: id,
+    },
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+          include: {
+            event: true, 
+            invitedUser:true
+          },
+  });
+
+  const total = await prisma.invitation.count({
+    where: {
+      invitedById: id,
     },
   });
 
@@ -69,7 +113,57 @@ const getMyAllnvitaionsFromDB = async (
   };
 };
 
+const getSingleInvitaionIntoDB =async (id:string)=>{
+  const result =await prisma.invitation.findUniqueOrThrow({
+  where:{
+  id
+  },
+  include:{
+  invitedBy:true,
+  event:true,
+  }
+  })
+  
+  return result;
+}
+
+
+
+
+const acceptInvitaionInDB = async (id: string) => {
+  // Ensure the invitation exists
+  await prisma.invitation.findUniqueOrThrow({
+    where: { id },
+  });
+
+  const result = await prisma.invitation.update({
+    where: { id },
+    data: {
+      status: InvitationStatus.ACCEPTED,
+    },
+  });
+  return result
+}
+const declineInvitaionInDB = async (id: string) => {
+  // Ensure the invitation exists
+  await prisma.invitation.findUniqueOrThrow({
+    where: { id },
+  });
+
+  const result = await prisma.invitation.update({
+    where: { id },
+    data: {
+      status: InvitationStatus.DECLINED,
+    },
+  });
+  return result
+}
+
 export const InvitaionServices = {
   createInvitaionDB,
   getMyAllnvitaionsFromDB,
+  getMyInvitedOnvitationsFromDB,
+  getSingleInvitaionIntoDB,
+  acceptInvitaionInDB,
+  declineInvitaionInDB
 };

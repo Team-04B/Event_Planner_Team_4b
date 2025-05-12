@@ -7,7 +7,7 @@ import { ReviewValidations } from '../reviews/reviews.validation';
 import { InvitationController } from '../invitations/invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
-import { fileUploder } from '../../app/helper/fileUploader';
+import { multerUpload } from '../../app/config/multer-config';
 
 const router = express.Router();
 
@@ -15,7 +15,8 @@ const router = express.Router();
 router.post(
   '/',
   auth(Role.USER),
-  fileUploder.upload.single('file'),
+  multerUpload.single('file'),
+  // fileUploder.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
@@ -24,11 +25,13 @@ router.post(
   EventController.createEvent
 );
 
-//get all events
-router.get('/', EventController.getEvents);
+// get all events
+router.get('/', EventController.getAllEvents);
+
+//get all events by user
+router.get('/', auth(Role.USER, Role.ADMIN), EventController.getAllEventsByUserId);
 
 // get event by id
-
 router.get(
   '/:id',
   // auth(Role.USER,Role.ADMIN),
@@ -39,12 +42,21 @@ router.get(
 router.patch(
   '/:id',
   auth(Role.USER),
+  // fileUploder.upload.single('file'),
+  multerUpload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
 
 // delete event from db
 router.delete('/:id', auth(Role.USER), EventController.deleteFromDB);
+
+// admin delete event
+router.delete('/deleteEvent', auth(Role.ADMIN));
 
 // updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
 router.patch(
@@ -62,6 +74,14 @@ router.post(
   auth(Role.USER),
   EventController.handleRequestEvent
 );
+
+// get participation status
+router.get(
+  '/:id/participation-status',
+  auth(Role.USER),
+  EventController.getParticipationStatus
+);
+
 
 // reviews routes
 router.post(

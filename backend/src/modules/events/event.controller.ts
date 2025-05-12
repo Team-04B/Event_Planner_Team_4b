@@ -6,35 +6,23 @@ import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
-import { fileUploder } from '../../app/helper/fileUploader';
-import { IFile } from '../../app/interface/file';
+import { multerUpload } from '../../app/config/multer-config';
 
 // create event
 const createEvent = catchAsync(async (req, res) => {
-  const file = req.file as Express.Multer.File;
-  const creatorId = req.user.id;
+  const file = req.file;
   console.log(file);
-  // Simplified mapping to IFile
-  const mappedFile: IFile = {
-    // fileName: file.filename,
-    orginalname: file.originalname,
-    encoding: file.encoding,
-    mimetype: file.mimetype,
-    destination: file.destination,
-    filename: file.filename,
-    path: file.path,
-    size: file.size,
-  };
-  // console.log(eventData);
+  if (!file) {
+    throw new Error('Image file is required');
+  }
 
-  // Upload the file to Cloudinary
-  const uploadedImage = await fileUploder.uploadToCloudinary(mappedFile);
+  const creatorId = req.user.id;
+
   const eventData = {
     ...req.body,
-    creatorId,
-    eventImgUrl: uploadedImage?.secure_url, // set image URL
+    eventImgUrl: file.path,
   };
-  const result = await EventService.createEventIntoDB(eventData);
+  const result = await EventService.createEventIntoDB(eventData, creatorId);
 
   sendResponse(res, {
     success: true,
@@ -44,8 +32,8 @@ const createEvent = catchAsync(async (req, res) => {
   });
 });
 
-// get all event
-const getEvents = catchAsync(async (req, res) => {
+// get all events - for user
+const getAllEventsByUserId = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const user = req.user;
@@ -91,6 +79,53 @@ const getEvents = catchAsync(async (req, res) => {
   });
 });
 
+// get all event -public
+const getEvents = catchAsync(async (req, res) => {
+  const rawFilters = pick(req.query, eventFilterableFields);
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+  // const user = req.user;
+
+  // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
+  const filters: IEventFilterRequest = {
+    isPublic:
+      rawFilters.isPublic === 'true'
+        ? true
+        : rawFilters.isPublic === 'false'
+          ? false
+          : undefined,
+    isPaid:
+      rawFilters.isPaid === 'true'
+        ? true
+        : rawFilters.isPaid === 'false'
+          ? false
+          : undefined,
+    searchTerm:
+      typeof rawFilters.searchTerm === 'string'
+        ? rawFilters.searchTerm
+        : undefined,
+  };
+
+  // If filters are empty, set them to undefined to fetch all events
+  if (
+    Object.keys(filters).length === 0 ||
+    Object.values(filters).every((value) => value === undefined)
+  ) {
+    filters.isPublic = undefined;
+    filters.isPaid = undefined;
+    filters.searchTerm = undefined;
+  }
+
+  const result = await EventService.getEventsFromDB(filters, options);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Event retrieved successfully',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 // get event by id
 const getEventById = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -107,8 +142,16 @@ const getEventById = catchAsync(async (req, res) => {
 //update event
 const updateEvent = catchAsync(async (req, res) => {
   const { id } = req.params;
+  const file = req.file;
+  const creatorId = req.user.id;
 
-  const result = await EventService.updateEventIntoDB(id, req.body);
+  const eventData = {
+    ...req.body,
+    creatorId,
+    eventImgUrl: file?.path, // set image URL
+  };
+
+  const result = await EventService.updateEventIntoDB(id, eventData);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -171,7 +214,7 @@ const handleJoinEvent = catchAsync(async (req, res) => {
   // console.log(userId);
   if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
   const result = await EventService.joinToPublicEvent(eventId, userId);
-  console.log(result);
+  // console.log(result);
 
   sendResponse(res, {
     success: true,
@@ -193,6 +236,22 @@ const handleRequestEvent = catchAsync(async (req, res) => {
     success: true,
     statusCode: httpStatus.CREATED,
     message: `Request to join event ${result.status.toLocaleLowerCase()}`,
+    data: result,
+  });
+});
+
+// GET /events/:id/participation-status
+const getParticipationStatus = catchAsync(async (req, res) => {
+  const eventId = req.params.id;
+  const userId = req.user?.id;
+
+  if (!userId) throw new ApiError(httpStatus.UNAUTHORIZED, 'User ID missing');
+
+  const result = await EventService.getParticipationStatus(eventId, userId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Participation status fetched',
     data: result,
   });
 });
@@ -260,11 +319,13 @@ const getAllEvents = catchAsync(async (req, res) => {
 export const EventController = {
   createEvent,
   getEvents,
+  getAllEvents,
   getEventById,
   updateEvent,
   deleteFromDB,
   handleJoinEvent,
   handleRequestEvent,
+  getParticipationStatus,
   updateParticipantStatus,
-  getAllEvents,
+  getAllEventsByUserId,
 };

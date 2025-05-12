@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -10,7 +11,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeftIcon, CheckCircleIcon, Loader2Icon, PlusIcon, UserIcon } from 'lucide-react'
 import {
@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { User } from "@/commonTypes/commonTypes"
 import { CreateInvitaion } from "@/service/Invitations"
+import { Event } from "@/types/eventType"
 
 export default function NewInvitationPage({ userDatas, allEventData }: { userDatas: User[]; allEventData: any }) {
   const router = useRouter()
@@ -57,7 +58,7 @@ export default function NewInvitationPage({ userDatas, allEventData }: { userDat
       user.email.toLowerCase().includes(userSearchQuery.toLowerCase()),
   )
   // Get selected event details
-  const selectedEvent = allEventData.find((event) => event.id === formData.eventId)
+  const selectedEvent = allEventData?.find((event: { id: string }) => event.id === formData?.eventId)
   // Handle form input changes
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({
@@ -195,7 +196,7 @@ const formatDate = (date: string | Date) => {
                     <SelectValue placeholder="Select an event" />
                   </SelectTrigger>
                   <SelectContent>
-                    {allEventData?.map((event) => (
+                    {allEventData?.map((event:Event) => (
                       <SelectItem key={event.id} value={event.id}>
                         {event.title}
                       </SelectItem>
@@ -267,7 +268,7 @@ const formatDate = (date: string | Date) => {
                         <CommandList>
                           <CommandEmpty>No users found.</CommandEmpty>
                           <CommandGroup>
-                            {filteredUsers.map((user) => (
+                            {filteredUsers?.map((user) => (
                               <CommandItem key={user.id} value={user.id} onSelect={() => handleUserSelect(user)}>
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-6 w-6">
@@ -320,27 +321,6 @@ const formatDate = (date: string | Date) => {
                 />
               </div>
             </div>
-
-            {selectedEvent?.isPaid && (
-              <div className="space-y-4">
-                <div className="border-t pt-4">
-                  <h3 className="text-lg font-medium mb-2">Payment Settings</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="payment">Require Payment</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Require the invitee to pay before confirming attendance
-                      </p>
-                    </div>
-                    <Switch
-                      id="payment"
-                      checked={formData.requirePayment}
-                      onCheckedChange={(checked) => handleChange("requirePayment", checked)}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button variant="outline" type="button" 
