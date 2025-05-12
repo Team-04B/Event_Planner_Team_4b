@@ -12,16 +12,16 @@ export default function PaymentSuccessPage() {
     const [message, setMessage] = useState("Validating your payment...")
 
   useEffect(() => {
-    const val_id = searchParams?.get("val_id")
+    // const val_id = searchParams?.get("val_id")
     const tran_id = searchParams?.get("tran_id")
 
-    if (val_id && tran_id) {
+    if (tran_id) {
       fetch(`http://localhost:5000/api/payment/inp`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ val_id, tran_id }),
+        body: JSON.stringify({tran_id }),
       })
         .then((res) => res.json())
         .then((data) => {

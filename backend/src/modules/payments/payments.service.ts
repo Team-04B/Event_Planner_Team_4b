@@ -28,7 +28,7 @@ const initPayment = async (payload:any,userId:string) => {
         total_amount: event.fee,
         currency: 'BDT',
         tran_id: userId+event.id, // use unique tran_id for each api call
-        success_url: `${config.ssl.successUrl}/${userId+event.id}`,
+        success_url: `${config.ssl.sslverifyUrl}?tran_id=${userId+event.id}`,
         fail_url: config.ssl.failUrl,
         cancel_url: config.ssl.cancelUrl,
         ipn_url: config.ssl.sslValidationApi,
@@ -108,24 +108,25 @@ const initPayment = async (payload:any,userId:string) => {
 
 
 const validationPayment = async(query:any) => {
-    if(!query || !query.status || !(query.status === "VALID")){
-        return {
-            message:"Invalid Payment"
-        }
-    }
-    const response = await axios({
-        method:"GET",
-        url:`${config.ssl.sslValidationApi}?val_id=${query.val_id}&store_id=${config.ssl.storeId}&store_passwd=${config.ssl.storePass}&format=json`
-    })
-    if(await response?.data?.status !== "VALID"){
-        return {
-            message:"Payment Failed!"
-        }
-    }
+    // if(!query || !query.status || !(query.status === "VALID")){
+    //     return {
+    //         message:"Invalid Payment"
+    //     }
+    // }
+    // const response = await axios({
+    //     method:"GET",
+    //     url:`${config.ssl.sslValidationApi}?val_id=${query.val_id}&store_id=${config.ssl.storeId}&store_passwd=${config.ssl.storePass}&format=json`
+    // })
+    // if(await response?.data?.status !== "VALID"){
+    //     return {
+    //         message:"Payment Failed!"
+    //     }
+    // }
+
     await prisma.$transaction(async(tx)=> {
         await tx.payment.updateMany({
             where:{
-                transactionId:response?.data?.tran_id,
+                transactionId:query?.tran_id,
             },
             data:{
                 status:PaymentStatus.SUCCESS,
@@ -133,10 +134,12 @@ const validationPayment = async(query:any) => {
             }
         })
 
-        return {
-            message: "Payment success!"
-        }
+        // return {
+        //     message: "Payment success!"
+        // }
     })
+
+    return true
 }
 
 const paymentSuccess = async(tran_id:string) => {

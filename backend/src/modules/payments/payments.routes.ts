@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/initpayment',auth(Role.ADMIN,Role.USER),PaymentController.initPayment)
 
 
-router.get('/ipn',PaymentController.validationPayment)
+router.post('/ipn',PaymentController.validationPayment)
 
 router.post('/success/:tran_id',PaymentController.paymentSuccess)
 
