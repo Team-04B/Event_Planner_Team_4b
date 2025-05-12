@@ -5,10 +5,15 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getMeFoDb } from "@/service/AuthService";
+import { checkAuthGuard, getMeFoDb } from "@/service/AuthService";
 
 const DashboardLayout = async ({ children }: TReactChildrenType) => {
   const { data } = await getMeFoDb();
+  const token = checkAuthGuard();
+
+  if (token instanceof Response) {
+    return token;
+  }
   return (
     <SidebarProvider>
       <AppSidebar name={data?.name} />
