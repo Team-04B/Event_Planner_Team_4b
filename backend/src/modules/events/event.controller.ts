@@ -6,7 +6,6 @@ import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
-import { multerUpload } from '../../app/config/multer-config';
 
 // create event
 const createEvent = catchAsync(async (req, res) => {
@@ -31,6 +30,52 @@ const createEvent = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+// // get all events - public
+// const getAllEvents = catchAsync(async (req, res) => {
+//   const rawFilters = pick(req.query, eventFilterableFields);
+//   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
+//   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
+//   const filters: IEventFilterRequest = {
+//     isPublic:
+//       rawFilters.isPublic === 'true'
+//         ? true
+//         : rawFilters.isPublic === 'false'
+//           ? false
+//           : undefined,
+//     isPaid:
+//       rawFilters.isPaid === 'true'
+//         ? true
+//         : rawFilters.isPaid === 'false'
+//           ? false
+//           : undefined,
+//     searchTerm:
+//       typeof rawFilters.searchTerm === 'string'
+//         ? rawFilters.searchTerm
+//         : undefined,
+//   };
+
+//   // If filters are empty, set them to undefined to fetch all events
+//   if (
+//     Object.keys(filters).length === 0 ||
+//     Object.values(filters).every((value) => value === undefined)
+//   ) {
+//     filters.isPublic = undefined;
+//     filters.isPaid = undefined;
+//     filters.searchTerm = undefined;
+//   }
+
+//   const result = await EventService.getAllEventsFromDB(filters, options);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.OK,
+//     message: 'Event retrieved successfully',
+//     meta: result.meta,
+//     data: result.data,
+//   });
+// });
 
 // get all events - for user
 const getAllEventsByUserId = catchAsync(async (req, res) => {
@@ -316,6 +361,8 @@ const getAllEvents = catchAsync(async (req, res) => {
     data: result.data,
   });
 });
+
+
 export const EventController = {
   createEvent,
   getEvents,
@@ -327,5 +374,6 @@ export const EventController = {
   handleRequestEvent,
   getParticipationStatus,
   updateParticipantStatus,
-  getAllEventsByUserId,
+  getAllEventsByUserId
+  // adminDeleteEvent,
 };
