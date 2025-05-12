@@ -13,7 +13,6 @@ const reviews_validation_1 = require("../reviews/reviews.validation");
 const invitations_controller_1 = require("../invitations/invitations.controller");
 const auth_1 = __importDefault(require("../../app/middleWares/auth"));
 const client_1 = require("@prisma/client");
-// import { fileUploder } from '../../app/helper/fileUploader';
 const multer_config_1 = require("../../app/config/multer-config");
 const router = express_1.default.Router();
 //create event
@@ -26,7 +25,7 @@ router.post('/', (0, auth_1.default)(client_1.Role.USER), multer_config_1.multer
 // get all events
 router.get('/', event_controller_1.EventController.getAllEvents);
 //get all events by user
-router.get('/', (0, auth_1.default)(client_1.Role.USER, client_1.Role.ADMIN), event_controller_1.EventController.getEvents);
+router.get('/', (0, auth_1.default)(client_1.Role.USER, client_1.Role.ADMIN), event_controller_1.EventController.getAllEventsByUserId);
 // get event by id
 router.get('/:id', 
 // auth(Role.USER,Role.ADMIN),
@@ -37,9 +36,7 @@ router.patch('/:id', (0, auth_1.default)(client_1.Role.USER),
 multer_config_1.multerUpload.single('file'), (req, res, next) => {
     req.body = JSON.parse(req.body.data);
     next();
-}, (0, validationRequest_1.validateRequest)(event_validation_1.EventValidations.updateEventZodSchema)
-// EventController.updateEvent
-);
+}, (0, validationRequest_1.validateRequest)(event_validation_1.EventValidations.updateEventZodSchema), event_controller_1.EventController.updateEvent);
 // delete event from db
 router.delete('/:id', (0, auth_1.default)(client_1.Role.USER), event_controller_1.EventController.deleteFromDB);
 // admin delete event
@@ -50,9 +47,14 @@ router.patch('/:id/participants/:participantId/status', (0, auth_1.default)(clie
 router.post('/:id/join', (0, auth_1.default)(client_1.Role.USER), event_controller_1.EventController.handleJoinEvent);
 // Private events
 router.post('/:id/request', (0, auth_1.default)(client_1.Role.USER), event_controller_1.EventController.handleRequestEvent);
+// get participation status
+router.get('/:id/participation-status', (0, auth_1.default)(client_1.Role.USER), event_controller_1.EventController.getParticipationStatus);
 // reviews routes
 router.post('/:id/reviews', (0, validationRequest_1.validateRequest)(reviews_validation_1.ReviewValidations.createReviewZodSchema), reviews_controller_1.ReviewController.createReview);
 router.get('/:id/reviews', reviews_controller_1.ReviewController.getAllReviews);
 // invitaion routes
 router.post('/:id/invite', (0, auth_1.default)(client_1.Role.ADMIN, client_1.Role.USER), invitations_controller_1.InvitationController.createInvitaion);
+router.get('/all-events', 
+// auth(Role.ADMIN, Role.USER),
+event_controller_1.EventController.getAllEvents);
 exports.EventRoutes = router;

@@ -337,6 +337,15 @@ const requestToPaidEvent = (eventId, userId) => __awaiter(void 0, void 0, void 0
     });
     return participation;
 });
+const getParticipationStatus = (eventId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.participation.findFirst({
+        where: {
+            eventId,
+            userId,
+        },
+    });
+    return result;
+});
 // update Participant Status
 const updateParticipantStatus = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma_1.default.participation.findUniqueOrThrow({
@@ -350,6 +359,71 @@ const updateParticipantStatus = (id, data) => __awaiter(void 0, void 0, void 0, 
     });
     return result;
 });
+// const getAllEventsFromDB = async (
+//   filters: IEventFilterRequest,
+//   options: IPaginationOptions
+// ) => {
+//   const { limit, page, skip } = paginationHelper.calculatePagination(options);
+//   const { searchTerm, ...filterData } = filters;
+//   const andConditions: Prisma.EventWhereInput[] = [];
+//   // Search term filter
+//   if (searchTerm) {
+//     andConditions.push({
+//       OR: eventSearchableFields.map((field) => ({
+//         [field]: {
+//           contains: searchTerm,
+//           mode: 'insensitive',
+//         },
+//       })),
+//     });
+//   }
+//   // Other filters
+//   if (Object.keys(filterData).length > 0) {
+//     andConditions.push({
+//       AND: Object.keys(filterData).map((key) => ({
+//         [key]: {
+//           equals: (filterData as any)[key],
+//         },
+//       })),
+//     });
+//   }
+//   // Filter by creatorId
+//   const whereConditions: Prisma.EventWhereInput =
+//     andConditions.length > 0 ? { AND: andConditions } : {};
+//   // Fetch all events
+//   const allEvents = await prisma.event.findMany({
+//     where: whereConditions,
+//     orderBy:
+//       options.sortBy && options.sortOrder
+//         ? { [options.sortBy]: options.sortOrder }
+//         : {
+//             createdAt: 'desc',
+//           },
+//   });
+//   // Today's date
+//   const now = new Date();
+//   // Segment the events
+//   const completedEvents = allEvents.filter(
+//     (event) => new Date(event.dateTime) < now
+//   );
+//   const upcomingEvents = allEvents.filter(
+//     (event) => new Date(event.dateTime) >= now
+//   );
+//   // Paginate the allEvents list
+//   const paginatedData = allEvents.slice(skip, skip + limit);
+//   return {
+//     meta: {
+//       page,
+//       limit,
+//       total: allEvents.length,
+//     },
+//     data: {
+//       paginatedData,
+//       completed: completedEvents,
+//       upcoming: upcomingEvents,
+//       all: allEvents,
+//     },
+//   };
 const adminDeletedEventFromDB = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.event.delete({
         where: {
@@ -367,6 +441,7 @@ exports.EventService = {
     deleteEventFromDB,
     joinToPublicEvent,
     requestToPaidEvent,
+    getParticipationStatus,
     updateParticipantStatus,
     adminDeletedEventFromDB,
 };
