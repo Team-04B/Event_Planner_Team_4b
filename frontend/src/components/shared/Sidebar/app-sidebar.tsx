@@ -40,7 +40,7 @@ const data = {
   navMain: [
     {
       title: "Overview",
-      url: "/dashboard/user-overivew",
+      url: "/dashboard/user-overview",
       icon: SquareTerminal,
       isActive: true,
     },
@@ -143,10 +143,9 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
               <SidebarMenuButton>
                 <Link href="/dashboard/create-event">
                   <h2 className="flex items-center gap-1">
-                    <Plus fontSize={700} size={20} /> Create Event.
+                    <Plus fontSize={700} size={20} /> Create Event
                   </h2>
                 </Link>
-                ;
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>
