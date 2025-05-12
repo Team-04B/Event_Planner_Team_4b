@@ -18,6 +18,10 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
     );
   }
 
+  const isExistUser = await prisma.user.findFirst({
+    where: { email: email },
+  });
+
   // const isExistUser = await prisma.user.findFirst({
   //   where: { email: email },
   // });
@@ -40,7 +44,6 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
     },
   });
 
-  console.log(registeredUser, 'register user');
   if (!registeredUser.id) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'user create problem');
   }
@@ -169,6 +172,7 @@ const chengePasswordForDb = async (
     where: { email: isExistUser.email },
     data: { password: hasPassword },
   });
+
   return result;
 };
 export const AuthService = {

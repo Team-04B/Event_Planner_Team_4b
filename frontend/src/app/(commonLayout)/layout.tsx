@@ -1,4 +1,5 @@
 import { TReactChildrenType } from "@/commonTypes/commonTypes";
+import Footer from "@/components/shared/Footer";
 import Navbar from "@/components/shared/Navbar";
 
 const CommonLayout = ({children}:TReactChildrenType) => {
@@ -9,7 +10,7 @@ const CommonLayout = ({children}:TReactChildrenType) => {
        </header>
             {children}
             <footer>
-            {/* <Footer/> */}
+            <Footer/>
         </footer>   
         </>
     )

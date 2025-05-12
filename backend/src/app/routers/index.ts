@@ -7,6 +7,7 @@ import { InvitationRoutes } from '../../modules/invitations/invitations.routes';
 import { PaymentRoutes } from '../../modules/payments/payments.routes';
 import { ReviewsRoutes } from '../../modules/reviews/reviews.routes';
 import { AdminRoutes } from '../../modules/admin/admin.routes';
+import { MailRoutes } from '../../modules/contact/contact.route';
 
 const router = express.Router();
 
@@ -42,10 +43,15 @@ const moduleRoutes = [
     {
         path:'/admin',
         route:AdminRoutes
-    }
+    },
+    {
+      path: '/sendMail',
+      route: MailRoutes,
+    },
 ]
 
-moduleRoutes.forEach(route => router.use(route.path,route.route));
 
+
+moduleRoutes.forEach((route) => router.use(route.path, route.route));
 
 export default router;

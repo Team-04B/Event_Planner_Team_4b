@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
+import { getValidToken } from "@/lib/verifyToken";
+import { revalidateTag } from "next/cache";
 
-// create event
+// Create Event
 export const createEvent = async (eventData: FormData) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("accessToken")?.value;
+    const cookieStore = cookies();
+    const accessToken = (await cookieStore).get("accessToken")?.value;
 
-    if (!accessToken) {
-      throw new Error("No access token found in cookies.");
-    }
+    if (!accessToken) throw new Error("No access token found in cookies.");
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events`, {
       method: "POST",
@@ -24,23 +23,19 @@ export const createEvent = async (eventData: FormData) => {
     });
 
     revalidateTag("EVENT");
-    return res.json();
+    return await res.json();
   } catch (error: any) {
     console.error("Event creation error:", error);
     return { success: false, error: error.message || "Unknown error" };
   }
 };
 
-// get all events
-
+// Get All Events
 export const getAllEvents = async (filters = {}) => {
   try {
     const query = new URLSearchParams();
-
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        query.append(key, String(value));
-      }
+      if (value) query.append(key, String(value));
     });
 
     const url = `${process.env.NEXT_PUBLIC_BASE_API}/events/all${
@@ -49,198 +44,153 @@ export const getAllEvents = async (filters = {}) => {
 
     const res = await fetch(url, {
       method: "GET",
-      cache: "no-store", // Ensure fresh data
+      cache: "no-store",
     });
 
-    if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`);
-    }
-
-    const data = await res.json();
-    return data;
+    if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+    return await res.json();
   } catch (error: any) {
     return {
       success: false,
       error: error.message || "Unknown error",
-      data: {
-        all: [],
-        completed: [],
-        upcoming: [],
-        paginatedData: [],
-      },
-      meta: {
-        page: 1,
-        limit: 10,
-        total: 0,
-      },
+      data: { all: [], completed: [], upcoming: [], paginatedData: [] },
+      meta: { page: 1, limit: 10, total: 0 },
     };
   }
 };
 
+// Get Events by User
 export const getAllEventsByUserId = async (filters = {}) => {
   try {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("accessToken")?.value;
+    const token = await getValidToken();
+    if (!token) throw new Error("No access token found.");
 
-    if (!accessToken) {
-      throw new Error("No access token found in cookies.");
-    }
-
-    // Convert filters object to URL query parameters
     const queryParams = new URLSearchParams();
-
-    // Add each filter to the query params
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        queryParams.append(key, String(value));
-      }
+      if (value) queryParams.append(key, String(value));
     });
 
-    // Build the URL with query parameters
     const url = `${process.env.NEXT_PUBLIC_BASE_API}/events${
       queryParams.toString() ? `?${queryParams.toString()}` : ""
     }`;
 
-    // console.log("Fetching events with URL:", url)
-
     const res = await fetch(url, {
       method: "GET",
-      headers: {
-        Authorization: accessToken,
-      },
+      headers: { Authorization: token },
       credentials: "include",
-      cache: "no-store", // Ensure we don't cache the results
+      cache: "no-store",
     });
 
-    if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`);
-    }
-
-    const data = await res.json();
-    return data;
+    if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+    return await res.json();
   } catch (error: any) {
-    // console.error("Event fetch error:", error)
     return {
       success: false,
       error: error.message || "Unknown error",
-      data: {
-        all: [],
-        completed: [],
-        upcoming: [],
-        paginatedData: [],
-      },
-      meta: {
-        page: 1,
-        limit: 10,
-        total: 0,
-      },
+      data: { all: [], completed: [], upcoming: [], paginatedData: [] },
+      meta: { page: 1, limit: 10, total: 0 },
     };
   }
 };
 
+// Get Event by ID
 export const getEventById = async (eventId: string) => {
   try {
-    const cookieStore = cookies();
-    const accessToken = (await cookieStore).get("accessToken")?.value;
+    const token = await getValidToken();
+    if (!token) throw new Error("No access token found.");
 
-    if (!accessToken) {
-      throw new Error("No access token found in cookies.");
-    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`, {
+      method: "GET",
+      headers: { Authorization: token },
+      credentials: "include",
+      cache: "no-store",
+    });
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: accessToken,
-        },
-        credentials: "include",
-        cache: "no-store", // Ensure we don't cache the results
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`);
-    }
-
-    const data = await res.json();
-    return data;
+    if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+    return await res.json();
   } catch (error: any) {
-    console.error("Event fetch error:", error);
-    return {
-      success: false,
-      error: error.message || "Unknown error",
-      data: null,
-    };
+    return { success: false, error: error.message || "Unknown error", data: null };
   }
-}
+};
 
+// Update Event
 export const updateEvent = async (eventId: string, eventData: FormData) => {
   try {
-    const cookieStore = cookies()
-    const accessToken = (await cookieStore).get("accessToken")?.value
-
-    if (!accessToken) {
-      throw new Error("No access token found in cookies.")
-    }
+    const token = await getValidToken();
+    if (!token) throw new Error("No access token found.");
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`, {
       method: "PATCH",
-      headers: {
-        // "Content-Type": "application/json",
-        Authorization: accessToken,
-      },
+      headers: { Authorization: token },
       body: eventData,
       credentials: "include",
-    })
+    });
 
-    if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`)
-    }
-
-    const data = await res.json()
-    return data
+    if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+    return await res.json();
   } catch (error: any) {
-    console.error("Event update error:", error)
-    return {
-      success: false,
-      error: error.message || "Unknown error",
-    }
+    return { success: false, error: error.message || "Unknown error" };
   }
-}
+};
 
-
+// Delete Event
 export const deleteEvent = async (eventId: string) => {
   try {
-    const cookieStore = cookies();
-    const accessToken = (await cookieStore).get("accessToken")?.value;
+    const token = await getValidToken();
+    if (!token) throw new Error("No access token found.");
 
-    if (!accessToken) {
-      throw new Error("No access token found in cookies.");
-    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`, {
+      method: "DELETE",
+      headers: { Authorization: token },
+      credentials: "include",
+    });
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: accessToken,
-        },
-        credentials: "include",
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error(`API request failed with status ${res.status}`);
-    }
-
-    const data = await res.json();
-    return data;
+    if (!res.ok) throw new Error(`API request failed with status ${res.status}`);
+    return await res.json();
   } catch (error: any) {
-    console.error("Event deletion error:", error);
-    return {
-      success: false,
-      error: error.message || "Unknown error",
-    };
+    return { success: false, error: error.message || "Unknown error" };
   }
+};
+
+// Join Public Event
+export const joinPublicEvent = async (eventId: string) => {
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get("accessToken")?.value;
+  if (!accessToken) throw new Error("No access token found in cookies.");
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/join`, {
+    method: "POST",
+    headers: { Authorization: accessToken },
+    credentials: "include",
+  });
+
+  return await res.json();
+};
+
+// Request Private Event
+export const requestPrivateEvent = async (eventId: string) => {
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get("accessToken")?.value;
+  if (!accessToken) throw new Error("No access token found in cookies.");
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/request`, {
+    method: "POST",
+    headers: { Authorization: accessToken },
+    credentials: "include",
+  });
+
+  return await res.json();
+};
+
+// Get Participation Status (Client-side)
+export const getParticipationStatus = async (eventId: string) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}/participation-status`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+  const result = await res.json();
+  return result.data as "PENDING" | "APPROVED" | null;
 };

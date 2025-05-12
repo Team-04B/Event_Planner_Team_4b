@@ -19,8 +19,6 @@ const registerUser = catchAsync(async (req, res, next) => {
 const logingUser = catchAsync(async (req, res) => {
   const result = await AuthService.authLogingInToDb(req.body);
 
-
-
   res.cookie('refeshToken', result.refeshToken, {
     secure: false,
     httpOnly: true,
@@ -52,8 +50,7 @@ const cheangePassword = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
-    message: 'refesh token Successfully get the access',
-    data: result,
+    message: 'your password succes fully cheanged',
   });
 });
 

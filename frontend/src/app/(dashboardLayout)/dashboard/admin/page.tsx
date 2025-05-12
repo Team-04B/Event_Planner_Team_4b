@@ -1,11 +1,16 @@
-import React from 'react';
+import AdminOverview from "@/components/modules/dashboard/Admin/overview";
+import { getAllUser } from "@/service/user";
 
-const page = () => {
-    return (
-        <div>
-            
-        </div>
-    );
+const AdminOverviewPage = async () => {
+  const { meta } = await getAllUser({ undefined });
+  console.log(meta);
+  const totalEvents = 100;
+  const totalUser = meta?.total;
+  return (
+    <div>
+      <AdminOverview totalEvents={totalEvents} totalUser={totalUser} />
+    </div>
+  );
 };
 
-export default page;
+export default AdminOverviewPage;

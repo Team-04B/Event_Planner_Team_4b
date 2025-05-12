@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useMobile } from "@/hooks/use-mobile"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { DialogTitle } from "../ui/dialog"
+import { DialogTitle } from "@/components/ui/dialog"
 import { useAppSelector } from "@/redux/hook"
 import { currentUser, logOut } from "@/redux/userSlice/userSlice"
 import { getAllInvitaions } from "@/service/Invitations"
@@ -34,7 +35,9 @@ export default function Navbar() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [invitations, setInvitations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const dispatch = useDispatch()
+  const pathname = usePathname()
 
   const handleLogout = () => {
     logout()
@@ -59,6 +62,20 @@ export default function Navbar() {
     fetchInvitations()
   }, [user])
 
+  // Add scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   const notifications = invitations.map((invitation) => ({
     id: invitation.id,
     title: `Event Invitation: ${invitation.event.title}`,
@@ -76,26 +93,12 @@ export default function Navbar() {
   const isMobile = useMobile()
   const unreadCount = notifications.filter((n) => n.status === "PENDING").length
 
-
-  const markAsRead = (id: string) => {
-  console.log(id)
-    // Implementation would go here
-  }
-
-  const markAllAsRead = () => {
-    // Implementation would go here
-  }
-
-  const handleAcceptInvitation = (id: string, eventId: string) => {
-    console.log(id, eventId)
-  }
-
-  const handleDeclineInvitation = (id: string, eventId: string) => {
-    console.log(id, eventId)
-  }
-
   return (
-    <nav className="w-full py-4 px-6 flex items-center justify-between border-b">
+    <nav
+      className={`w-full py-4 px-6 flex items-center justify-between border-b z-50 transition-all duration-300 ${
+        scrolled ? "fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-sm" : "relative bg-white"
+      }`}
+    >
       <Link href="/" className="text-xl font-bold">
         EvenTora
       </Link>
@@ -103,15 +106,7 @@ export default function Navbar() {
       {isMobile ? (
         <div className="flex items-center gap-2">
           {user && (
-            <NotificationsMobile
-              notifications={notifications}
-              unreadCount={unreadCount}
-              markAsRead={markAsRead}
-              markAllAsRead={markAllAsRead}
-              handleAcceptInvitation={handleAcceptInvitation}
-              handleDeclineInvitation={handleDeclineInvitation}
-              isLoading={isLoading}
-            />
+            <NotificationsMobile notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
           )}
           <Sheet>
             <SheetTrigger asChild>
@@ -131,15 +126,38 @@ export default function Navbar() {
                 <DialogTitle>Navigation Menu</DialogTitle>
               </VisuallyHidden>
               <div className="flex flex-col gap-6 mt-6">
-                <Link href="/" className="text-lg font-medium">
+                <Link
+                  href="/"
+                  className={`text-lg font-medium transition-colors ${
+                    pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
+                  }`}
+                >
                   Home
                 </Link>
-                <Link href="/events" className="text-lg font-medium">
+                <Link
+                  href="/events"
+                  className={`text-lg font-medium transition-colors ${
+                    pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
+                  }`}
+                >
                   Events
+                </Link>
+                <Link
+                  href="/about"
+                  className={`text-lg font-medium transition-colors ${
+                    pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
+                  }`}
+                >
+                  About
                 </Link>
                 {user ? (
                   <>
-                    <Link href="/dashboard" className="text-lg font-medium">
+                    <Link
+                      href="/dashboard"
+                      className={`text-lg font-medium transition-colors ${
+                        pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
+                      }`}
+                    >
                       Dashboard
                     </Link>
                     <Button onClick={handleLogout} variant="outline" className="justify-start">
@@ -162,29 +180,45 @@ export default function Navbar() {
         </div>
       ) : (
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-sm font-medium">
+          <Link
+            href="/"
+            className={`text-sm font-medium transition-colors ${
+              pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
+            }`}
+          >
             Home
           </Link>
-          <Link href="/events" className="text-sm font-medium">
+          <Link
+            href="/events"
+            className={`text-sm font-medium transition-colors ${
+              pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
+            }`}
+          >
             Events
           </Link>
+          <Link
+            href="/about"
+            className={`text-sm font-medium transition-colors ${
+              pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
+            }`}
+          >
+            About
+          </Link>
+
           {user ? (
             <>
-              <Link href="/dashboard" className="text-sm font-medium">
+              <Link
+                href="/dashboard"
+                className={`text-sm font-medium transition-colors ${
+                  pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
+                }`}
+              >
                 Dashboard
               </Link>
               <Button onClick={handleLogout} variant="outline" size="sm">
                 Logout
               </Button>
-              <NotificationsDesktop
-                notifications={notifications}
-                unreadCount={unreadCount}
-                markAsRead={markAsRead}
-                markAllAsRead={markAllAsRead}
-                handleAcceptInvitation={handleAcceptInvitation}
-                handleDeclineInvitation={handleDeclineInvitation}
-                isLoading={isLoading}
-              />
+              <NotificationsDesktop notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
             </>
           ) : (
             <>
@@ -205,29 +239,18 @@ export default function Navbar() {
 interface NotificationsDesktopProps {
   notifications: Notification[]
   unreadCount: number
-  markAsRead: (id: string) => void
-  markAllAsRead: () => void
-  handleAcceptInvitation: (id: string, eventId: string) => void
-  handleDeclineInvitation: (id: string, eventId: string) => void
   isLoading: boolean
 }
 
-function NotificationsDesktop({
-  notifications,
-  unreadCount,
-  markAllAsRead,
-  handleAcceptInvitation,
-  handleDeclineInvitation,
-  isLoading,
-}: NotificationsDesktopProps) {
+function NotificationsDesktop({ notifications, unreadCount, isLoading }: NotificationsDesktopProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" className="relative">
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              {unreadCount}
+            <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+              
             </span>
           )}
         </Button>
@@ -235,11 +258,6 @@ function NotificationsDesktop({
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between border-b p-3">
           <h3 className="font-medium">Invitations</h3>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-8">
-              Mark all as read
-            </Button>
-          )}
         </div>
         <div className="max-h-80 overflow-auto">
           {isLoading ? (
@@ -248,17 +266,17 @@ function NotificationsDesktop({
             notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`p-3 border-b last:border-0 ${notification.read ? "" : "bg-slate-50"}`}
+                className={`p-3 border-b last:border-0 ${notification.read ? "" : "bg-slate-50"} hover:bg-slate-100 transition-colors`}
               >
                 <div className="flex justify-between items-start mb-1">
                   <h4 className="font-medium text-sm">{notification.title}</h4>
                   <span className="text-xs text-muted-foreground">{notification.time}</span>
                 </div>
-                <p className="text-sm text-muted-foreground">{notification.message}</p>
+                <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
 
-                <div className="mt-2 text-xs flex flex-wrap gap-2">
+                <div className="mt-2 text-xs flex flex-wrap gap-2 mb-2">
                   {notification.venue && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="12"
@@ -278,7 +296,7 @@ function NotificationsDesktop({
                   )}
 
                   {notification.date && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="12"
@@ -300,46 +318,12 @@ function NotificationsDesktop({
                   )}
                 </div>
 
-                <div className="mt-2 text-xs">
-                  <span
-                    className={`px-2 py-0.5 rounded-full ${
-                      notification.status === "PENDING"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : notification.status === "ACCEPTED"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {notification.status}
-                  </span>
-                  {notification.paid && (
-                    <span className="ml-2 px-2 py-0.5 rounded-full bg-green-100 text-green-800">Paid</span>
-                  )}
-                </div>
-
-                {notification.status === "PENDING" && (
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      size="sm"
-                      className="h-8"
-                      onClick={() =>
-                        notification.eventId && handleAcceptInvitation(notification.id, notification.eventId)
-                      }
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8"
-                      onClick={() =>
-                        notification.eventId && handleDeclineInvitation(notification.id, notification.eventId)
-                      }
-                    >
-                      Decline
-                    </Button>
-                  </div>
-                )}
+                <Link
+                  href={`/dashboard/myinvitaions/${notification?.id}`}
+                  className="inline-block text-xs font-medium text-primary hover:underline transition-colors"
+                >
+                  View Invitation Details →
+                </Link>
               </div>
             ))
           ) : (
@@ -351,17 +335,9 @@ function NotificationsDesktop({
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface NotificationsMobileProps extends NotificationsDesktopProps {}
 
-function NotificationsMobile({
-  notifications,
-  unreadCount,
-  markAllAsRead,
-  handleAcceptInvitation,
-  handleDeclineInvitation,
-  isLoading,
-}: NotificationsMobileProps) {
+function NotificationsMobile({ notifications, unreadCount, isLoading }: NotificationsMobileProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -377,27 +353,25 @@ function NotificationsMobile({
       <SheetContent side="right" className="overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-3 mt-6">
           <h3 className="font-medium">Invitations</h3>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-8">
-              Mark all as read
-            </Button>
-          )}
         </div>
         <div className="mt-4 space-y-4">
           {isLoading ? (
             <div className="p-4 text-center">Loading invitations...</div>
           ) : notifications.length > 0 ? (
             notifications.map((notification) => (
-              <div key={notification.id} className={`p-3 border rounded-lg ${notification.read ? "" : "bg-slate-50"}`}>
+              <div
+                key={notification.id}
+                className={`p-3 border rounded-lg ${notification.read ? "" : "bg-slate-50"} hover:bg-slate-100 transition-colors`}
+              >
                 <div className="flex justify-between items-start mb-1">
                   <h4 className="font-medium text-sm">{notification.title}</h4>
                   <span className="text-xs text-muted-foreground">{notification.time}</span>
                 </div>
-                <p className="text-sm text-muted-foreground">{notification.message}</p>
+                <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
 
-                <div className="mt-2 text-xs flex flex-wrap gap-2">
+                <div className="mt-2 text-xs flex flex-wrap gap-2 mb-2">
                   {notification.venue && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="12"
@@ -417,7 +391,7 @@ function NotificationsMobile({
                   )}
 
                   {notification.date && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="12"
@@ -439,46 +413,12 @@ function NotificationsMobile({
                   )}
                 </div>
 
-                <div className="mt-2 text-xs">
-                  <span
-                    className={`px-2 py-0.5 rounded-full ${
-                      notification.status === "PENDING"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : notification.status === "ACCEPTED"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {notification.status}
-                  </span>
-                  {notification.paid && (
-                    <span className="ml-2 px-2 py-0.5 rounded-full bg-green-100 text-green-800">Paid</span>
-                  )}
-                </div>
-
-                {notification.status === "PENDING" && (
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      size="sm"
-                      className="h-8"
-                      onClick={() =>
-                        notification.eventId && handleAcceptInvitation(notification.id, notification.eventId)
-                      }
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8"
-                      onClick={() =>
-                        notification.eventId && handleDeclineInvitation(notification.id, notification.eventId)
-                      }
-                    >
-                      Decline
-                    </Button>
-                  </div>
-                )}
+                <Link
+                  href={`/dashboard/myinvitaions/${notification?.id}`}
+                  className="inline-block text-xs font-medium text-primary hover:underline transition-colors"
+                >
+                  View Invitation Details →
+                </Link>
               </div>
             ))
           ) : (

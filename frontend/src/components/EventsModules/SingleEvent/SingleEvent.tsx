@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useAppSelector } from "@/redux/hook"
 import { currentToken } from "@/redux/userSlice/userSlice"
+import { joinPublicEvent, requestPrivateEvent } from "@/service/Events";
+import { toast } from "sonner";
+
 type SingleEvent = {
 event:IEvent;
 currentUser:any;
@@ -18,6 +21,99 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
   const [isLoading, setIsLoading] = useState(false)
   // const router = useRouter()
   const token = useAppSelector(currentToken)
+
+
+  const [loading, setLoading] = useState(false);
+
+  const eventId = event.id;
+  const isPublic = event.isPublic;
+  const isPaid = event.isPaid;
+
+  if (!currentUser?.id) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-red-500">
+          You are not authorized!!
+        </h2>
+        <p className="mt-2 text-gray-600">Please login to view this event.</p>
+      </div>
+    );
+  }
+
+  const handleJoin = async () => {
+    setLoading(true);
+
+    try {
+      const res = await joinPublicEvent(eventId);
+      if (res.success) {
+        toast.success(res.message || "Joined successfully!");
+      } else {
+        toast.error(res.message || "Something went wrong.");
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        toast.error(error.message || "An error occurred.");
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRequest = async () => {
+    setLoading(true);
+    try {
+      const res = await requestPrivateEvent(eventId);
+
+      if (res.success) {
+        toast.success(res.message || "Requested successfully!");
+      } else {
+        toast.error(res.message || "Something went wrong.");
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        toast.error(error.message || "An error occurred.");
+      } else {
+        toast.error("An unknown error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Button rendering based on event type
+  const renderActionButton = () => {
+    if (isPublic && !isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleJoin}>
+          Join Free
+        </Button>
+      );
+    }
+    if (isPublic && isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleJoin}>
+          Pay & Join
+        </Button>
+      );
+    }
+    if (!isPublic && !isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleRequest}>
+          Request to Join
+        </Button>
+      );
+    }
+    if (!isPublic && isPaid) {
+      return (
+        <Button disabled={loading} onClick={handleRequest}>
+          Pay & Request
+        </Button>
+      );
+    }
+    return null;
+  };
 
   const handleJoinEvent = async (eventId:string) => {
     try {
@@ -88,6 +184,10 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
             <p className="text-gray-700">{event.description}</p>
           </div>
 
+          {/* ✅ Conditional action buttons */}
+          {/* ✅ Conditional action buttons */}
+          {renderActionButton()}
+
           <div className="mt-6 sm:mt-8">
             <EventReviewSection eventId={event.id} userId={currentUser.id} />
           </div>
@@ -100,8 +200,12 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500">Date and Time</p>
-                  <p className="font-medium">{format(new Date(event.dateTime), "PPP")}</p>
-                  <p className="font-medium">{format(new Date(event.dateTime), "p")}</p>
+                  <p className="font-medium">
+                    {format(new Date(event.dateTime), "PPP")}
+                  </p>
+                  <p className="font-medium">
+                    {format(new Date(event.dateTime), "p")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
@@ -109,11 +213,15 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Price</p>
-                  <p className="font-medium">{event.isPaid ? `$${event.fee?.toFixed(2)}` : "Free"}</p>
+                  <p className="font-medium">
+                    {event.isPaid ? `$${event.fee?.toFixed(2)}` : "Free"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Visibility</p>
-                  <p className="font-medium">{event.isPublic ? "Public" : "Private"}</p>
+                  <p className="font-medium">
+                    {event.isPublic ? "Public" : "Private"}
+                  </p>
                 </div>
                 {/* Join Event Button */}
                  <div className="pt-4 mt-2">
@@ -127,5 +235,5 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
         </div>
       </div>
     </div>
-  )
+  );
 }
