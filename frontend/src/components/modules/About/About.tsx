@@ -648,10 +648,10 @@ export default function AboutPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { src: "/images/born.jpg?height=300&width=300", alt: "Team collaboration" },
-                  { src: "/images/born.jpg?height=300&width=300", alt: "Office environment" },
-                  { src: "/images/born.jpg?height=300&width=300", alt: "Team meeting" },
-                  { src: "/images/born.jpg?height=300&width=300", alt: "Team celebration" },
+                  { src: "/images/about1.png?height=300&width=300", alt: "Team collaboration" },
+                  { src: "/images/about2.png?height=300&width=300", alt: "Office environment" },
+                  { src: "/images/about3.png?height=300&width=300", alt: "Team meeting" },
+                  { src: "/images/about4.png?height=300&width=300", alt: "Team celebration" },
                 ].map((img, i) => (
                   <div key={i} className="relative aspect-square overflow-hidden rounded-xl">
                     <Image
@@ -708,12 +708,16 @@ export default function AboutPage() {
             </p>
 
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button size="lg" className="bg-white text-black hover:bg-gray-100">
-                Create Your Event
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                Explore Events <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+          <Button asChild size="lg" className="bg-white text-black hover:bg-gray-100">
+  <Link href="/dashboard/create-event">Create Event</Link>
+</Button>
+
+<Button asChild size="lg" variant="outline" className="border-white text-black hover:text-white hover:bg-white/10">
+  <Link href="/events">
+    Explore Events
+    <ArrowRight className="ml-2 h-4 w-4" />
+  </Link>
+</Button>
             </div>
           </div>
 
