@@ -143,10 +143,10 @@ A secure, full-featured event management web platform developed by **Team #4b**.
 ## 📸 Screenshots
 
 ### Homepage
-![Homepage Screenshot](./assets/homepage.png)
+![Homepage Screenshot](https://res.cloudinary.com/ddzk2sd7f/image/upload/v1747049315/obegpnmjp8zneblwyjol.png)
 
 ### Dashboard View
-![Dashboard Screenshot](https://i.imgur.com/xyz1234.png)
+![Dashboard Screenshot](https://res.cloudinary.com/ddzk2sd7f/image/upload/v1747049341/u1zegx5hb2yecmak5d5z.png)
 
 ---
 
@@ -183,7 +183,7 @@ npm run dev
 
 ## Contributors
 
-- [**Rifat Sarker**](https://github.com/your-github) – Web Developer  
+- [**Rifat Sarker**](https://github.com/rifat-sarker) – Web Developer  
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/rifatswd/)
 
 - [**Amdadul Haque**](https://github.com/amdadulhaque) – Web Developer  
