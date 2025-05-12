@@ -519,6 +519,5 @@ export const EventService = {
   requestToPaidEvent,
   getParticipationStatus,
   updateParticipantStatus,
-  getAllEventsFromDB,
   adminDeletedEventFromDB,
 };

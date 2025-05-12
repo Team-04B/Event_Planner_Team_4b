@@ -94,7 +94,7 @@ const initPayment = async (payload:any,userId:string) => {
     console.log(paymentUrl,'2')
     return paymentUrl
     
-    } catch (error:{message:string}) {
+    } catch (error:any) {
         throw new ApiError(httpStatus.BAD_REQUEST,`Payment Error Occured${error?.message}`)
     }
     // const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
