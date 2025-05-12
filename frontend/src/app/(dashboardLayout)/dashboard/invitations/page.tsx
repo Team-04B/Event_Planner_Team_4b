@@ -6,7 +6,6 @@ import { getAllSentInvitaions } from "@/service/Invitations"
 const page =async () => {
  const Invitations = await getAllSentInvitaions()
          const InvitationsData = Invitations?.data
-         console.log(Invitations)
   return (
     <div>
     <InvitationsPage InvitationsData={InvitationsData} />

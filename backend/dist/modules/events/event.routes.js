@@ -23,7 +23,7 @@ router.post('/', (0, auth_1.default)(client_1.Role.USER), multer_config_1.multer
     next();
 }, (0, validationRequest_1.validateRequest)(event_validation_1.EventValidations.createEventZodSchema), event_controller_1.EventController.createEvent);
 // get all events
-router.get('/', event_controller_1.EventController.getAllEvents);
+router.get('/all', event_controller_1.EventController.getAllEvents);
 //get all events by user
 router.get('/', (0, auth_1.default)(client_1.Role.USER, client_1.Role.ADMIN), event_controller_1.EventController.getAllEventsByUserId);
 // get event by id

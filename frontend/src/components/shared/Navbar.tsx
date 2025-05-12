@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -32,6 +32,7 @@ interface Notification {
 
 export default function Navbar() {
   const user = useAppSelector(currentUser)
+  const router = useRouter()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [invitations, setInvitations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -62,6 +63,12 @@ export default function Navbar() {
     fetchInvitations()
   }, [user])
 
+  useEffect(() => {
+    if (!user) {
+      // Redirect to login or home if user is not authenticated
+      router.push("/login") // or router.push("/") for homepage
+    }
+  }, [user, router])
   // Add scroll effect
   useEffect(() => {
     const handleScroll = () => {
@@ -71,7 +78,8 @@ export default function Navbar() {
         setScrolled(false)
       }
     }
-
+    
+    
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -104,7 +112,7 @@ export default function Navbar() {
       </Link>
 
       {isMobile ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {user && (
             <NotificationsMobile notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
           )}
@@ -121,15 +129,17 @@ export default function Navbar() {
                 </svg>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
+            <SheetContent side="right" className="p-4">
               <VisuallyHidden>
                 <DialogTitle>Navigation Menu</DialogTitle>
               </VisuallyHidden>
-              <div className="flex flex-col gap-6 mt-6">
+              <div className="flex flex-col gap-4 mt-4">
                 <Link
                   href="/"
                   className={`text-lg font-medium transition-colors ${
-                    pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
+                    pathname === "/"
+                      ? "text-black font-bold border-l-4 border-primary pl-2"
+                      : "text-gray-500 hover:text-black"
                   }`}
                 >
                   Home
@@ -137,7 +147,9 @@ export default function Navbar() {
                 <Link
                   href="/events"
                   className={`text-lg font-medium transition-colors ${
-                    pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
+                    pathname === "/events"
+                      ? "text-black font-bold border-l-4 border-primary pl-2"
+                      : "text-gray-500 hover:text-black"
                   }`}
                 >
                   Events
@@ -145,7 +157,9 @@ export default function Navbar() {
                 <Link
                   href="/about"
                   className={`text-lg font-medium transition-colors ${
-                    pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
+                    pathname === "/about"
+                      ? "text-black font-bold border-l-4 border-primary pl-2"
+                      : "text-gray-500 hover:text-black"
                   }`}
                 >
                   About
@@ -155,7 +169,9 @@ export default function Navbar() {
                     <Link
                       href="/dashboard"
                       className={`text-lg font-medium transition-colors ${
-                        pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
+                        pathname?.startsWith("/dashboard")
+                          ? "text-black font-bold border-l-4 border-primary pl-2"
+                          : "text-gray-500 hover:text-black"
                       }`}
                     >
                       Dashboard
@@ -183,7 +199,7 @@ export default function Navbar() {
           <Link
             href="/"
             className={`text-sm font-medium transition-colors ${
-              pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
+              pathname === "/" ? "text-black font-bold border-b-2 border-primary" : "text-gray-500 hover:text-black"
             }`}
           >
             Home
@@ -191,7 +207,9 @@ export default function Navbar() {
           <Link
             href="/events"
             className={`text-sm font-medium transition-colors ${
-              pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
+              pathname === "/events"
+                ? "text-black font-bold border-b-2 border-primary"
+                : "text-gray-500 hover:text-black"
             }`}
           >
             Events
@@ -199,7 +217,9 @@ export default function Navbar() {
           <Link
             href="/about"
             className={`text-sm font-medium transition-colors ${
-              pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
+              pathname === "/about"
+                ? "text-black font-bold border-b-2 border-primary"
+                : "text-gray-500 hover:text-black"
             }`}
           >
             About
@@ -210,7 +230,9 @@ export default function Navbar() {
               <Link
                 href="/dashboard"
                 className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
+                  pathname?.startsWith("/dashboard")
+                    ? "text-black font-bold border-b-2 border-primary"
+                    : "text-gray-500 hover:text-black"
                 }`}
               >
                 Dashboard
@@ -250,7 +272,7 @@ function NotificationsDesktop({ notifications, unreadCount, isLoading }: Notific
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              
+              {unreadCount}
             </span>
           )}
         </Button>
@@ -350,11 +372,14 @@ function NotificationsMobile({ notifications, unreadCount, isLoading }: Notifica
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="overflow-y-auto">
-        <div className="flex items-center justify-between border-b pb-3 mt-6">
-          <h3 className="font-medium">Invitations</h3>
+      <SheetContent side="right" className="overflow-y-auto p-4">
+        <VisuallyHidden>
+          <DialogTitle>Notifications</DialogTitle>
+        </VisuallyHidden>
+        <div className="flex items-center justify-between border-b pb-3">
+          <h3 className="font-medium text-lg">Invitations</h3>
         </div>
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-3">
           {isLoading ? (
             <div className="p-4 text-center">Loading invitations...</div>
           ) : notifications.length > 0 ? (

@@ -36,8 +36,8 @@ const moduleRoutes = [
         route: invitations_routes_1.InvitationRoutes,
     },
     {
-        path: '/payments',
-        route: payments_routes_1.PaymentRoutes,
+        path: '/payment',
+        route: payments_routes_1.PaymentRoutes
     },
     {
         path: '/reviews',
@@ -45,7 +45,7 @@ const moduleRoutes = [
     },
     {
         path: '/admin',
-        route: admin_routes_1.AdminRoutes,
+        route: admin_routes_1.AdminRoutes
     },
     {
         path: '/sendMail',

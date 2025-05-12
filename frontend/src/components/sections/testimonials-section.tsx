@@ -16,7 +16,7 @@ const testimonials = [
     comment:
       "This platform has revolutionized how I manage my events. The payment integration and approval workflows save me hours of manual work.",
     rating: 5,
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "/images/11.jpg?height=100&width=100",
   },
   {
     id: "2",
@@ -25,7 +25,7 @@ const testimonials = [
     comment:
       "The ability to create both public and private events with different fee structures gives me the flexibility I need for various types of conferences.",
     rating: 5,
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "/images/22.jpg?height=100&width=100",
   },
   {
     id: "3",
@@ -34,7 +34,7 @@ const testimonials = [
     comment:
       "I love how easy it is to discover and join events. The payment process is seamless, and I can see all my upcoming events in one place.",
     rating: 4,
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "/images/33.jpg?height=100&width=100",
   },
   {
     id: "4",
@@ -43,7 +43,7 @@ const testimonials = [
     comment:
       "As someone who runs both free community workshops and paid professional training, this platform perfectly accommodates all my needs.",
     rating: 5,
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "/images/44.jpg?height=100&width=100",
   },
   {
     id: "5",
@@ -52,7 +52,7 @@ const testimonials = [
     comment:
       "The private event features with approval workflows have made managing corporate events so much more efficient. Highly recommended!",
     rating: 5,
-    avatar: "/placeholder.svg?height=100&width=100",
+    avatar: "/images/55.jpg?height=100&width=100",
   },
 ]
 

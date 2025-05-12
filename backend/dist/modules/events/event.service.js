@@ -71,6 +71,7 @@ const getAllEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 
             reviews: true,
             invitations: true,
             participations: true,
+            payments: true
         },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
@@ -142,6 +143,7 @@ const getEventsFromDB = (filters, options, creatorId) => __awaiter(void 0, void 
             reviews: true,
             invitations: true,
             participations: true,
+            payments: true
         },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
