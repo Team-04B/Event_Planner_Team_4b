@@ -1,434 +1,410 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { useMobile } from "@/hooks/use-mobile"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { DialogTitle } from "@/components/ui/dialog"
-import { useAppSelector } from "@/redux/hook"
-import { currentUser, logOut } from "@/redux/userSlice/userSlice"
-import { getAllInvitaions } from "@/service/Invitations"
-import { logout } from "@/service/AuthService"
-import { useDispatch } from "react-redux"
+import { useState, useEffect } from "react"
+import { format } from "date-fns"
+import { CalendarIcon, ClockIcon, DollarSignIcon, GlobeIcon, LockIcon, MapPinIcon, StarIcon, UserIcon, Loader2Icon } from 'lucide-react'
 
-interface Notification {
-  id: string
-  title: string
-  message: string
-  time: string
-  read: boolean
-  type: "invitation" | "reminder" | "update"
-  eventId: string
-  status: string
-  paid: boolean
-  venue?: string
-  date?: string
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getEventById } from "@/service/Events"
+import Image from "next/image"
+
+interface EventDetailsDialogProps {
+  eventId: string | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export default function Navbar() {
-  const user = useAppSelector(currentUser)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [invitations, setInvitations] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const dispatch = useDispatch()
-  const pathname = usePathname()
+export function EventDetailsDialog({ eventId, open, onOpenChange }: EventDetailsDialogProps) {
+  const [event, setEvent] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState("details")
 
-  const handleLogout = () => {
-    logout()
-    dispatch(logOut())
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      if (!eventId) return
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await getEventById(eventId)
+        
+        if (response.success && response.data) {
+          setEvent(response.data)
+        } else {
+          setError(response.error || "Failed to fetch event details")
+        }
+      } catch (err) {
+        setError("An error occurred while fetching event details")
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (open && eventId) {
+      fetchEventDetails()
+    }
+  }, [eventId, open])
+
+  // Get initials for avatar
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2)
   }
 
-  useEffect(() => {
-    const fetchInvitations = async () => {
-      if (!user) return
+  // Calculate average rating
+  const getAverageRating = (reviews: any[]) => {
+    if (!reviews || reviews.length === 0) return null
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0)
+    return (sum / reviews.length).toFixed(1)
+  }
 
-      setIsLoading(true)
-      try {
-        const invitationData = await getAllInvitaions(null, null)
-        setInvitations(invitationData?.data?.data || [])
-      } catch (error) {
-        console.error("Error fetching invitations:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  // Calculate total revenue
+  const getTotalRevenue = (payments: any[]) => {
+    if (!payments || payments.length === 0) return 0
+    return payments.reduce((acc, payment) => acc + payment.amount, 0)
+  }
 
-    fetchInvitations()
-  }, [user])
-
-  // Add scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true)
-      } else {
-        setScrolled(false)
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  const notifications = invitations.map((invitation) => ({
-    id: invitation.id,
-    title: `Event Invitation: ${invitation.event.title}`,
-    message: invitation.invitationNote || `You've been invited to ${invitation.event.title}`,
-    time: new Date(invitation.createdAt).toLocaleDateString(),
-    read: false,
-    type: "invitation" as const,
-    eventId: invitation.eventId,
-    status: invitation.status,
-    paid: invitation.paid,
-    venue: invitation.event.venue,
-    date: new Date(invitation.event.dateTime).toLocaleDateString(),
-  }))
-
-  const isMobile = useMobile()
-  const unreadCount = notifications.filter((n) => n.status === "PENDING").length
+  if (!open) return null
 
   return (
-    <nav
-      className={`w-full py-4 px-6 flex items-center justify-between border-b z-50 transition-all duration-300 ${
-        scrolled ? "fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-sm" : "relative bg-white"
-      }`}
-    >
-      <Link href="/" className="text-xl font-bold">
-        EvenTora
-      </Link>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">Loading event details...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12 text-red-500">
+            <p>{error}</p>
+            <p className="text-sm text-muted-foreground mt-2">Please try again later</p>
+          </div>
+        ) : event ? (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-between">
+                <DialogTitle className="text-2xl">{event.title}</DialogTitle>
+                <div className="flex items-center space-x-2">
+                  <Badge variant={event.isPublic ? "default" : "outline"}>
+                    {event.isPublic ? "Public" : "Private"}
+                  </Badge>
+                  <Badge variant={event.isPaid ? "secondary" : "outline"}>
+                    {event.isPaid ? `$${event.fee}` : "Free"}
+                  </Badge>
+                </div>
+              </div>
+              <DialogDescription className="flex items-center mt-2">
+                <CalendarIcon className="h-4 w-4 mr-1 text-muted-foreground" />
+                {format(new Date(event.dateTime), "EEEE, MMMM d, yyyy 'at' h:mm a")}
+              </DialogDescription>
+            </DialogHeader>
 
-      {isMobile ? (
-        <div className="flex items-center gap-3">
-          {user && (
-            <NotificationsMobile notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
-          )}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="ml-2">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M1.5 3C1.22386 3 1 3.22386 1 3.5C1 3.77614 1.22386 4 1.5 4H13.5C13.7761 4 14 3.77614 14 3.5C14 3.22386 13.7761 3 13.5 3H1.5ZM1 7.5C1 7.22386 1.22386 7 1.5 7H13.5C13.7761 7 14 7.22386 14 7.5C14 7.77614 13.7761 8 13.5 8H1.5C1.22386 8 1 7.77614 1 7.5ZM1 11.5C1 11.2239 1.22386 11 1.5 11H13.5C13.7761 11 14 11.2239 14 11.5C14 11.7761 13.7761 12 13.5 12H1.5C1.22386 12 1 11.7761 1 11.5Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="p-4">
-              <VisuallyHidden>
-                <DialogTitle>Navigation Menu</DialogTitle>
-              </VisuallyHidden>
-              <div className="flex flex-col gap-4 mt-4">
-                <Link
-                  href="/"
-                  className={`text-lg font-medium transition-colors ${
-                    pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
-                  }`}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/events"
-                  className={`text-lg font-medium transition-colors ${
-                    pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
-                  }`}
-                >
-                  Events
-                </Link>
-                <Link
-                  href="/about"
-                  className={`text-lg font-medium transition-colors ${
-                    pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
-                  }`}
-                >
-                  About
-                </Link>
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className={`text-lg font-medium transition-colors ${
-                        pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
-                      }`}
-                    >
-                      Dashboard
-                    </Link>
-                    <Button onClick={handleLogout} variant="outline" className="justify-start">
-                      Logout
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="outline" className="justify-start">
-                      <Link href="/login">Login</Link>
-                    </Button>
-                    <Button className="justify-start">
-                      <Link href="/register">Sign up</Link>
-                    </Button>
-                  </>
+            <Tabs defaultValue="details" value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-4 mb-4">
+                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="participants">
+                  Participants ({event.participations?.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="invitations">
+                  Invitations ({event.invitations?.length || 0})
+                </TabsTrigger>
+                {event.isPaid && (
+                  <TabsTrigger value="payments">
+                    Payments ({event.payments?.length || 0})
+                  </TabsTrigger>
                 )}
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/" ? "text-primary font-semibold" : "hover:text-primary/80"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            href="/events"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/events" ? "text-primary font-semibold" : "hover:text-primary/80"
-            }`}
-          >
-            Events
-          </Link>
-          <Link
-            href="/about"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/about" ? "text-primary font-semibold" : "hover:text-primary/80"
-            }`}
-          >
-            About
-          </Link>
+              </TabsList>
 
-          {user ? (
-            <>
-              <Link
-                href="/dashboard"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith("/dashboard") ? "text-primary font-semibold" : "hover:text-primary/80"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Button onClick={handleLogout} variant="outline" size="sm">
-                Logout
-              </Button>
-              <NotificationsDesktop notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button size="sm">
-                <Link href="/register">Sign up</Link>
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-    </nav>
-  )
-}
+              {/* Details Tab */}
+              <TabsContent value="details" className="space-y-4">
+                {event.eventImgUrl && (
+                  <div className="rounded-lg overflow-hidden h-64 w-full">
+                    <Image
+                    src={event.eventImgUrl || "/placeholder.svg"}
+                    alt={event.title || "Event Image"}
+                    width={400}
+                    height={300}
+                    className="w-full h-full object-cover"
+                    onError={({ currentTarget }) => {
+                      currentTarget.src = "/placeholder.svg";
+                    }}
+                    unoptimized={event.eventImgUrl?.startsWith("http") ? false : true}
+                  />
+                  </div>
+                )}
 
-interface NotificationsDesktopProps {
-  notifications: Notification[]
-  unreadCount: number
-  isLoading: boolean
-}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>About this event</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="whitespace-pre-line">{event.description}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
 
-function NotificationsDesktop({ notifications, unreadCount, isLoading }: NotificationsDesktopProps) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end">
-        <div className="flex items-center justify-between border-b p-3">
-          <h3 className="font-medium">Invitations</h3>
-        </div>
-        <div className="max-h-80 overflow-auto">
-          {isLoading ? (
-            <div className="p-4 text-center">Loading invitations...</div>
-          ) : notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 border-b last:border-0 ${notification.read ? "" : "bg-slate-50"} hover:bg-slate-100 transition-colors`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notification.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
+                  <div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Event Information</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-start">
+                          <MapPinIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">Venue</p>
+                            <p className="text-sm text-muted-foreground">{event.venue}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start">
+                          <ClockIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">Date & Time</p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(event.dateTime), "MMMM d, yyyy")}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(event.dateTime), "h:mm a")}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start">
+                          {event.isPublic ? (
+                            <GlobeIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                          ) : (
+                            <LockIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                          )}
+                          <div>
+                            <p className="font-medium">Visibility</p>
+                            <p className="text-sm text-muted-foreground">
+                              {event.isPublic ? "Public event" : "Private event"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start">
+                          <DollarSignIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">Fee</p>
+                            <p className="text-sm text-muted-foreground">
+                              {event.isPaid ? `$${event.fee}` : "Free event"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {event.reviews && event.reviews.length > 0 && (
+                          <div className="flex items-start">
+                            <StarIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">Rating</p>
+                              <div className="flex items-center">
+                                <span className="text-sm font-medium mr-1">
+                                  {getAverageRating(event.reviews)}
+                                </span>
+                                <div className="flex">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <StarIcon
+                                      key={star}
+                                      className={`h-4 w-4 ${
+                                        star <= Math.round(Number(getAverageRating(event.reviews)))
+                                          ? "text-yellow-500 fill-yellow-500"
+                                          : "text-gray-300"
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-xs text-muted-foreground ml-1">
+                                  ({event.reviews.length} reviews)
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-start">
+                          <UserIcon className="h-5 w-5 mr-2 mt-0.5 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium">Created by</p>
+                            <p className="text-sm text-muted-foreground">
+                              {event.creator?.name || "Unknown"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(event.createdAt), "MMMM d, yyyy")}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
+              </TabsContent>
 
-                <div className="mt-2 text-xs flex flex-wrap gap-2 mb-2">
-                  {notification.venue && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {notification.venue}
-                    </span>
-                  )}
+              {/* Participants Tab */}
+              <TabsContent value="participants">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Participants</CardTitle>
+                    <CardDescription>
+                      People who have joined this event
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {event.participations && event.participations.length > 0 ? (
+                      <div className="space-y-4">
+                        {event.participations.map((participation: any) => (
+                          <div key={participation.id} className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <Avatar className="h-10 w-10 mr-3">
+                                <AvatarImage src={participation.user?.profileImg || "/placeholder.svg"} />
+                                <AvatarFallback>
+                                  {getInitials(participation.user?.name || "User")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{participation.user?.name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {participation.user?.email}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Joined {format(new Date(participation.createdAt), "MMM d, yyyy")}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No participants have joined this event yet.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                  {notification.date && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                        <line x1="16" x2="16" y1="2" y2="6" />
-                        <line x1="8" x2="8" y1="2" y2="6" />
-                        <line x1="3" x2="21" y1="10" y2="10" />
-                      </svg>
-                      {notification.date}
-                    </span>
-                  )}
-                </div>
+              {/* Invitations Tab */}
+              <TabsContent value="invitations">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Invitations</CardTitle>
+                    <CardDescription>
+                      People who have been invited to this event
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {event.invitations && event.invitations.length > 0 ? (
+                      <div className="space-y-4">
+                        {event.invitations.map((invitation: any) => (
+                          <div key={invitation.id} className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <Avatar className="h-10 w-10 mr-3">
+                                <AvatarImage src={invitation.user?.profileImg || "/placeholder.svg"} />
+                                <AvatarFallback>
+                                  {getInitials(invitation.user?.name || "User")}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{invitation.user?.name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {invitation.user?.email}
+                                </p>
+                              </div>
+                            </div>
+                            <Badge variant={invitation.status === "pending" ? "outline" : 
+                                         invitation.status === "accepted" ? "default" : "destructive"}>
+                              {invitation.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No invitations have been sent for this event.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                <Link
-                  href={`/dashboard/myinvitaions/${notification?.id}`}
-                  className="inline-block text-xs font-medium text-primary hover:underline transition-colors"
-                >
-                  View Invitation Details →
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">No invitations found</div>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
-
-interface NotificationsMobileProps extends NotificationsDesktopProps {}
-
-function NotificationsMobile({ notifications, unreadCount, isLoading }: NotificationsMobileProps) {
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
-          <Bell className="h-4 w-4" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="overflow-y-auto p-4">
-        <VisuallyHidden>
-          <DialogTitle>Notifications</DialogTitle>
-        </VisuallyHidden>
-        <div className="flex items-center justify-between border-b pb-3">
-          <h3 className="font-medium text-lg">Invitations</h3>
-        </div>
-        <div className="mt-4 space-y-3">
-          {isLoading ? (
-            <div className="p-4 text-center">Loading invitations...</div>
-          ) : notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-3 border rounded-lg ${notification.read ? "" : "bg-slate-50"} hover:bg-slate-100 transition-colors`}
-              >
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notification.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notification.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">{notification.message}</p>
-
-                <div className="mt-2 text-xs flex flex-wrap gap-2 mb-2">
-                  {notification.venue && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {notification.venue}
-                    </span>
-                  )}
-
-                  {notification.date && (
-                    <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                        <line x1="16" x2="16" y1="2" y2="6" />
-                        <line x1="8" x2="8" y1="2" y2="6" />
-                        <line x1="3" x2="21" y1="10" y2="10" />
-                      </svg>
-                      {notification.date}
-                    </span>
-                  )}
-                </div>
-
-                <Link
-                  href={`/dashboard/myinvitaions/${notification?.id}`}
-                  className="inline-block text-xs font-medium text-primary hover:underline transition-colors"
-                >
-                  View Invitation Details →
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-muted-foreground">No invitations found</div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
+              {/* Payments Tab */}
+              {event.isPaid && (
+                <TabsContent value="payments">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <CardTitle>Payments</CardTitle>
+                          <CardDescription>
+                            Payment records for this event
+                          </CardDescription>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">Total Revenue</p>
+                          <p className="text-2xl font-bold">${getTotalRevenue(event.payments).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {event.payments && event.payments.length > 0 ? (
+                        <div className="space-y-4">
+                          {event.payments.map((payment: any) => (
+                            <div key={payment.id} className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <Avatar className="h-10 w-10 mr-3">
+                                  <AvatarImage src={payment.user?.profileImg || "/placeholder.svg"} />
+                                  <AvatarFallback>
+                                    {getInitials(payment.user?.name || "User")}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium">{payment.user?.name}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {payment.user?.email}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium">${payment.amount}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {format(new Date(payment.createdAt), "MMM d, yyyy")}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No payments have been recorded for this event.
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
+            </Tabs>
+          </>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            No event details found.
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
