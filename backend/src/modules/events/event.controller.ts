@@ -373,6 +373,15 @@ const dataNeedForDashboard = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const adminDeleteEvent = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await EventService.adminDeletedEventFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'admin delete event for db',
+  });
+});
 export const EventController = {
   createEvent,
   getEvents,
@@ -385,6 +394,6 @@ export const EventController = {
   getParticipationStatus,
   updateParticipantStatus,
   getAllEventsByUserId,
-  // adminDeleteEvent,
+  adminDeleteEvent,
   dataNeedForDashboard,
 };

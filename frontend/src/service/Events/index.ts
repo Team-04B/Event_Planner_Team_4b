@@ -38,7 +38,7 @@ export const getAllEvents = async (filters = {}) => {
       if (value) query.append(key, String(value));
     });
 
-    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events/all${
+    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events${
       query.toString() ? `?${query.toString()}` : ""
     }`;
 
@@ -223,12 +223,27 @@ export const getAllDataForDb = async () => {
   const token = await getValidToken();
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_API}/events/dashboard-data`,
+
     {
       method: "GET",
       credentials: "include",
       headers: { Authorization: token },
     }
   );
+  const result = await res.json();
+  return result;
+};
+export const adminDeleteEvent = async (id: string) => {
+  const token = await getValidToken();
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/events/admin-delete-event/${id}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: { Authorization: token },
+    }
+  );
+  revalidateTag("EVENT");
   const result = await res.json();
   return result;
 };

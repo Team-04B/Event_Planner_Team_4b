@@ -1,12 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import * as React from "react";
 import {
+  Bot,
   CalendarDays,
   Clock,
+  Frame,
+  HeartPulse,
+  LifeBuoy,
+  ListOrdered,
+  Map,
+  MessageSquare,
+  PieChart,
   Plus,
+  Send,
+  Settings,
   SquareTerminal,
+  User,
   UserPlus,
 } from "lucide-react";
 import {
@@ -21,7 +31,7 @@ import {
 import { NavMain } from "./nav-main";
 import Link from "next/link";
 import { useAppSelector } from "@/redux/hook";
-import { currentUser } from "@/redux/userSlice/userSlice";
+import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
 import { LogoutModal } from "@/components/modules/Login/LogoutModal";
 
@@ -30,7 +40,7 @@ const data = {
   navMain: [
     {
       title: "Overview",
-      url: "/dashboard/user-overview",
+      url: "/dashboard/user-overivew",
       icon: SquareTerminal,
       isActive: true,
     },
@@ -40,14 +50,14 @@ const data = {
       icon: CalendarDays,
     },
     {
-      title: "My Invitaions",
-      url: "/dashboard/myinvitaions",
-      icon: UserPlus,
-    },
-    {
       title: "Pending Invitations",
       url: "/dashboard/pendinginvitations",
       icon: Clock,
+    },
+    {
+      title: "My Reviews",
+      url: "/dashboard/reviews",
+      icon: MessageSquare,
     },
     {
       title: "Invite People",
@@ -133,9 +143,10 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
               <SidebarMenuButton>
                 <Link href="/dashboard/create-event">
                   <h2 className="flex items-center gap-1">
-                    <Plus fontSize={700} size={20} /> Create Event
+                    <Plus fontSize={700} size={20} /> Create Event.
                   </h2>
                 </Link>
+                ;
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>

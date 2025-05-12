@@ -26,6 +26,7 @@ router.post(
 );
 
 // get all events
+
 router.get('/all', EventController.getAllEvents);
 
 //get all events by user
@@ -92,5 +93,10 @@ router.get(
   EventController.getAllEvents
 );
 router.get('/dashboard-data', auth(Role.USER), EventController.getAllEvents);
+router.delete(
+  '/admin-delete-event',
+  auth(Role.ADMIN),
+  EventController.getAllEvents
+);
 
 export const EventRoutes = router;
