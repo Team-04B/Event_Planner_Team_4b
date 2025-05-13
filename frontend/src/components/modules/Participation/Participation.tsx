@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams} from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -61,7 +61,6 @@ interface ParticipationsResponse {
 }
 
 export default function PendingParticipationsPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const token = useAppSelector(currentToken)
 
@@ -76,8 +75,8 @@ export default function PendingParticipationsPage() {
   // State for filters
   const [searchTerm, setSearchTerm] = useState(searchParams?.get("searchTerm") || "")
   const [paidFilter, setPaidFilter] = useState(searchParams?.get("paid") || "")
-  const [sortBy, setSortBy] = useState(searchParams?.get("sortBy") || "createdAt")
-  const [sortOrder, setSortOrder] = useState(searchParams?.get("sortOrder") || "desc")
+  const [sortBy] = useState(searchParams?.get("sortBy") || "createdAt")
+  const [sortOrder] = useState(searchParams?.get("sortOrder") || "desc")
   const [loading, setLoading] = useState(false)
 
   // Fetch participations based on current filters and pagination
