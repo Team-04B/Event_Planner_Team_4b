@@ -62,7 +62,7 @@ export type Event = {
 }
 
 export default function FeaturedEventsSection({ events }:  { events: Event[] } ) {
-  const featuredEvents = events|| []
+  const featuredEvents = (events || []).slice(0, 6)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [autoplay, setAutoplay] = useState(true)
   const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop")
@@ -108,7 +108,7 @@ export default function FeaturedEventsSection({ events }:  { events: Event[] } )
     if (autoplayRef.current) clearInterval(autoplayRef.current)
     autoplayRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % maxSlides)
-    }, 5000)
+    }, 6000)
   }
 
   useEffect(() => {

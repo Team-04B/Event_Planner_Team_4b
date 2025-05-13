@@ -20,7 +20,8 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useEffect, useState } from "react"
-import { AcceptInvitaon, getSingleInvitaion } from "@/service/Invitations"
+import { AcceptInvitaon, DeclineInvitaion, getSingleInvitaion } from "@/service/Invitations"
+import { CreatePayment } from "@/service/payment"
 
 
 // Types based on the real data model
@@ -153,7 +154,23 @@ export default function InvitationDetailPage({id}:{id:string}) {
       console.error("Error accepting invitation:", error)
     }
   }
-
+  const HandleDeclineInvitaion = async (id: string) => {
+    try {
+      const res = await DeclineInvitaion(id)
+      console.log(res)
+      if (res?.success) {
+        // Refresh the invitation data to get updated status
+        const updatedInvitation = await getSingleInvitaion(id)
+        setInvitation(updatedInvitation?.data)
+      }
+    } catch (error) {
+      console.error("Error accepting invitation:", error)
+    }
+  }
+const createPayment =async (id:string)=>{
+  const res =await CreatePayment(id)
+  console.log(res)
+}
   // Format datetime for timeline
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -379,14 +396,14 @@ console.log(invitation)
                       <CheckIcon className="mr-2 h-4 w-4" />
                       Accept Invitation
                     </Button>
-                    <Button className="w-full" variant="outline">
+                    <Button onClick={()=>HandleDeclineInvitaion(invitation.id)} className="w-full" variant="outline">
                       <XIcon className="mr-2 h-4 w-4" />
                       Decline Invitation
                     </Button>
                   </>
                 )}
                 {invitation.status === "ACCEPTED" && invitation.event.isPaid && (
-                  <Button className="w-full" variant="default">
+                  <Button onClick={()=>createPayment(invitation?.eventId)} className="w-full" variant="default">
                     <DollarSignIcon className="mr-2 h-4 w-4" />
                     Make Payment
                   </Button>

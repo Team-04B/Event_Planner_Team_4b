@@ -81,8 +81,7 @@ export default function Navbar() {
         setScrolled(false)
       }
     }
-    
-    
+
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -105,43 +104,113 @@ export default function Navbar() {
   const unreadCount = notifications.filter((n) => n.status === "PENDING").length
 
   return (
-    <nav
-      className={`w-full py-4 px-6 flex items-center justify-between border-b z-50 transition-all duration-300 ${
-        scrolled ? "fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-sm" : "relative bg-white"
-      }`}
-    >
-      <Link href="/" className="text-xl font-bold">
-        EvenTora
-      </Link>
+    <div className="w-full bg-white">
+      <div className="container mx-auto  ">
+        <nav
+          className={`w-full py-4  flex items-center justify-between border-b z-50 transition-all duration-300 ${
+            scrolled ? "fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-sm" : "relative"
+          }`}
+          style={{
+            maxWidth: scrolled ? "none" : "inherit",
+            width: scrolled ? "100%" : "inherit",
+          }}
+        >
+          {scrolled && <div className="absolute inset-0 bg-white/90 backdrop-blur-sm -z-10"></div>}
+          <div className={`${scrolled ? "max-w-7xl mx-auto w-[96%]" : ""} flex items-center justify-between w-full`}>
+            <Link href="/" className="text-xl font-bold">
+              EvenTora
+            </Link>
 
-      {isMobile ? (
-        <div className="flex items-center gap-3">
-          {user && (
-            <NotificationsMobile notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
-          )}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="ml-2">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M1.5 3C1.22386 3 1 3.22386 1 3.5C1 3.77614 1.22386 4 1.5 4H13.5C13.7761 4 14 3.77614 14 3.5C14 3.22386 13.7761 3 13.5 3H1.5ZM1 7.5C1 7.22386 1.22386 7 1.5 7H13.5C13.7761 7 14 7.22386 14 7.5C14 7.77614 13.7761 8 13.5 8H1.5C1.22386 8 1 7.77614 1 7.5ZM1 11.5C1 11.2239 1.22386 11 1.5 11H13.5C13.7761 11 14 11.2239 14 11.5C14 11.7761 13.7761 12 13.5 12H1.5C1.22386 12 1 11.7761 1 11.5Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="p-4">
-              <VisuallyHidden>
-                <DialogTitle>Navigation Menu</DialogTitle>
-              </VisuallyHidden>
-              <div className="flex flex-col gap-4 mt-4">
+            {isMobile ? (
+              <div className="flex items-center gap-3">
+                {user && (
+                  <NotificationsMobile notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
+                )}
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" className="ml-2">
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M1.5 3C1.22386 3 1 3.22386 1 3.5C1 3.77614 1.22386 4 1.5 4H13.5C13.7761 4 14 3.77614 14 3.5C14 3.22386 13.7761 3 13.5 3H1.5ZM1 7.5C1 7.22386 1.22386 7 1.5 7H13.5C13.7761 7 14 7.22386 14 7.5C14 7.77614 13.7761 8 13.5 8H1.5C1.22386 8 1 7.77614 1 7.5ZM1 11.5C1 11.2239 1.22386 11 1.5 11H13.5C13.7761 11 14 11.2239 14 11.5C14 11.7761 13.7761 12 13.5 12H1.5C1.22386 12 1 11.7761 1 11.5Z"
+                          fill="currentColor"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        ></path>
+                      </svg>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="p-4">
+                    <VisuallyHidden>
+                      <DialogTitle>Navigation Menu</DialogTitle>
+                    </VisuallyHidden>
+                    <div className="flex flex-col gap-4 mt-4">
+                      <Link
+                        href="/"
+                        className={`text-lg font-medium transition-colors ${
+                          pathname === "/"
+                            ? "text-black font-bold border-l-4 border-primary pl-2"
+                            : "text-gray-500 hover:text-black"
+                        }`}
+                      >
+                        Home
+                      </Link>
+                      <Link
+                        href="/events"
+                        className={`text-lg font-medium transition-colors ${
+                          pathname === "/events"
+                            ? "text-black font-bold border-l-4 border-primary pl-2"
+                            : "text-gray-500 hover:text-black"
+                        }`}
+                      >
+                        Events
+                      </Link>
+                      <Link
+                        href="/about"
+                        className={`text-lg font-medium transition-colors ${
+                          pathname === "/about"
+                            ? "text-black font-bold border-l-4 border-primary pl-2"
+                            : "text-gray-500 hover:text-black"
+                        }`}
+                      >
+                        About
+                      </Link>
+                      {user ? (
+                        <>
+                          <Link
+                            href="/dashboard"
+                            className={`text-lg font-medium transition-colors ${
+                              pathname?.startsWith("/dashboard")
+                                ? "text-black font-bold border-l-4 border-primary pl-2"
+                                : "text-gray-500 hover:text-black"
+                            }`}
+                          >
+                            Dashboard
+                          </Link>
+                          <Button onClick={handleLogout} variant="outline" className="justify-start">
+                            Logout
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="outline" className="justify-start">
+                            <Link href="/login">Login</Link>
+                          </Button>
+                          <Button className="justify-start">
+                            <Link href="/register">Sign up</Link>
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
                 <Link
                   href="/"
-                  className={`text-lg font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors ${
                     pathname === "/"
-                      ? "text-black font-bold border-l-4 border-primary pl-2"
+                      ? "text-black font-bold border-b-2 border-primary"
                       : "text-gray-500 hover:text-black"
                   }`}
                 >
@@ -149,9 +218,9 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/events"
-                  className={`text-lg font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors ${
                     pathname === "/events"
-                      ? "text-black font-bold border-l-4 border-primary pl-2"
+                      ? "text-black font-bold border-b-2 border-primary"
                       : "text-gray-500 hover:text-black"
                   }`}
                 >
@@ -159,105 +228,52 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/about"
-                  className={`text-lg font-medium transition-colors ${
+                  className={`text-sm font-medium transition-colors ${
                     pathname === "/about"
-                      ? "text-black font-bold border-l-4 border-primary pl-2"
+                      ? "text-black font-bold border-b-2 border-primary"
                       : "text-gray-500 hover:text-black"
                   }`}
                 >
                   About
                 </Link>
+
                 {user ? (
                   <>
                     <Link
                       href="/dashboard"
-                      className={`text-lg font-medium transition-colors ${
+                      className={`text-sm font-medium transition-colors ${
                         pathname?.startsWith("/dashboard")
-                          ? "text-black font-bold border-l-4 border-primary pl-2"
+                          ? "text-black font-bold border-b-2 border-primary"
                           : "text-gray-500 hover:text-black"
                       }`}
                     >
                       Dashboard
                     </Link>
-                    <Button onClick={handleLogout} variant="outline" className="justify-start">
+                    <Button onClick={handleLogout} variant="outline" size="sm">
                       Logout
                     </Button>
+                    <NotificationsDesktop
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      isLoading={isLoading}
+                    />
                   </>
                 ) : (
                   <>
-                    <Button variant="outline" className="justify-start">
+                    <Button variant="outline" size="sm">
                       <Link href="/login">Login</Link>
                     </Button>
-                    <Button className="justify-start">
+                    <Button size="sm">
                       <Link href="/register">Sign up</Link>
                     </Button>
                   </>
                 )}
               </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/" ? "text-black font-bold border-b-2 border-primary" : "text-gray-500 hover:text-black"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            href="/events"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/events"
-                ? "text-black font-bold border-b-2 border-primary"
-                : "text-gray-500 hover:text-black"
-            }`}
-          >
-            Events
-          </Link>
-          <Link
-            href="/about"
-            className={`text-sm font-medium transition-colors ${
-              pathname === "/about"
-                ? "text-black font-bold border-b-2 border-primary"
-                : "text-gray-500 hover:text-black"
-            }`}
-          >
-            About
-          </Link>
-
-          {user ? (
-            <>
-              <Link
-                href="/dashboard"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith("/dashboard")
-                    ? "text-black font-bold border-b-2 border-primary"
-                    : "text-gray-500 hover:text-black"
-                }`}
-              >
-                Dashboard
-              </Link>
-              <Button onClick={handleLogout} variant="outline" size="sm">
-                Logout
-              </Button>
-              <NotificationsDesktop notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button size="sm">
-                <Link href="/register">Sign up</Link>
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-    </nav>
+            )}
+          </div>
+        </nav>
+      </div>
+    </div>
   )
 }
 
