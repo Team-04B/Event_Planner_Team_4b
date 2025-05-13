@@ -122,7 +122,7 @@ export default function PendingParticipationsPage() {
     params.append("sortBy", sortBy)
     params.append("sortOrder", sortOrder)
 
-    router.push(`/dashboard/pending-participations?${params.toString()}`)
+    // router.push(`/dashboard/pending-participations?${params.toString()}`)
   }
 
   // Handle search submission
