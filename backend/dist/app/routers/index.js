@@ -17,23 +17,23 @@ const router = express_1.default.Router();
 const moduleRoutes = [
     {
         path: '/auth',
-        route: auth_routes_1.AuthRoutes
+        route: auth_routes_1.AuthRoutes,
     },
     {
         path: '/users',
-        route: users_routes_1.UsersRoutes
+        route: users_routes_1.UsersRoutes,
     },
     {
         path: '/events',
-        route: event_routes_1.EventRoutes
+        route: event_routes_1.EventRoutes,
     },
     {
         path: '/participants',
-        route: participation_routes_1.ParticipationRoutes
+        route: participation_routes_1.ParticipationRoutes,
     },
     {
         path: '/invitations',
-        route: invitations_routes_1.InvitationRoutes
+        route: invitations_routes_1.InvitationRoutes,
     },
     {
         path: '/payment',
@@ -41,7 +41,7 @@ const moduleRoutes = [
     },
     {
         path: '/reviews',
-        route: reviews_routes_1.ReviewsRoutes
+        route: reviews_routes_1.ReviewsRoutes,
     },
     {
         path: '/admin',

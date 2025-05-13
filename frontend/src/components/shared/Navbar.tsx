@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -32,6 +32,8 @@ interface Notification {
 
 export default function Navbar() {
   const user = useAppSelector(currentUser)
+  const router = useRouter()
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [invitations, setInvitations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -61,7 +63,15 @@ export default function Navbar() {
 
     fetchInvitations()
   }, [user])
-
+  const routes = ['/','/events','/about']
+  useEffect(() => {
+    if(!(routes?.includes(pathname as string))){
+      if (!user) {
+        // Redirect to login or home if user is not authenticated
+        router.push("/login") // or router.push("/") for homepage
+      }
+    }
+  }, [user, router])
   // Add scroll effect
   useEffect(() => {
     const handleScroll = () => {

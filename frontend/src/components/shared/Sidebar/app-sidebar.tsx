@@ -5,6 +5,7 @@ import * as React from "react";
 import {
   CalendarDays,
   Clock,
+  MessageSquare,
   Plus,
   SquareTerminal,
   UserPlus,
@@ -30,7 +31,7 @@ const data = {
   navMain: [
     {
       title: "Overview",
-      url: "/dashboard/user-overview",
+      url: "/dashboard/user-overivew",
       icon: SquareTerminal,
       isActive: true,
     },
@@ -45,9 +46,14 @@ const data = {
       icon: UserPlus,
     },
     {
-      title: "Pending Invitations",
-      url: "/dashboard/pendinginvitations",
+      title: "Participation Request",
+      url: "/dashboard/participation",
       icon: Clock,
+    },
+    {
+      title: "My Reviews",
+      url: "/dashboard/reviews",
+      icon: MessageSquare,
     },
     {
       title: "Invite People",
@@ -133,9 +139,10 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
               <SidebarMenuButton>
                 <Link href="/dashboard/create-event">
                   <h2 className="flex items-center gap-1">
-                    <Plus fontSize={700} size={20} /> Create Event
+                    <Plus fontSize={700} size={20} /> Create Event.
                   </h2>
                 </Link>
+                ;
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>

@@ -55,7 +55,7 @@ export const deleteUser = async (id: string) => {
   console.log(token);
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${id}`, {
-      method: "GET",
+      method: "DELETE",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",

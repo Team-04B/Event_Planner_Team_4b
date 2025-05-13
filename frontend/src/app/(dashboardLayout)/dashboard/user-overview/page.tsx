@@ -1,9 +1,12 @@
 import AnalyticsDashboard from "@/components/modules/dashboard/overview";
+import { getAllDataForDb } from "@/service/Events";
 
-const UserOverivewPage = () => {
-  const totalEvents = 100;
-  const totalAttendance = 1000;
-  const totalRevenu = 10000;
+const UserOverivewPage =async () => {
+  const {data}=await getAllDataForDb()
+
+  const totalEvents =data?.totalEvents;
+  const totalAttendance = data?.totalParticipants;
+  const totalRevenu = data?.totalRevenue;
   return (
     <div>
       <AnalyticsDashboard

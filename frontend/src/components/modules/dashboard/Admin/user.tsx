@@ -24,6 +24,7 @@ import {
 import { deleteUser } from "@/service/user";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 // Mock user data
 
@@ -37,7 +38,10 @@ export function UserManagementTable({ userData, meta }: any) {
   const limit = Number(searchParams.get("limit")) || 10;
 
   const handleClickDeleteUser = async (id: string) => {
-     await deleteUser(id);
+    const result = await deleteUser(id);
+    if (result?.success) {
+      toast.success("User success fully delete");
+    }
   };
 
   const handleClickSearchQuery = (value: string) => {
