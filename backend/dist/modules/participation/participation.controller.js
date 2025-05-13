@@ -17,6 +17,8 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = require("../../app/helper/catchAsync");
 const participation_service_1 = require("./participation.service");
 const sendResponse_1 = require("../../app/shared/sendResponse");
+const pick_1 = __importDefault(require("../../app/shared/pick"));
+const participation_constant_1 = require("./participation.constant");
 // respond invitation
 const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { invitationId } = req.params;
@@ -28,6 +30,36 @@ const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awa
         data: result,
     });
 }));
+const getPendingParticipations = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const rawFilters = (0, pick_1.default)(req.query, participation_constant_1.participationFilterableFields);
+    const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const filters = {
+        searchTerm: typeof rawFilters.searchTerm === 'string'
+            ? rawFilters.searchTerm
+            : undefined,
+        paid: rawFilters.paid === 'true'
+            ? 'true'
+            : rawFilters.paid === 'false'
+                ? 'false'
+                : undefined,
+    };
+    // If filters are empty, set them all to undefined
+    if (Object.keys(filters).length === 0 ||
+        Object.values(filters).every((value) => value === undefined)) {
+        filters.searchTerm = undefined;
+        filters.paid = undefined;
+    }
+    const result = yield participation_service_1.ParticipationService.getPendingParticipations(filters, options, user.id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'Pending participations fetched successfully',
+        meta: result.meta,
+        data: result.data,
+    });
+}));
 exports.ParticipationController = {
     updateParticipantStatus,
+    getPendingParticipations
 };

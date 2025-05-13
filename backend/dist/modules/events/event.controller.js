@@ -311,6 +311,25 @@ const getAllEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         data: result.data,
     });
 }));
+const dataNeedForDashboard = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.user;
+    const result = yield event_service_1.EventService.dataNeedForDashboardInToDb(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'get the data need for dashboard',
+        data: result,
+    });
+}));
+const adminDeleteEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield event_service_1.EventService.adminDeletedEventFromDB(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: 'admin delete event for db',
+    });
+}));
 exports.EventController = {
     createEvent,
     getEvents,
@@ -322,6 +341,7 @@ exports.EventController = {
     handleRequestEvent,
     getParticipationStatus,
     updateParticipantStatus,
-    getAllEventsByUserId
-    // adminDeleteEvent,
+    getAllEventsByUserId,
+    adminDeleteEvent,
+    dataNeedForDashboard,
 };

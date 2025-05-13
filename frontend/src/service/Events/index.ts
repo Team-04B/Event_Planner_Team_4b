@@ -38,7 +38,7 @@ export const getAllEvents = async (filters = {}) => {
       if (value) query.append(key, String(value));
     });
 
-    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events${
+    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events/all${
       query.toString() ? `?${query.toString()}` : ""
     }`;
 

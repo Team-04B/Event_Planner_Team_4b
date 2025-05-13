@@ -11,4 +11,5 @@ const client_1 = require("@prisma/client");
 const router = express_1.default.Router();
 //respond invitation
 router.post('/:invitationId/respond', (0, auth_1.default)(client_1.Role.USER), participation_controller_1.ParticipationController.updateParticipantStatus);
+router.get('/', (0, auth_1.default)(client_1.Role.USER), participation_controller_1.ParticipationController.getPendingParticipations);
 exports.ParticipationRoutes = router;
