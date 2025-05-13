@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -42,13 +42,12 @@ interface Notification {
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [invitations, setInvitations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const dispatch = useDispatch()
   const pathname = usePathname()
-
+const router = useRouter()
   const handleLogout = () => {
     logout()
     dispatch(logOut())
@@ -61,14 +60,12 @@ export default function Navbar() {
       try {
         const userData = await getCurrentUser()
         if (!userData) {
-        console.log("first")
           handleLogout()
           return
         }
 
         // Then get detailed user data
         const response = await getMeFoDb()
-        console.log(response)
         if (!response || !response.data) {
         
           handleLogout()
@@ -105,7 +102,15 @@ export default function Navbar() {
       fetchInvitations()
     }
   }, [user])
-
+  const routes = ['/','/events','/about']
+  useEffect(() => {
+    if(!(routes?.includes(pathname as string))){
+      if (!user) {
+        // Redirect to login or home if user is not authenticated
+        router.push("/login") // or router.push("/") for homepage
+      }
+    }
+  }, [user, router])
   // Add scroll effect
   useEffect(() => {
     const handleScroll = () => {

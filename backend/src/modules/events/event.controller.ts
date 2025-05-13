@@ -6,6 +6,7 @@ import pick from '../../app/shared/pick';
 import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
+import { JwtPayload } from 'jsonwebtoken';
 
 // create event
 const createEvent = catchAsync(async (req, res) => {
@@ -362,7 +363,25 @@ const getAllEvents = catchAsync(async (req, res) => {
   });
 });
 
-
+const dataNeedForDashboard = catchAsync(async (req, res) => {
+  const { id } = req.user as JwtPayload;
+  const result = await EventService.dataNeedForDashboardInToDb(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'get the data need for dashboard',
+    data: result,
+  });
+});
+const adminDeleteEvent = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await EventService.adminDeletedEventFromDB(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'admin delete event for db',
+  });
+});
 export const EventController = {
   createEvent,
   getEvents,
@@ -374,6 +393,7 @@ export const EventController = {
   handleRequestEvent,
   getParticipationStatus,
   updateParticipantStatus,
-  getAllEventsByUserId
-  // adminDeleteEvent,
+  getAllEventsByUserId,
+  adminDeleteEvent,
+  dataNeedForDashboard,
 };
