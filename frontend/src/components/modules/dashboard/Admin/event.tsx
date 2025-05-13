@@ -3,17 +3,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   CalendarIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  EditIcon,
-  EyeIcon,
   FilterIcon,
   MapPinIcon,
   MoreHorizontalIcon,
-  PlusIcon,
   StarIcon,
   TrashIcon,
   UsersIcon,
@@ -54,13 +50,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  getAllEventsByUserId,
-  deleteEvent,
   getAllEvents,
   adminDeleteEvent,
 } from "@/service/Events";
-import DeleteModal from "@/components/modules/Events/myEvents/DeleteModal";
-import { EventDetailsDialog } from "@/components/modules/Events/myEvents/ViewEventsDetails";
 import { toast } from "sonner";
 
 // Update the Event interface to match your Prisma model
