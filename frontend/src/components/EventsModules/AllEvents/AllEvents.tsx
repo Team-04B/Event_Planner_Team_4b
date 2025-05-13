@@ -67,7 +67,7 @@ export default function AllEvents({events}:{events:IEvent[]}) {
                 <p className="mt-3 text-sm text-gray-700 line-clamp-2">{event.description}</p>
               </CardContent>
               <CardFooter className="pt-0">
-                <Button asChild className="w-full">
+                <Button type="button" className="w-full">
                   <Link href={`/events/${event.id}`}>View Details</Link>
                 </Button>
               </CardFooter>

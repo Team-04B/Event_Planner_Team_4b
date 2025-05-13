@@ -12,4 +12,11 @@ router.post(
   ParticipationController.updateParticipantStatus
 );
 
+
+router.get(
+  '/',
+  auth(Role.USER),
+  ParticipationController.getPendingParticipations
+)
+
 export const ParticipationRoutes = router;

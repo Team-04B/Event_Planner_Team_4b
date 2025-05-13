@@ -1,22 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import * as React from "react";
 import {
-  Bot,
   CalendarDays,
   Clock,
-  Frame,
-  HeartPulse,
-  LifeBuoy,
-  ListOrdered,
-  Map,
   MessageSquare,
-  PieChart,
   Plus,
-  Send,
-  Settings,
   SquareTerminal,
-  User,
   UserPlus,
 } from "lucide-react";
 import {
@@ -31,7 +22,7 @@ import {
 import { NavMain } from "./nav-main";
 import Link from "next/link";
 import { useAppSelector } from "@/redux/hook";
-import { currentToken, currentUser } from "@/redux/userSlice/userSlice";
+import { currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
 import { LogoutModal } from "@/components/modules/Login/LogoutModal";
 
@@ -50,8 +41,13 @@ const data = {
       icon: CalendarDays,
     },
     {
-      title: "Pending Invitations",
-      url: "/dashboard/pendinginvitations",
+      title: "My Invitaions",
+      url: "/dashboard/myinvitaions",
+      icon: UserPlus,
+    },
+    {
+      title: "Participation Request",
+      url: "/dashboard/participation",
       icon: Clock,
     },
     {
