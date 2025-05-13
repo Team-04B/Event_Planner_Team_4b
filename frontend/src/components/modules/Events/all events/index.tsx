@@ -22,7 +22,7 @@ export default function AllEvents() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage] = useState(9);
+  const [eventsPerPage] = useState(6);
 
   // Filter state
   const [filters, setFilters] = useState({
