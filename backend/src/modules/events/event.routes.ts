@@ -7,7 +7,6 @@ import { ReviewValidations } from '../reviews/reviews.validation';
 import { InvitationController } from '../invitations/invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
-// import { fileUploder } from '../../app/helper/fileUploader';
 import { multerUpload } from '../../app/config/multer-config';
 
 const router = express.Router();
@@ -15,9 +14,9 @@ const router = express.Router();
 //create event
 router.post(
   '/',
+
   auth(Role.USER),
   multerUpload.single('file'),
-  // fileUploder.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
@@ -27,12 +26,18 @@ router.post(
 );
 
 // get all events
-router.get('/', EventController.getAllEvents);
+
+router.get('/all', EventController.getAllEvents);
 
 //get all events by user
-router.get('/', auth(Role.USER, Role.ADMIN), EventController.getEvents);
+router.get(
+  '/',
+  auth(Role.USER, Role.ADMIN),
+  EventController.getAllEventsByUserId
+);
 
 // get event by id
+
 router.get(
   '/:id',
   // auth(Role.USER,Role.ADMIN),
@@ -43,12 +48,6 @@ router.get(
 router.patch(
   '/:id',
   auth(Role.USER),
-  // fileUploder.upload.single('file'),
-  multerUpload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = JSON.parse(req.body.data);
-    next();
-  },
   validateRequest(EventValidations.updateEventZodSchema),
   EventController.updateEvent
 );
@@ -56,9 +55,12 @@ router.patch(
 // delete event from db
 router.delete('/:id', auth(Role.USER), EventController.deleteFromDB);
 
-// admin delete event
-router.delete('/deleteEvent', auth(Role.ADMIN));
-
+// updateParticipantStatus (PENDING,APPROVED,REJECTED,BANNED)
+router.patch(
+  '/:id/participants/:participantId/status',
+  auth(Role.USER),
+  EventController.updateParticipantStatus
+);
 
 // Public events
 router.post('/:id/join', auth(Role.USER), EventController.handleJoinEvent);
@@ -69,14 +71,6 @@ router.post(
   auth(Role.USER),
   EventController.handleRequestEvent
 );
-
-// get participation status
-router.get(
-  '/:id/participation-status',
-  auth(Role.USER),
-  EventController.getParticipationStatus
-);
-
 
 // reviews routes
 router.post(
@@ -92,6 +86,17 @@ router.post(
   '/:id/invite',
   auth(Role.ADMIN, Role.USER),
   InvitationController.createInvitaion
+);
+router.get(
+  '/all-events',
+  // auth(Role.ADMIN, Role.USER),
+  EventController.getAllEvents
+);
+router.get('/dashboard-data', auth(Role.USER), EventController.getAllEvents);
+router.delete(
+  '/admin-delete-event',
+  auth(Role.ADMIN),
+  EventController.getAllEvents
 );
 
 export const EventRoutes = router;

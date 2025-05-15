@@ -14,8 +14,9 @@ const eslintConfig = [
 
   // ✅ Disable specific rule
   {
-    rules: {
+     rules: {
       "@typescript-eslint/no-empty-object-type": "off",
+      "react/no-unescaped-entities": "off", 
     },
   },
 ];

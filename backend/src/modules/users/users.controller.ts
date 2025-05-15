@@ -3,12 +3,14 @@ import { sendResponse } from '../../app/shared/sendResponse';
 import { userServices } from './users.service';
 import httpStatus from 'http-status';
 const getAllUsers = catchAsync(async (req, res) => {
-  const result = await userServices.getAllUsersInToDb();
+  console.log(req.query);
+  const result = await userServices.getAllUsersInToDb(req.query);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.CREATED,
     message: 'get all user Successfully',
-    data: result,
+    data: result.data,
+    meta: result.meta,
   });
 });
 const getSingleUsers = catchAsync(async (req, res) => {

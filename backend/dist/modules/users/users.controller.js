@@ -18,12 +18,14 @@ const sendResponse_1 = require("../../app/shared/sendResponse");
 const users_service_1 = require("./users.service");
 const http_status_1 = __importDefault(require("http-status"));
 const getAllUsers = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield users_service_1.userServices.getAllUsersInToDb();
+    console.log(req.query);
+    const result = yield users_service_1.userServices.getAllUsersInToDb(req.query);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
         message: 'get all user Successfully',
-        data: result,
+        data: result.data,
+        meta: result.meta,
     });
 }));
 const getSingleUsers = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

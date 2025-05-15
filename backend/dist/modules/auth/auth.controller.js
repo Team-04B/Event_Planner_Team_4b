@@ -59,8 +59,7 @@ const cheangePassword = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(voi
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_1.default.CREATED,
-        message: 'refesh token Successfully get the access',
-        data: result,
+        message: 'your password succes fully cheanged',
     });
 }));
 exports.AuthController = {

@@ -28,7 +28,6 @@ const auth = (...roles) => {
                 throw new ApiError_1.default(http_status_1.default.FORBIDDEN, 'You are Forbidden!!');
             }
             req.user = varifiedUser;
-            console.log(varifiedUser, 'auth');
             next();
         }
         catch (error) {

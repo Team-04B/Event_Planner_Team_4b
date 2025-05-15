@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InvitaionServices = void 0;
+const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../../app/shared/prisma"));
 const paginationHelper_1 = require("../../app/helper/paginationHelper");
 // create Invitaion
@@ -119,9 +120,37 @@ const getSingleInvitaionIntoDB = (id) => __awaiter(void 0, void 0, void 0, funct
     });
     return result;
 });
+const acceptInvitaionInDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    // Ensure the invitation exists
+    yield prisma_1.default.invitation.findUniqueOrThrow({
+        where: { id },
+    });
+    const result = yield prisma_1.default.invitation.update({
+        where: { id },
+        data: {
+            status: client_1.InvitationStatus.ACCEPTED,
+        },
+    });
+    return result;
+});
+const declineInvitaionInDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    // Ensure the invitation exists
+    yield prisma_1.default.invitation.findUniqueOrThrow({
+        where: { id },
+    });
+    const result = yield prisma_1.default.invitation.update({
+        where: { id },
+        data: {
+            status: client_1.InvitationStatus.DECLINED,
+        },
+    });
+    return result;
+});
 exports.InvitaionServices = {
     createInvitaionDB,
     getMyAllnvitaionsFromDB,
     getMyInvitedOnvitationsFromDB,
-    getSingleInvitaionIntoDB
+    getSingleInvitaionIntoDB,
+    acceptInvitaionInDB,
+    declineInvitaionInDB
 };

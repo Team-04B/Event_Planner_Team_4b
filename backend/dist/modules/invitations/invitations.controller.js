@@ -66,9 +66,31 @@ const getSingleInvitaion = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(
         data: result,
     });
 }));
+const acceptInvitaion = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield invitations_service_1.InvitaionServices.acceptInvitaionInDB(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.CREATED,
+        message: 'Invitaion accepted Successfully',
+        data: result,
+    });
+}));
+const declineInvitaion = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield invitations_service_1.InvitaionServices.declineInvitaionInDB(id);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.CREATED,
+        message: 'Invitaion decline Successfully',
+        data: result,
+    });
+}));
 exports.InvitationController = {
     createInvitaion,
     getMyAllnvitaions,
     getMySentInvitaions,
-    getSingleInvitaion
+    getSingleInvitaion,
+    acceptInvitaion,
+    declineInvitaion
 };

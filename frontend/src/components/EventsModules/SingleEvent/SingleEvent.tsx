@@ -1,33 +1,33 @@
+"use client"
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
-import Image from "next/image";
-import { CalendarIcon, MapPinIcon, TicketIcon } from "lucide-react";
-import { format } from "date-fns";
-import { Card, CardContent } from "@/components/ui/card";
-import EventReviewSection from "@/components/EventsModules/EventReviewSection";
-import { IEvent } from "@/commonTypes/commonTypes";
-import { Button } from "@/components/ui/button";
+import Image from "next/image"
+import { CalendarIcon, MapPinIcon, TicketIcon } from "lucide-react"
+import { format } from "date-fns"
+import { Card, CardContent } from "@/components/ui/card"
+import EventReviewSection from "@/components/EventsModules/EventReviewSection"
+import { IEvent } from "@/commonTypes/commonTypes"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { useAppSelector } from "@/redux/hook"
+import { currentToken } from "@/redux/userSlice/userSlice"
 import { joinPublicEvent, requestPrivateEvent } from "@/service/Events";
-import { useState } from "react";
 import { toast } from "sonner";
 
 type SingleEvent = {
-  event: IEvent;
-  currentUser: any;
-};
+event:IEvent;
+currentUser:any;
+}
+export default function SingleEvent({event,currentUser}:SingleEvent) {
+  // const router = useRouter()
+  const token = useAppSelector(currentToken)
 
-export default function SingleEvent({ event, currentUser }: SingleEvent) {
+
   const [loading, setLoading] = useState(false);
 
   const eventId = event.id;
   const isPublic = event.isPublic;
   const isPaid = event.isPaid;
 
-  console.log();
-
-  console.log("🚀 currentUser:", currentUser);
-  
   if (!currentUser?.id) {
     return (
       <div className="text-center py-12">
@@ -48,6 +48,9 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
         toast.success(res.message || "Joined successfully!");
       } else {
         toast.error(res.message || "Something went wrong.");
+      }
+      if(res.success && isPaid){
+        await paymentForJoinEvent()
       }
     } catch (error: any) {
       if (error instanceof Error) {
@@ -70,6 +73,9 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
       } else {
         toast.error(res.message || "Something went wrong.");
       }
+      if(res.success && isPaid){
+        await paymentForJoinEvent()
+      }
     } catch (error: any) {
       if (error instanceof Error) {
         toast.error(error.message || "An error occurred.");
@@ -85,35 +91,91 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
   const renderActionButton = () => {
     if (isPublic && !isPaid) {
       return (
-        <Button disabled={loading} onClick={handleJoin}>
+        <Button className="w-full" disabled={loading} onClick={handleJoin}>
           Join Free
         </Button>
       );
     }
     if (isPublic && isPaid) {
       return (
-        <Button disabled={loading} onClick={handleJoin}>
-          Pay & Join
+        <Button className="w-full" disabled={loading} onClick={handleJoin}>
+          Pay & Join(${event.fee})
         </Button>
       );
     }
     if (!isPublic && !isPaid) {
       return (
-        <Button disabled={loading} onClick={handleRequest}>
-          Request to Join
+        <Button className="w-full" disabled={loading} onClick={handleRequest}>
+          Request to Join (${event.fee})
         </Button>
       );
     }
     if (!isPublic && isPaid) {
       return (
         <Button disabled={loading} onClick={handleRequest}>
-          Pay & Request
+          Pay & Request (${event.fee})
         </Button>
       );
     }
     return null;
   };
 
+  const paymentForJoinEvent = async() => {
+    
+    try{
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/payment/initpayment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({ eventId }),
+      })
+
+      const data = await response.json()
+      if (data.data) {
+        window.location.href = data.data // Redirect to SSLCommerz
+      } else {
+        alert("Payment initialization failed: " + (data.message || "Unknown error"))
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Something went wrong while joining the event.")
+    }
+  }
+
+  // const handleJoinEvent = async (eventId:string) => {
+  //   try {
+  //     setLoading(true)
+
+  //     // if (!token) {
+  //     //   router.push("/login?redirect=" + encodeURIComponent(window.location.pathname))
+  //     //   return
+  //     // }
+
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/payment/initpayment`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `${token}`,
+  //       },
+  //       body: JSON.stringify({ eventId }),
+  //     })
+
+  //     const data = await response.json()
+  //     console.log(data)
+  //     if (data.data) {
+  //       window.location.href = data.data // Redirect to SSLCommerz
+  //     } else {
+  //       alert("Payment initialization failed: " + (data.message || "Unknown error"))
+  //     }
+  //   } catch (err) {
+  //     console.error(err)
+  //     alert("Something went wrong while joining the event.")
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
   return (
     <div className="container mx-auto py-6 sm:py-8 px-4">
       <div className="grid md:grid-cols-3 gap-6 md:gap-8">
@@ -153,7 +215,7 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
 
           {/* ✅ Conditional action buttons */}
           {/* ✅ Conditional action buttons */}
-          {renderActionButton()}
+          {/* {renderActionButton()} */}
 
           <div className="mt-6 sm:mt-8">
             <EventReviewSection eventId={event.id} userId={currentUser.id} />
@@ -189,6 +251,12 @@ export default function SingleEvent({ event, currentUser }: SingleEvent) {
                   <p className="font-medium">
                     {event.isPublic ? "Public" : "Private"}
                   </p>
+                </div>
+                {/* Join Event Button */}
+                 <div className="pt-4 mt-2">
+                  
+                    {renderActionButton()}
+                  
                 </div>
               </div>
             </CardContent>
