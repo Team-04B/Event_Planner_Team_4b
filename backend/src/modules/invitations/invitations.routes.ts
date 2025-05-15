@@ -1,5 +1,4 @@
 import express from 'express';
-import { ReviewController } from '../reviews/reviews.controller';
 import { InvitationController } from './invitations.controller';
 import auth from '../../app/middleWares/auth';
 import { Role } from '@prisma/client';
@@ -21,5 +20,14 @@ router.get(
   auth(Role.ADMIN, Role.USER),
   InvitationController.getMySentInvitaions
 );
-
+router.put(
+  '/invitaion/:id/accept',
+  auth(Role.ADMIN, Role.USER),
+  InvitationController.acceptInvitaion
+);
+router.put(
+  '/invitaion/:id/decline',
+  auth(Role.ADMIN, Role.USER),
+  InvitationController.declineInvitaion
+);
 export const InvitationRoutes = router;

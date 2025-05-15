@@ -1,0 +1,57 @@
+import { catchAsync } from "../../app/helper/catchAsync";
+import { sendResponse } from "../../app/shared/sendResponse";
+import httpStatus from 'http-status'
+import { PaymentService } from "./payments.service";
+import config from "../../app/config";
+
+const initPayment = catchAsync(async(req,res)=>{
+    
+    const payload = req.body
+
+    const user = req.user
+
+    
+    const result = await PaymentService.initPayment(payload,user.id);
+
+    console.log(result,'asdfsadfsdafsa')
+
+    sendResponse(res,{
+        statusCode: httpStatus.OK,
+        success:true,
+        message:"Payment Initate successfully",
+        data:result
+    })
+})
+
+const validationPayment = catchAsync(async(req,res)=> {
+
+    const result = await PaymentService.validationPayment(req.query);
+
+    if(result){
+        res.redirect(config.ssl.successUrl as string)
+    }
+    
+    // sendResponse(res,{
+    //     statusCode: httpStatus.OK,
+    //     success:true,
+    //     message:"Payment Validate successfully",
+    //     data:result
+    // })
+})
+
+const paymentSuccess = catchAsync(async(req,res)=>{
+    const result = await PaymentService.paymentSuccess(req.params.tran_id);
+
+    sendResponse(res,{
+        statusCode: httpStatus.OK,
+        success:true,
+        message:"Payment Validate successfully",
+        data:result
+    })
+})
+
+export const PaymentController = {
+    initPayment,
+    validationPayment,
+    paymentSuccess
+}

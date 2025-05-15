@@ -12,43 +12,45 @@ import { MailRoutes } from '../../modules/contact/contact.route';
 const router = express.Router();
 
 const moduleRoutes = [
-  {
-    path: '/auth',
-    route: AuthRoutes,
-  },
-  {
-    path: '/users',
-    route: UsersRoutes,
-  },
-  {
-    path: '/events',
-    route: EventRoutes,
-  },
-  {
-    path: '/participants',
-    route: ParticipationRoutes,
-  },
-  {
-    path: '/invitations',
-    route: InvitationRoutes,
-  },
-  {
-    path: '/payments',
-    route: PaymentRoutes,
-  },
-  {
-    path: '/reviews',
-    route: ReviewsRoutes,
-  },
-  {
-    path: '/admin',
-    route: AdminRoutes,
-  },
-  {
-    path: '/sendMail',
-    route: MailRoutes,
-  },
-];
+    {
+        path:'/auth',
+        route:AuthRoutes
+    },
+    {
+        path:'/users',
+        route:UsersRoutes
+    },
+    {
+        path:'/events',
+        route:EventRoutes
+    },
+    {
+        path:'/participants',
+        route:ParticipationRoutes
+    },
+    {
+        path:'/invitations',
+        route:InvitationRoutes
+    },
+    {
+        path:'/payment',
+        route:PaymentRoutes
+    },
+    {
+        path:'/reviews',
+        route:ReviewsRoutes
+    },
+    {
+        path:'/admin',
+        route:AdminRoutes
+    },
+    {
+      path: '/sendMail',
+      route: MailRoutes,
+    },
+]
+
+
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
 
