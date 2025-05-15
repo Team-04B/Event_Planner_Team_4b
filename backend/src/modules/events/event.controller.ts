@@ -219,6 +219,23 @@ const deleteFromDB = catchAsync(async (req, res) => {
   });
 });
 
+// update Participant Status
+const updateParticipantStatus = catchAsync(async (req, res) => {
+  const { participantId } = req.params;
+  // console.log(req.body);
+  const result = await EventService.updateParticipantStatus(
+    participantId,
+    req.body
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: `Participation ${req.body.status.toLowerCase()} successfully`,
+    data: result,
+  });
+});
+
 // join free public event
 // const joinPublicEvent = catchAsync(async (req, res) => {
 //   const { id: eventId } = req.params;
@@ -302,25 +319,6 @@ const getParticipationStatus = catchAsync(async (req, res) => {
   });
 });
 
-
-// update Participant Status
-const updateParticipantStatus = catchAsync(async (req, res) => {
-  const { participantId } = req.params;
-  // console.log(req.body);
-  const result = await EventService.updateParticipantStatus(
-    participantId,
-    req.body
-  );
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: `Participation ${req.body.status.toLowerCase()} successfully`,
-    data: result,
-  });
-});
-
-
 const getAllEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -395,8 +393,8 @@ export const EventController = {
   handleJoinEvent,
   handleRequestEvent,
   getParticipationStatus,
-  updateParticipantStatus,
   getAllEventsByUserId,
   adminDeleteEvent,
+  updateParticipantStatus,
   dataNeedForDashboard,
 };
