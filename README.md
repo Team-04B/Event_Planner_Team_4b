@@ -183,6 +183,9 @@ npm run dev
 
 ## Contributors
 
+- [**Md Mydul Islam**](https://github.com/mydul62) – Web Developer  
+  [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/mahim62/)
+
 - [**Amdadul Haque**](https://github.com/amdadulhaque) – Web Developer 
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/Amdadul-Haque-Bhuiyan/)
 
