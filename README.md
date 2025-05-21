@@ -182,8 +182,8 @@ npm run dev
 ```
 
 ## Contributors
-
-- [**Amdadul Haque**](https://github.com/amdadulhaque) – Web Developer  
+– Web Developer (Team Lead)
+- [**Amdadul Haque**](https://github.com/amdadulhaque)   
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/Amdadul-Haque-Bhuiyan/)
 
 - [**Rifat Sarker**](https://github.com/rifat-sarker) – Web Developer  
