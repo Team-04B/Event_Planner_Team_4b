@@ -196,5 +196,6 @@ npm run dev
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/mahim62/)
 
 - **Web Developer**
-  [**Md Sanim Mia**](https://github.com/md-sanim-mia) 
+  [**Md Sanim Mia**](https://github.com/md-sanim-mia)   
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/sanim-mia/)
+
