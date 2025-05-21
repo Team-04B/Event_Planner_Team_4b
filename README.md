@@ -184,7 +184,7 @@ npm run dev
 ## Contributors
 
 - **Web Developer (Team Lead)**
-  [**Amdadul Haque**](https://github.com/amdadulhaque)   
+  [**Amdadul Haque**](https://github.com/Amdadul-HQ)   
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/Amdadul-Haque-Bhuiyan/)
 
 - **Web Developer**
