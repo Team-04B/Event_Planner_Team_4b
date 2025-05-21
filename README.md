@@ -183,11 +183,11 @@ npm run dev
 
 ## Contributors
 
+- [**Amdadul Haque**](https://github.com/amdadulhaque) – Web Developer (Team Lead)
+  [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/Amdadul-Haque-Bhuiyan/)
+
 - [**Rifat Sarker**](https://github.com/rifat-sarker) – Web Developer  
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/rifatswd/)
-
-- [**Amdadul Haque**](https://github.com/amdadulhaque) – Web Developer  
-  [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/Amdadul-Haque-Bhuiyan/)
 
 - [**Md Mydul Islam**](https://github.com/mydul62) – Web Developer  
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/mahim62/)
