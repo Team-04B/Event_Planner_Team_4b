@@ -1,11 +1,26 @@
 import { z } from "zod";
 
+
+export const categoryEnum = z.enum([
+  "Professional",
+  "Educational",
+  "Social",
+  "Business",
+  "Health",
+  "Sports",
+  "Tech",
+  "Sales",
+  "Community",
+  "Personal",
+]);
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 // Create schema for event form (for creating a new event)
 export const eventFormSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }),
   date: z.date({ required_error: "Event date is required" }),
+  category: categoryEnum,
   venue: z.string().min(3, { message: "Venue must be at least 3 characters" }),
   publicEvent: z.boolean(),
   paidEvent: z.boolean(),

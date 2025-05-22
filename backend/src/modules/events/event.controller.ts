@@ -81,28 +81,33 @@ const createEvent = catchAsync(async (req, res) => {
 // get all events - for user
 const getAllEventsByUserId = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
+  console.log(req.query)
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const user = req.user;
 
   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
-  const filters: IEventFilterRequest = {
-    isPublic:
-      rawFilters.isPublic === 'true'
-        ? true
-        : rawFilters.isPublic === 'false'
-          ? false
-          : undefined,
-    isPaid:
-      rawFilters.isPaid === 'true'
-        ? true
-        : rawFilters.isPaid === 'false'
-          ? false
-          : undefined,
-    searchTerm:
-      typeof rawFilters.searchTerm === 'string'
-        ? rawFilters.searchTerm
+   const filters: IEventFilterRequest = {
+  isPublic:
+    rawFilters.isPublic === 'true'
+      ? true
+      : rawFilters.isPublic === 'false'
+        ? false
         : undefined,
-  };
+  isPaid:
+    rawFilters.isPaid === 'true'
+      ? true
+      : rawFilters.isPaid === 'false'
+        ? false
+        : undefined,
+  category:
+    typeof rawFilters.category === 'string'
+      ? rawFilters.category
+      : undefined,
+  searchTerm:
+    typeof rawFilters.searchTerm === 'string'
+      ? rawFilters.searchTerm
+      : undefined,
+};
 
   // If filters are empty, set them to undefined to fetch all events
   if (
@@ -128,28 +133,33 @@ const getAllEventsByUserId = catchAsync(async (req, res) => {
 // get all event -public
 const getEvents = catchAsync(async (req, res) => {
   const rawFilters = pick(req.query, eventFilterableFields);
+  console.log(req.query)
   const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   // const user = req.user;
 
   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
   const filters: IEventFilterRequest = {
-    isPublic:
-      rawFilters.isPublic === 'true'
-        ? true
-        : rawFilters.isPublic === 'false'
-          ? false
-          : undefined,
-    isPaid:
-      rawFilters.isPaid === 'true'
-        ? true
-        : rawFilters.isPaid === 'false'
-          ? false
-          : undefined,
-    searchTerm:
-      typeof rawFilters.searchTerm === 'string'
-        ? rawFilters.searchTerm
+  isPublic:
+    rawFilters.isPublic === 'true'
+      ? true
+      : rawFilters.isPublic === 'false'
+        ? false
         : undefined,
-  };
+  isPaid:
+    rawFilters.isPaid === 'true'
+      ? true
+      : rawFilters.isPaid === 'false'
+        ? false
+        : undefined,
+  category:
+    typeof rawFilters.category === 'string'
+      ? rawFilters.category
+      : undefined,
+  searchTerm:
+    typeof rawFilters.searchTerm === 'string'
+      ? rawFilters.searchTerm
+      : undefined,
+};
 
   // If filters are empty, set them to undefined to fetch all events
   if (

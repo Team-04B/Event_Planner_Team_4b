@@ -38,6 +38,7 @@ model Event {
   dateTime       DateTime
   eventImgUrl    String
   venue          String
+  category       EventCategory
   isPublic       Boolean
   isPaid         Boolean
   fee            Float? // Nullable for free events
@@ -49,6 +50,19 @@ model Event {
   payments       Payment[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+}
+
+enum EventCategory {
+  Professional
+  Educational
+  Social
+  Business
+  Health
+  Sports
+  Tech
+  Sales
+  Community
+  Personal
 }
 
 model Participation {

@@ -31,7 +31,7 @@ const data = {
   navMain: [
     {
       title: "Overview",
-      url: "/dashboard/user-overivew",
+      url: "/dashboard/user-overview",
       icon: SquareTerminal,
       isActive: true,
     },
@@ -87,20 +87,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ name, ...props }: AppSidebarProps) {
   const user = useAppSelector(currentUser);
 
-  // const token = useAppSelector(currentToken)';
-  // const [userdata, setData] = React.useState<any>(null);
-  // React.useEffect(() => {
-  //   if (!user?.id || !token) return;
-  //   fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/${user?.id}`, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: `${token}`,
-  //     },
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => setData(data?.data));
-  // }, [user?.id, token]);
   const userRole = {
     ADMIN: "ADMIN",
     USER: "USER",

@@ -65,7 +65,7 @@ export const getAllEventsByUserId = async (filters = {}) => {
   try {
     const token = await getValidToken();
     if (!token) throw new Error("No access token found.");
-
+    console.log(filters,'asdfsdf')
     const queryParams = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) queryParams.append(key, String(value));

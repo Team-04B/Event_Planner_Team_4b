@@ -55,6 +55,20 @@ interface Event {
   updatedAt: Date
 }
 
+const category = [
+  "Category",
+  "Professional",
+  "Educational",
+  "Social",
+  "Business",
+  "Health",
+  "Sports",
+  "Tech",
+  "Sales",
+  "Community",
+  "Personal",
+]
+
 export default function MyEventsPage() {
   const router = useRouter()
   const [events, setEvents] = useState<Event[]>([])
@@ -62,6 +76,7 @@ export default function MyEventsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [categoryFilter,setCategoryFilter] = useState<string>("Category")
   const [sortField, setSortField] = useState<string>("createdAt")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -127,6 +142,10 @@ export default function MyEventsPage() {
         filterParams.isPublic = ""
       }
 
+      if(categoryFilter !== 'Category'){
+        filterParams.category = categoryFilter
+      }
+
       // Call API with filter parameters
       const response = await getAllEventsByUserId(filterParams)
 
@@ -145,7 +164,7 @@ export default function MyEventsPage() {
             // Default to paginatedData for "all" tab
             eventsData = response.data.paginatedData || []
         }
-
+        console.log(eventsData)
         setEvents(eventsData)
         setTotalEvents(response.meta.total || 0)
         setTotalPages(Math.ceil((response.meta.total || 0) / itemsPerPage))
@@ -162,9 +181,9 @@ export default function MyEventsPage() {
   }
 
   useEffect(() => {
-
+    console.log(categoryFilter)
     fetchEvents()
-  }, [currentPage, debouncedSearchTerm, statusFilter, typeFilter, sortField, sortDirection, itemsPerPage, activeTab])
+  }, [currentPage, debouncedSearchTerm,categoryFilter, statusFilter, typeFilter, sortField, sortDirection, itemsPerPage, activeTab])
 
   // Handle sort
   const handleSort = (field: string) => {
@@ -278,6 +297,25 @@ export default function MyEventsPage() {
                 />
               </div>
               <div className="flex gap-2">
+
+                  <Select
+                  value={categoryFilter}
+                  onValueChange={(value) => {
+                    setCategoryFilter(value)
+                    setCurrentPage(1) // Reset to first page when filter changes
+                  }}
+                >
+                  <SelectTrigger className="w-fit px-2">
+                    <FilterIcon className="mr-2 h-4 w-4" />
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {
+                      category.map((item) =><SelectItem key={item} value={item}>{item}</SelectItem>)
+                    }
+                  </SelectContent>
+                </Select>
+
                 <Select
                   value={typeFilter}
                   onValueChange={(value) => {
