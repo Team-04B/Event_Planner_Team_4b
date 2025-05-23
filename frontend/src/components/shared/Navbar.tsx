@@ -327,7 +327,7 @@ export default function Navbar() {
           <div className="w-full py-2 px-4 border-b bg-gray-50">
             <div className="container mx-auto">
               <div className="flex items-center justify-between overflow-x-auto hide-scrollbar">
-                <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center justify-center w-full gap-x-6 text-sm">
                   <Link
                     href="/events?category=Professional"
                     className="whitespace-nowrap text-gray-600 hover:text-primary transition-colors"
