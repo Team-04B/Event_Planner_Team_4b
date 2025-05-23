@@ -15,6 +15,10 @@ router.post('/ipn', PaymentController.validationPayment);
 
 router.post('/success/:tran_id', PaymentController.paymentSuccess);
 
-router.get('/', PaymentController.getDashboardOverview);
+router.get(
+  '/dashboard',
+  auth(Role.ADMIN, Role.USER),
+  PaymentController.getDashboardOverview
+);
 
 export const PaymentRoutes = router;
