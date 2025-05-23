@@ -3,6 +3,7 @@ import { sendResponse } from '../../app/shared/sendResponse';
 import httpStatus from 'http-status';
 import { PaymentService } from './payments.service';
 import config from '../../app/config';
+import { userServices } from '../users/users.service';
 
 const initPayment = catchAsync(async (req, res) => {
   const payload = req.body;
@@ -55,12 +56,14 @@ const getDashboardOverview = catchAsync(async (req, res) => {
     latestPayments,
     revenueByProvider,
     monthlyRevenue,
+    monthlyNewUsers,
   ] = await Promise.all([
     PaymentService.getTotalRevenue(),
     PaymentService.getTotalPayments(),
     PaymentService.getLatestPayments(5),
     PaymentService.getRevenueByProvider(),
     PaymentService.getMonthlyRevenue(),
+    userServices.getMonthlyNewUsers(),
   ]);
 
   sendResponse(res, {
@@ -73,6 +76,7 @@ const getDashboardOverview = catchAsync(async (req, res) => {
       latestPayments,
       revenueByProvider,
       monthlyRevenue,
+      monthlyNewUsers,
     },
   });
 });

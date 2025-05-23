@@ -5,7 +5,6 @@ import ApiError from '../../app/error/ApiError';
 import httpStatus from 'http-status';
 import { PaymentStatus, Prisma } from '@prisma/client';
 
-
 const initPayment = async (payload: any, userId: string) => {
   try {
     const { eventId } = payload;
@@ -173,7 +172,6 @@ const paymentSuccess = async (tran_id: string) => {
   return tran_id;
 };
 
-
 // Get total revenue from successful payments
 const getTotalRevenue = async () => {
   const result = await prisma.payment.aggregate({
@@ -217,14 +215,21 @@ const getRevenueByProvider = async () => {
 
 // Optional: Get monthly revenue (for charts)
 const getMonthlyRevenue = async () => {
-  return await prisma.$queryRaw<
-    { month: Date; revenue: number }[]
+  const result = await prisma.$queryRaw<
+    { month: Date; revenue: bigint }[]
   >`SELECT DATE_TRUNC('month', "paidAt") AS month, SUM("amount") as revenue
     FROM "Payment"
     WHERE "status" = 'SUCCESS' AND "paidAt" IS NOT NULL
     GROUP BY month
     ORDER BY month ASC;`;
+
+  return result.map((entry) => ({
+    month: entry.month,
+    revenue: Number(entry.revenue), // ✅ convert BigInt to Number
+  }));
 };
+
+
 
 export const PaymentService = {
   initPayment,

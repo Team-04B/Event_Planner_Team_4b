@@ -84,9 +84,26 @@ const deleteUserInToDb = async (id: string) => {
   const result = await prisma.user.delete({ where: { id: id } });
   return result;
 };
+
+// get new users from user model
+ const getMonthlyNewUsers = async () => {
+  const result = await prisma.$queryRaw<{ month: Date; newUsers: number }[]>`
+    SELECT DATE_TRUNC('month', "createdAt") AS month, COUNT(*) AS "newUsers"
+    FROM "User"
+    GROUP BY month
+    ORDER BY month ASC;
+  `;
+
+  return result.map((entry) => ({
+    month: entry.month.toISOString().slice(0, 7), // e.g., "2025-05"
+    users: Number(entry.newUsers),
+  }));
+};
+
 export const userServices = {
   getAllUsersInToDb,
   getSingleUsersInToDb,
   updateUserInToDb,
   deleteUserInToDb,
+  getMonthlyNewUsers,
 };
