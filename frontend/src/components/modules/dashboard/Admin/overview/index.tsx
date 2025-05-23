@@ -23,13 +23,6 @@ const eventDistribution = [
   { name: "Private Paid", value: 15 },
 ];
 
-const newUsers = [
-  { month: "Jan", users: 20 },
-  { month: "Feb", users: 35 },
-  { month: "Mar", users: 50 },
-  { month: "Apr", users: 30 },
-];
-
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const SummaryCard = ({
@@ -69,11 +62,13 @@ const AdminOverview = ({
   totalRevenue,
   totalPayments,
   monthlyRevenue,
+  monthlyNewUsers,
 }: {
   totalUser: number;
   totalEvents: number;
   totalRevenue?: number;
   totalPayments?: number;
+  monthlyNewUsers: { month: string; users: number }[];
   monthlyRevenue: { month: string; revenue: number }[];
 }) => {
   return (
@@ -112,7 +107,7 @@ const AdminOverview = ({
 
         <ChartCard title="New User Growth">
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={newUsers}>
+            <LineChart data={monthlyNewUsers}>
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />

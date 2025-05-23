@@ -24,8 +24,10 @@ const AdminOverviewPage = async () => {
     totalRevenue = 0,
     totalPayments = 0,
     monthlyRevenue = [],
+    monthlyNewUsers =[]
   } = paymentOverview.data;
 
+  console.log(monthlyNewUsers);
   return (
     <div>
       <AdminOverview
@@ -34,6 +36,7 @@ const AdminOverviewPage = async () => {
         totalRevenue={totalRevenue}
         totalPayments={totalPayments}
         monthlyRevenue={monthlyRevenue}
+        monthlyNewUsers={monthlyNewUsers}
       />
     </div>
   );
