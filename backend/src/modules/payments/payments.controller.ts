@@ -50,32 +50,27 @@ const paymentSuccess = catchAsync(async (req, res) => {
   });
 });
 
-const getAllPayment = catchAsync(async (req, res) => {
-  const rawFilters = pick(req.query, paymentSearchableFields);
-  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
-  const filters: IPaymentFilterRequest = {
-    searchTerm:
-      typeof rawFilters.searchTerm === 'string'
-        ? rawFilters.searchTerm
-        : undefined,
-  };
+// Controller to get admin dashboard payment stats
+const getDashboardOverview = catchAsync(async (req, res) => {
+  const [totalRevenue, totalPayments, latestPayments, revenueByProvider] =
+    await Promise.all([
+      PaymentService.getTotalRevenue(),
+      PaymentService.getTotalPayments(),
+      PaymentService.getLatestPayments(5),
+      PaymentService.getRevenueByProvider(),
+    ]);
 
-  // If filters are empty, set them to undefined to fetch all events
-  if (
-    Object.keys(filters).length === 0 ||
-    Object.values(filters).every((value) => value === undefined)
-  ) {
-    filters.searchTerm = undefined;
-  }
-
-  const result = await PaymentService.getAllPaymentFromDB(filters, options);
-  console.log(result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Payment retrieved successfully',
-    data: result.data,
+    message: 'Dashboard overview fetched successfully',
+    data: {
+      totalRevenue,
+      totalPayments,
+      latestPayments,
+      revenueByProvider,
+    },
   });
 });
 
@@ -83,5 +78,5 @@ export const PaymentController = {
   initPayment,
   validationPayment,
   paymentSuccess,
-  getAllPayment,
+  getDashboardOverview,
 };

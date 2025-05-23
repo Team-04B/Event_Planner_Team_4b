@@ -176,74 +176,66 @@ const paymentSuccess = async (tran_id: string) => {
   return tran_id;
 };
 
-const getAllPaymentFromDB = async (
-  filters: IPaymentFilterRequest,
-  options: IPaginationOptions
-) => {
-  const { limit, page, skip } = paginationHelper.calculatePagination(options);
 
-  const { searchTerm, ...filterData } = filters;
+// Get total revenue from successful payments
+const getTotalRevenue = async () => {
+  const result = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { status: 'SUCCESS' },
+  });
 
-  const andConditions: Prisma.PaymentWhereInput[] = [];
+  return result._sum.amount || 0;
+};
 
-  // Search term filter
-  if (searchTerm) {
-    andConditions.push({
-      OR: paymentSearchableFields.map((field) => ({
-        [field]: {
-          contains: searchTerm,
-          mode: 'insensitive',
-        },
-      })),
-    });
-  }
+// Get total number of payments
+const getTotalPayments = async () => {
+  return await prisma.payment.count();
+};
 
-  // Other filters
-  if (Object.keys(filterData).length > 0) {
-    andConditions.push({
-      AND: Object.keys(filterData).map((key) => ({
-        [key]: {
-          equals: (filterData as any)[key],
-        },
-      })),
-    });
-  }
-
-  const whereConditions: Prisma.PaymentWhereInput =
-    andConditions.length > 0 ? { AND: andConditions } : {};
-
-  const allPayments = await prisma.payment.findMany({
-    where: whereConditions,
+// Get the latest N payments with user and event info
+const getLatestPayments = async (limit: number = 5) => {
+  return await prisma.payment.findMany({
+    take: limit,
+    orderBy: { createdAt: 'desc' },
     include: {
       user: true,
       event: true,
     },
-    orderBy:
-      options.sortBy && options.sortOrder
-        ? { [options.sortBy]: options.sortOrder }
-        : {
-            createdAt: 'desc',
-          },
+  });
+};
+
+// Get total revenue grouped by payment provider
+const getRevenueByProvider = async () => {
+  const result = await prisma.payment.groupBy({
+    by: ['provider'],
+    _sum: { amount: true },
+    where: { status: 'SUCCESS' },
   });
 
-  const paginatedData = allPayments.slice(skip, skip + limit);
+  return result.map((item) => ({
+    provider: item.provider,
+    revenue: item._sum.amount || 0,
+  }));
+};
 
-  return {
-    meta: {
-      page,
-      limit,
-      total: allPayments.length,
-    },
-    data: {
-      paginatedData,
-      totalPayments: allPayments,
-    },
-  };
+// Optional: Get monthly revenue (for charts)
+const getMonthlyRevenue = async () => {
+  return await prisma.$queryRaw<
+    { month: Date; revenue: number }[]
+  >`SELECT DATE_TRUNC('month', "paidAt") AS month, SUM("amount") as revenue
+    FROM "Payment"
+    WHERE "status" = 'SUCCESS' AND "paidAt" IS NOT NULL
+    GROUP BY month
+    ORDER BY month ASC;`;
 };
 
 export const PaymentService = {
   initPayment,
   validationPayment,
   paymentSuccess,
-  getAllPaymentFromDB,
+  getTotalRevenue,
+  getTotalPayments,
+  getLatestPayments,
+  getRevenueByProvider,
+  getMonthlyRevenue,
 };

@@ -15,6 +15,6 @@ router.post('/ipn', PaymentController.validationPayment);
 
 router.post('/success/:tran_id', PaymentController.paymentSuccess);
 
-router.get('/', PaymentController.getAllPayment);
+router.get('/', PaymentController.getDashboardOverview);
 
 export const PaymentRoutes = router;
