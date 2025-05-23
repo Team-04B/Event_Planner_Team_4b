@@ -15,6 +15,7 @@ import {
   Legend,
 } from "recharts";
 import React from "react";
+import { Activity } from "@/types/activity";
 
 const eventDistribution = [
   { name: "Public Free", value: 10 },
@@ -56,21 +57,31 @@ const ChartCard = ({
   </div>
 );
 
+type MonthlyStat = {
+  month: string;
+  users?: number;
+  revenue?: number;
+};
+
+type Props = {
+  totalEvents: number;
+  totalUser: number;
+  totalRevenue: number;
+  totalPayments: number;
+  monthlyNewUsers: MonthlyStat[];
+  monthlyRevenue: MonthlyStat[];
+  recentActivities?: Activity[];
+};
+
 const AdminOverview = ({
   totalUser,
   totalEvents,
   totalRevenue,
   totalPayments,
-  monthlyRevenue,
   monthlyNewUsers,
-}: {
-  totalUser: number;
-  totalEvents: number;
-  totalRevenue?: number;
-  totalPayments?: number;
-  monthlyNewUsers: { month: string; users: number }[];
-  monthlyRevenue: { month: string; revenue: number }[];
-}) => {
+  monthlyRevenue,
+  recentActivities = [],
+}: Props) => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <header className="bg-white shadow-lg rounded-lg p-6 mb-8">
@@ -150,14 +161,24 @@ const AdminOverview = ({
             </tr>
           </thead>
           <tbody>
-            <tr className="hover:bg-gray-50">
-              <td className="p-2">New Event</td>
-              <td className="p-2">Rifat Sarker</td>
-              <td className="p-2">May 20, 2025</td>
-              <td className="p-2">
-                <button className="text-blue-600 hover:underline">View</button>
-              </td>
-            </tr>
+            {recentActivities.length === 0 ? (
+              <tr>
+                <td className="p-2" colSpan={4}>
+                  No recent activity found.
+                </td>
+              </tr>
+            ) : (
+              recentActivities.map((activity) => (
+                <tr key={activity.id} className="hover:bg-gray-50">
+                  <td className="p-2">{activity.type}</td>
+                  <td className="p-2">{activity.user?.name ?? "Unknown"}</td>
+                  <td className="p-2">
+                    {new Date(activity.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-2">{activity.action}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
