@@ -20,7 +20,6 @@ import { EventDistributionItem } from "@/service/RecentActivity";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-
 const borderColors = {
   blue: "border-blue-500",
   green: "border-green-500",
@@ -45,14 +44,13 @@ const SummaryCard = ({
   color: keyof typeof borderColors;
 }) => (
   <div
-    className={`bg-white shadow-lg rounded-lg p-6 ${borderColors[color]} border-l-4`}
+    className={`bg-white shadow-lg rounded-xl p-6 ${borderColors[color]} border-l-4`}
   >
     <h2 className="text-md font-semibold text-gray-600">{title}</h2>
     <p className={`${textColors[color]} text-2xl font-bold mt-2`}>{value}</p>
     <p className="text-gray-400 text-sm">Last 30 days</p>
   </div>
 );
-
 
 const ChartCard = ({
   title,
@@ -71,6 +69,7 @@ type MonthlyStat = {
   month: string;
   users?: number;
   revenue?: number;
+  events?: number;
 };
 
 type Props = {
@@ -80,6 +79,7 @@ type Props = {
   totalPayments: number;
   monthlyNewUsers: MonthlyStat[];
   monthlyRevenue: MonthlyStat[];
+  monthlyEvents: MonthlyStat[];
   recentActivities?: Activity[];
   eventDistribution: EventDistributionItem[];
 };
@@ -91,9 +91,19 @@ const AdminOverview = ({
   totalPayments,
   monthlyNewUsers,
   monthlyRevenue,
+  monthlyEvents,
   recentActivities = [],
-  eventDistribution = []
+  eventDistribution = [],
 }: Props) => {
+  const combinedMonthlyStats = monthlyEvents.map((event) => {
+    const match = monthlyRevenue.find((r) => r.month === event.month);
+    return {
+      month: event.month,
+      events: event.events ?? 0, // ✅ correct field
+      revenue: match?.revenue ?? 0, // ✅ fallback to 0 if not matched
+    };
+  });
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <header className="bg-white shadow-lg rounded-lg p-6 mb-8">
@@ -117,7 +127,7 @@ const AdminOverview = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <ChartCard title="Monthly Revenue">
+        {/* <ChartCard title="Monthly Revenue">
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={monthlyRevenue}>
               <XAxis dataKey="month" />
@@ -126,7 +136,23 @@ const AdminOverview = ({
               <Bar dataKey="revenue" fill="#6366f1" />
             </BarChart>
           </ResponsiveContainer>
-        </ChartCard>
+        </ChartCard> */}
+
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            Monthly Events
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={combinedMonthlyStats}>
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="events" fill="#8884d8" />
+              <Bar dataKey="revenue" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
         <ChartCard title="New User Growth">
           <ResponsiveContainer width="100%" height={250}>
