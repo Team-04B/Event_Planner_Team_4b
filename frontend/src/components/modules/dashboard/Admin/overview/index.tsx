@@ -6,6 +6,8 @@ const AdminOverview = ({
 }: {
   totalEvents: number;
   totalUser: number;
+  totalRevenue?: number;
+  totalPayments?: number;
 }) => {
   return (
     <div>
