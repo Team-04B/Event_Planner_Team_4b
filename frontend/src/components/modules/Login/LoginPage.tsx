@@ -78,9 +78,9 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br w-full from-gray-50 via-white to-gray-100 flex">
       {/* Hero Section */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
+      <div className="hidden lg:flex w-full relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
@@ -173,7 +173,7 @@ const LoginPage = () => {
       </div>
 
       {/* Login Form Section */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full flex items-center justify-center p-8">
         <div
           className={`w-full max-w-md transform transition-all duration-1000 delay-300 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
