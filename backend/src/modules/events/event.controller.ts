@@ -7,6 +7,7 @@ import { eventFilterableFields } from './event.constant';
 import { IEventFilterRequest } from './event.interface';
 import ApiError from '../../app/error/ApiError';
 import { JwtPayload } from 'jsonwebtoken';
+import { Prisma } from '@prisma/client';
 
 // create event
 const createEvent = catchAsync(async (req, res) => {
@@ -31,6 +32,51 @@ const createEvent = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+
+// const createEvent = catchAsync(async (req, res) => {
+//   const file = req.file;
+//   if (!file) {
+//     throw new Error('Image file is required');
+//   }
+
+//   const creatorId = req.user.id;
+
+//   // Extract and convert fields from req.body
+//   const {
+//     title,
+//     description,
+//     dateTime,
+//     venue,
+//     category,
+//     isPublic,
+//     isPaid,
+//     fee,
+//   } = req.body;
+
+//   // Construct event payload with proper types
+//   const eventData: Prisma.EventUncheckedCreateInput = {
+//     title,
+//     description,
+//     dateTime: new Date(dateTime),
+//     venue,
+//     category: category as Prisma.EventCategory,
+//     isPublic: isPublic === 'true',
+//     isPaid: isPaid === 'true',
+//     fee: fee ? parseFloat(fee) : null,
+//     eventImgUrl: file.path,
+//     creatorId,
+//   };
+
+//   const result = await EventService.createEventIntoDB(eventData);
+
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Event created successfully',
+//     data: result,
+//   });
+// });
 
 // // get all events - public
 // const getAllEvents = catchAsync(async (req, res) => {
