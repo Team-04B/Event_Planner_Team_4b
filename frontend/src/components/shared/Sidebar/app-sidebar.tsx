@@ -85,7 +85,7 @@ const adminItem = [
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   name: string;
 }
-export function AppSidebar({ name, ...props }: AppSidebarProps) {
+export function AppSidebar({  ...props }: AppSidebarProps) {
   const user = useAppSelector(currentUser);
 
   const userRole = {
