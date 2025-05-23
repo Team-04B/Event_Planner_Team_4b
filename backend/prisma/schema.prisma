@@ -15,21 +15,21 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  name           String
-  email          String          @unique
-  password       String
-  role           Role            @default(USER)
-  events         Event[]         @relation("User")
-  participations Participation[]
-  invitations    Invitation[]    @relation("InvitedUser")
-  sentInvitations Invitation[]   @relation("Inviter")
-  reviews        Review[]
-  payments       Payment[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id              String          @id @default(uuid())
+  name            String
+  email           String          @unique
+  password        String
+  role            Role            @default(USER)
+  events          Event[]         @relation("User")
+  participations  Participation[]
+  invitations     Invitation[]    @relation("InvitedUser")
+  sentInvitations Invitation[]    @relation("Inviter")
+  reviews         Review[]
+  payments        Payment[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  ActivityLog     ActivityLog[]
 }
-
 
 model Event {
   id             String          @id @default(uuid())
@@ -77,22 +77,21 @@ model Participation {
 }
 
 model Invitation {
-  id             String           @id @default(uuid())
-  event          Event            @relation("EventInvitations", fields: [eventId], references: [id])
-  eventId        String
+  id      String @id @default(uuid())
+  event   Event  @relation("EventInvitations", fields: [eventId], references: [id])
+  eventId String
 
-  invitedUser    User             @relation("InvitedUser", fields: [userEmail], references: [email])
-  userEmail      String
+  invitedUser User   @relation("InvitedUser", fields: [userEmail], references: [email])
+  userEmail   String
 
-  invitedBy      User             @relation("Inviter", fields: [invitedById], references: [id])
-  invitedById    String
+  invitedBy   User   @relation("Inviter", fields: [invitedById], references: [id])
+  invitedById String
 
   invitationNote String
   status         InvitationStatus @default(PENDING)
   paid           Boolean          @default(false)
   createdAt      DateTime         @default(now())
 }
-
 
 model Review {
   id        String   @id @default(uuid())
@@ -111,13 +110,24 @@ model Payment {
   userId        String
   event         Event         @relation(fields: [eventId], references: [id])
   eventId       String
-  amount        Int           
+  amount        Int
   status        PaymentStatus @default(PENDING) // e.g., SUCCESS, FAILED, PENDING
   provider      String // e.g., 'SSLCommerz', 'ShurjoPay'
   transactionId String        @unique // From payment gateway
   paidAt        DateTime? // When payment was completed
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+}
+
+model ActivityLog {
+  id              String         @id @default(cuid())
+  type            ActivityType
+  action          ActivityAction
+  description     String
+  userId          String? // who triggered the action
+  relatedEntityId String? // optional: userId/eventId/paymentId
+  createdAt       DateTime       @default(now())
+  user            User?          @relation(fields: [userId], references: [id])
 }
 
 enum PaymentStatus {
@@ -142,4 +152,16 @@ enum InvitationStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+enum ActivityType {
+  USER
+  EVENT
+  PAYMENT
+}
+
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
 }

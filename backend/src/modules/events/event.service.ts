@@ -1,4 +1,10 @@
-import { Event, Participation, Prisma } from '@prisma/client';
+import {
+  ActivityAction,
+  ActivityType,
+  Event,
+  Participation,
+  Prisma,
+} from '@prisma/client';
 import prisma from '../../app/shared/prisma';
 import { paginationHelper } from '../../app/helper/paginationHelper';
 import { IPaginationOptions } from '../../app/interface/pagination';
@@ -6,6 +12,7 @@ import { eventSearchableFields } from './event.constant';
 import { IEventFilterRequest, IEventUpdate } from './event.interface';
 import ApiError from '../../app/error/ApiError';
 import httpStatus from 'http-status';
+import { logActivity } from '../logActivity';
 
 // create event into db
 const createEventIntoDB = async (payload: Event, creatorId: string) => {
@@ -15,7 +22,13 @@ const createEventIntoDB = async (payload: Event, creatorId: string) => {
       creatorId,
     },
   });
-  return result;
+  await logActivity({
+    type: ActivityType.EVENT,
+    action: ActivityAction.CREATED,
+    description: `Event "${result.title}" created`,
+    userId: creatorId, 
+    relatedEntityId: result.id, 
+  });
 };
 
 // getAll events from db
@@ -405,7 +418,6 @@ const getParticipationStatus = async (eventId: string, userId: string) => {
   });
   return result;
 };
-
 
 // update Participant Status
 const updateParticipantStatus = async (

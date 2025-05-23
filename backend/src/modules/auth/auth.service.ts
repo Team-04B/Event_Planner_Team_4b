@@ -1,11 +1,12 @@
 import prisma from '../../app/shared/prisma';
 import ApiError from '../../app/error/ApiError';
 import httpStatus from 'http-status';
-import { User } from '@prisma/client';
+import { ActivityAction, ActivityType, User } from '@prisma/client';
 import { createToken } from '../../app/shared/createToken';
 import bcrypt from 'bcryptjs';
 import config from '../../app/config';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { logActivity } from '../logActivity';
 
 const authRegisterInToDB = async (payload: Partial<User>) => {
   const { name, email, password } = payload;
@@ -26,8 +27,6 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
   //   where: { email: email },
   // });
 
-
-
   // if (isExistUser) {
   //   throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
   // }
@@ -42,6 +41,14 @@ const authRegisterInToDB = async (payload: Partial<User>) => {
       email,
       password: hasPassword,
     },
+  });
+
+  // user logactivity
+  await logActivity({
+    type: ActivityType.USER,
+    action: ActivityAction.CREATED,
+    description: `User ${registeredUser.name} signed up`,
+    userId: registeredUser.id,
   });
 
   if (!registeredUser.id) {
