@@ -337,6 +337,9 @@ const getAllEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
             : rawFilters.isPaid === 'false'
                 ? false
                 : undefined,
+        category: typeof rawFilters.category === 'string'
+            ? rawFilters.category
+            : undefined,
         searchTerm: typeof rawFilters.searchTerm === 'string'
             ? rawFilters.searchTerm
             : undefined,

@@ -381,23 +381,27 @@ const getAllEvents = catchAsync(async (req, res) => {
 
   // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
   const filters: IEventFilterRequest = {
-    isPublic:
-      rawFilters.isPublic === 'true'
-        ? true
-        : rawFilters.isPublic === 'false'
-          ? false
-          : undefined,
-    isPaid:
-      rawFilters.isPaid === 'true'
-        ? true
-        : rawFilters.isPaid === 'false'
-          ? false
-          : undefined,
-    searchTerm:
-      typeof rawFilters.searchTerm === 'string'
-        ? rawFilters.searchTerm
+  isPublic:
+    rawFilters.isPublic === 'true'
+      ? true
+      : rawFilters.isPublic === 'false'
+        ? false
         : undefined,
-  };
+  isPaid:
+    rawFilters.isPaid === 'true'
+      ? true
+      : rawFilters.isPaid === 'false'
+        ? false
+        : undefined,
+  category:
+    typeof rawFilters.category === 'string'
+      ? rawFilters.category
+      : undefined,
+  searchTerm:
+    typeof rawFilters.searchTerm === 'string'
+      ? rawFilters.searchTerm
+      : undefined,
+};
 
   // If filters are empty, set them to undefined to fetch all events
   if (

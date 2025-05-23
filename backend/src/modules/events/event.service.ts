@@ -41,6 +41,7 @@ const getAllEventsFromDB = async (
   const { searchTerm, ...filterData } = filters;
 
   const andConditions: Prisma.EventWhereInput[] = [];
+  console.log(filters,'form service')
 
   // Search term filter
   if (searchTerm) {

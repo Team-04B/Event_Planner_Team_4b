@@ -65,7 +65,6 @@ export const getAllEventsByUserId = async (filters = {}) => {
   try {
     const token = await getValidToken();
     if (!token) throw new Error("No access token found.");
-    console.log(filters, "asdfsdf");
     const queryParams = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) queryParams.append(key, String(value));
@@ -98,14 +97,14 @@ export const getAllEventsByUserId = async (filters = {}) => {
 // Get Event by ID
 export const getEventById = async (eventId: string) => {
   try {
-    const token = await getValidToken();
-    if (!token) throw new Error("No access token found.");
+    // const token = await getValidToken();
+    // if (!token) throw new Error("No access token found.");
 
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/events/${eventId}`,
       {
         method: "GET",
-        headers: { Authorization: token },
+        // headers: { Authorization: token },
         credentials: "include",
         cache: "no-store",
       }
