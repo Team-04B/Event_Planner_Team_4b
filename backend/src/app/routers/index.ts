@@ -6,9 +6,9 @@ import { ParticipationRoutes } from '../../modules/participation/participation.r
 import { InvitationRoutes } from '../../modules/invitations/invitations.routes';
 import { PaymentRoutes } from '../../modules/payments/payments.routes';
 import { ReviewsRoutes } from '../../modules/reviews/reviews.routes';
-import { AdminRoutes } from '../../modules/admin/admin.routes';
 import { MailRoutes } from '../../modules/contact/contact.route';
 import { ActivityRoutes } from '../../modules/logActivity/activity.route';
+import { AdminRoutes } from '../../modules/admin/admin.routes';
 
 const router = express.Router();
 
