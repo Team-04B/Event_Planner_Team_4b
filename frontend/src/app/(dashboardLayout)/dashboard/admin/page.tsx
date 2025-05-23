@@ -1,31 +1,39 @@
+// app/(admin)/dashboard/page.tsx
+
 import AdminOverview from "@/components/modules/dashboard/Admin/overview";
 import { getAllEvents } from "@/service/Events";
 import { getDashboardOverview } from "@/service/payment";
 import { getAllUser } from "@/service/user";
 
 const AdminOverviewPage = async () => {
-  const { meta } = await getAllUser({ undefined });
-  const { meta: metaData } = await getAllEvents();
-  const overview = await getDashboardOverview();
+  const { meta: userMeta } = await getAllUser({});
+  const { meta: eventMeta } = await getAllEvents();
+  const paymentOverview = await getDashboardOverview();
 
-  if (!overview) {
-    return <div>Failed to load dashboard data</div>;
+  if (!paymentOverview || !paymentOverview.data) {
+    return (
+      <div className="p-6 text-red-600 font-semibold">
+        ⚠ Failed to load dashboard data
+      </div>
+    );
   }
 
-  console.log(overview);
-
-  // console.log(meta);
-  const totalEvents = metaData?.total;
-  const totalUser = meta?.total;
-  const { totalRevenue, totalPayments } = overview.data || {};
+  const totalUser = userMeta?.total || 0;
+  const totalEvents = eventMeta?.total || 0;
+  const {
+    totalRevenue = 0,
+    totalPayments = 0,
+    monthlyRevenue = [],
+  } = paymentOverview.data;
 
   return (
     <div>
       <AdminOverview
-        totalEvents={totalEvents}
         totalUser={totalUser}
+        totalEvents={totalEvents}
         totalRevenue={totalRevenue}
         totalPayments={totalPayments}
+        monthlyRevenue={monthlyRevenue}
       />
     </div>
   );
