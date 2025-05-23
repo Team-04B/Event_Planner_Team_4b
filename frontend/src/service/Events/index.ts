@@ -38,9 +38,9 @@ export const getAllEvents = async (filters = {}) => {
       if (value) query.append(key, String(value));
     });
 
-    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events${
+    const url = `${process.env.NEXT_PUBLIC_BASE_API}/events/all${
       query.toString() ? `?${query.toString()}` : ""
-    }`;
+    }`
 
     const res = await fetch(url, {
       method: "GET",
@@ -65,7 +65,7 @@ export const getAllEventsByUserId = async (filters = {}) => {
   try {
     const token = await getValidToken();
     if (!token) throw new Error("No access token found.");
-
+    console.log(filters,'asdfsdf')
     const queryParams = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) queryParams.append(key, String(value));

@@ -4,5 +4,6 @@ export const eventFilterableFields: string[] = [
   'isPublic',
   'isPaid',
   'fee',
+  'category',
   'searchTerm',
 ];

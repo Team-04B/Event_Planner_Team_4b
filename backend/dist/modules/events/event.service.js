@@ -71,7 +71,7 @@ const getAllEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 
             reviews: true,
             invitations: true,
             participations: true,
-            payments: true
+            payments: true,
         },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
@@ -143,7 +143,7 @@ const getEventsFromDB = (filters, options, creatorId) => __awaiter(void 0, void 
             reviews: true,
             invitations: true,
             participations: true,
-            payments: true
+            payments: true,
         },
         orderBy: options.sortBy && options.sortOrder
             ? { [options.sortBy]: options.sortOrder }
@@ -434,6 +434,39 @@ const adminDeletedEventFromDB = (eventId) => __awaiter(void 0, void 0, void 0, f
     });
     return result;
 });
+const dataNeedForDashboardInToDb = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const totalEvents = yield prisma_1.default.event.count({
+        where: {
+            creatorId: userId,
+        },
+    });
+    const events = yield prisma_1.default.event.findMany({
+        where: {
+            creatorId: userId,
+        },
+        select: {
+            participations: true,
+        },
+    });
+    const totalParticipants = events.reduce((sum, event) => sum + event.participations.length, 0);
+    const totalRevenues = yield prisma_1.default.payment.aggregate({
+        _sum: {
+            amount: true,
+        },
+        where: {
+            event: {
+                creatorId: userId,
+            },
+            status: 'SUCCESS',
+        },
+    });
+    const totalRevenue = totalRevenues._sum.amount || 0;
+    return {
+        totalEvents,
+        totalRevenue,
+        totalParticipants,
+    };
+});
 exports.EventService = {
     createEventIntoDB,
     getEventsFromDB,
@@ -446,4 +479,5 @@ exports.EventService = {
     getParticipationStatus,
     updateParticipantStatus,
     adminDeletedEventFromDB,
+    dataNeedForDashboardInToDb,
 };

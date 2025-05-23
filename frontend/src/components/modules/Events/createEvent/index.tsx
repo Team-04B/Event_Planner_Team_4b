@@ -25,8 +25,9 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { eventFormSchema } from "./createEventValidations";
+import { categoryEnum, eventFormSchema } from "./createEventValidations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CreateEvent = () => {
   const form = useForm<z.infer<typeof eventFormSchema>>({
@@ -56,6 +57,7 @@ const CreateEvent = () => {
     const eventData = {
       title: data.title,
       description: data.description,
+      category: data.category,
       dateTime: data.date?.toISOString() || null,
       venue: data.venue,
       isPublic: data.publicEvent,
@@ -175,6 +177,38 @@ const CreateEvent = () => {
                 )}
               />
 
+              {/* category */}
+              <FormField
+              control={control}
+              name="category"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Event Category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl className="w-full">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categoryEnum.options.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription className="text-xs">
+                    What kind of event is this?
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
               {/* Venue */}
               <FormField
                 control={control}
@@ -200,14 +234,16 @@ const CreateEvent = () => {
                 control={control}
                 name="publicEvent"
                 render={({ field }) => (
-                  <FormItem className="w-full flex flex-col space-y-2">
-                    <FormLabel>Public Event</FormLabel>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                  <FormItem className="w-full flex flex-col space-y-2 border rounded-xl p-4 justify-center">
+                    <div className="flex gap-x-2">
+                      <FormLabel>Public Event</FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                     </FormControl>
+                    </div>
                     <FormDescription className="text-xs">
                       Make this event visible to everyone
                     </FormDescription>
@@ -220,14 +256,16 @@ const CreateEvent = () => {
                 control={control}
                 name="paidEvent"
                 render={({ field }) => (
-                  <FormItem className="w-full flex flex-col space-y-2">
-                    <FormLabel>Paid Event</FormLabel>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
+                  <FormItem className="w-full flex flex-col space-y-2 border rounded-xl p-4 justify-center">
+                    <div className="flex gap-x-2">
+                      <FormLabel>Paid Event</FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </div>
                     <FormDescription className="text-xs">
                       Charge fee for this event
                     </FormDescription>

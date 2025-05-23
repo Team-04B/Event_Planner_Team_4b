@@ -1,5 +1,18 @@
 import { z } from 'zod';
 
+const EventCategoryEnum = z.enum([
+  'Professional',
+  'Educational',
+  'Social',
+  'Business',
+  'Health',
+  'Sports',
+  'Tech',
+  'Sales',
+  'Community',
+  'Personal',
+]);
+
 const createEventZodSchema = z.object({
   body: z.object({
     title: z.string({
@@ -14,6 +27,7 @@ const createEventZodSchema = z.object({
     venue: z.string({
       required_error: 'Venue is required',
     }),
+    category: EventCategoryEnum,
     isPublic: z.boolean({
       required_error: 'isPublic is required',
     }),
@@ -29,6 +43,7 @@ const updateEventZodSchema = z.object({
   description: z.string().optional(),
   dateTime: z.string().optional(),
   venue: z.string().optional(),
+  category: EventCategoryEnum.optional(),
   isPublic: z.boolean().optional(),
   isPaid: z.boolean().optional(),
   fee: z.number().nullable().optional(),

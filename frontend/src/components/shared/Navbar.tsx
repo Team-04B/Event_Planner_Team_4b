@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -10,11 +12,19 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useMobile } from "@/hooks/use-mobile"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { DialogTitle } from "@/components/ui/dialog"
-import { useAppSelector } from "@/redux/hook"
-import { currentUser, logOut } from "@/redux/userSlice/userSlice"
+import { logOut } from "@/redux/userSlice/userSlice"
 import { getAllInvitaions } from "@/service/Invitations"
-import { logout } from "@/service/AuthService"
+import { getCurrentUser, getMeFoDb, logout } from "@/service/AuthService"
 import { useDispatch } from "react-redux"
+
+// Define proper types for user data
+interface User {
+  id?: string
+  name?: string
+  email?: string
+  role?: string
+  [key: string]: any // For any additional properties
+}
 
 interface Notification {
   id: string
@@ -31,20 +41,47 @@ interface Notification {
 }
 
 export default function Navbar() {
-  const user = useAppSelector(currentUser)
-  const router = useRouter()
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [user, setUser] = useState<User | null>(null)
   const [invitations, setInvitations] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const dispatch = useDispatch()
   const pathname = usePathname()
-
+const router = useRouter()
   const handleLogout = () => {
     logout()
     dispatch(logOut())
+    setUser(null)
+    localStorage.removeItem("token")
   }
+
+  useEffect(() => {
+    const getUserdata = async () => {
+      try {
+        const userData = await getCurrentUser()
+        if (!userData) {
+          handleLogout()
+          return
+        }
+
+        // Then get detailed user data
+        const response = await getMeFoDb()
+        if (!response || !response.data) {
+        
+          handleLogout()
+          return
+        }
+        setUser(response.data)
+      } catch (error) {
+        console.error("Error fetching user data:", error)
+        handleLogout()
+      }
+    }
+
+
+      getUserdata()
+  
+  }, [])
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -61,7 +98,9 @@ export default function Navbar() {
       }
     }
 
-    fetchInvitations()
+    if (user) {
+      fetchInvitations()
+    }
   }, [user])
   const routes = ['/','/events','/about']
   useEffect(() => {
@@ -103,11 +142,14 @@ export default function Navbar() {
   const isMobile = useMobile()
   const unreadCount = notifications.filter((n) => n.status === "PENDING").length
 
+  // Check if user is an empty object or null
+  const isAuthenticated = user && Object.keys(user).length > 0
+
   return (
     <div className="w-full bg-white">
-      <div className="container mx-auto  ">
+      <div className="container mx-auto">
         <nav
-          className={`w-full py-4  flex items-center justify-between border-b z-50 transition-all duration-300 ${
+          className={`w-full py-4 px-4 flex items-center justify-between border-b z-50 transition-all duration-300 ${
             scrolled ? "fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-sm" : "relative"
           }`}
           style={{
@@ -123,7 +165,7 @@ export default function Navbar() {
 
             {isMobile ? (
               <div className="flex items-center gap-3">
-                {user && (
+                {isAuthenticated && (
                   <NotificationsMobile notifications={notifications} unreadCount={unreadCount} isLoading={isLoading} />
                 )}
                 <Sheet>
@@ -174,7 +216,7 @@ export default function Navbar() {
                       >
                         About
                       </Link>
-                      {user ? (
+                      {isAuthenticated ? (
                         <>
                           <Link
                             href="/dashboard"
@@ -192,10 +234,10 @@ export default function Navbar() {
                         </>
                       ) : (
                         <>
-                          <Button variant="outline" className="justify-start">
+                          <Button variant="outline" className="justify-start" asChild>
                             <Link href="/login">Login</Link>
                           </Button>
-                          <Button className="justify-start">
+                          <Button className="justify-start" asChild>
                             <Link href="/register">Sign up</Link>
                           </Button>
                         </>
@@ -237,7 +279,7 @@ export default function Navbar() {
                   About
                 </Link>
 
-                {user ? (
+                {isAuthenticated ? (
                   <>
                     <Link
                       href="/dashboard"
@@ -260,10 +302,10 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" asChild>
                       <Link href="/login">Login</Link>
                     </Button>
-                    <Button size="sm">
+                    <Button size="sm" asChild>
                       <Link href="/register">Sign up</Link>
                     </Button>
                   </>
