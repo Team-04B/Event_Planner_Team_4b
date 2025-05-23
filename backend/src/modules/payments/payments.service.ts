@@ -213,19 +213,42 @@ const getRevenueByProvider = async () => {
   }));
 };
 
-// Optional: Get monthly revenue (for charts)
+//  Get monthly revenue (for charts)
 const getMonthlyRevenue = async () => {
   const result = await prisma.$queryRaw<
     { month: Date; revenue: bigint }[]
-  >`SELECT DATE_TRUNC('month', "paidAt") AS month, SUM("amount") as revenue
+  >`SELECT DATE_TRUNC('month', "createdAt") AS month, SUM(amount) as revenue
     FROM "Payment"
-    WHERE "status" = 'SUCCESS' AND "paidAt" IS NOT NULL
+    WHERE status = 'SUCCESS'
+    GROUP BY month
+    ORDER BY month ASC;`;
+
+  return result.map((entry) => {
+    const date = new Date(entry.month);
+    const monthName = date.toLocaleString('default', { month: 'short' }); 
+
+    return {
+      month: monthName,
+      revenue: Number(entry.revenue),
+    };
+  });
+};
+
+
+
+// Get monthly events (for charts)
+const getMonthlyEvents = async () => {
+  const result = await prisma.$queryRaw<
+    { month: Date; count: bigint }[]
+  >`SELECT DATE_TRUNC('month', "createdAt") AS month, COUNT(*) as count
+    FROM "Event"
+    WHERE "createdAt" IS NOT NULL
     GROUP BY month
     ORDER BY month ASC;`;
 
   return result.map((entry) => ({
-    month: entry.month,
-    revenue: Number(entry.revenue), // ✅ convert BigInt to Number
+    month: entry.month.toLocaleString('en-US', { month: 'short' }), 
+    events: Number(entry.count),
   }));
 };
 
@@ -240,4 +263,5 @@ export const PaymentService = {
   getLatestPayments,
   getRevenueByProvider,
   getMonthlyRevenue,
+  getMonthlyEvents,
 };

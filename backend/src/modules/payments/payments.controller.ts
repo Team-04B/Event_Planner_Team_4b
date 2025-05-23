@@ -57,6 +57,7 @@ const getDashboardOverview = catchAsync(async (req, res) => {
     revenueByProvider,
     monthlyRevenue,
     monthlyNewUsers,
+    monthlyEvents
   ] = await Promise.all([
     PaymentService.getTotalRevenue(),
     PaymentService.getTotalPayments(),
@@ -64,6 +65,7 @@ const getDashboardOverview = catchAsync(async (req, res) => {
     PaymentService.getRevenueByProvider(),
     PaymentService.getMonthlyRevenue(),
     userServices.getMonthlyNewUsers(),
+    PaymentService.getMonthlyEvents(),
   ]);
 
   sendResponse(res, {
@@ -77,6 +79,7 @@ const getDashboardOverview = catchAsync(async (req, res) => {
       revenueByProvider,
       monthlyRevenue,
       monthlyNewUsers,
+      monthlyEvents,
     },
   });
 });
