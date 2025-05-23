@@ -41,6 +41,7 @@ const getAllEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 
     const { limit, page, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
     const andConditions = [];
+    console.log(filters, 'form service');
     // Search term filter
     if (searchTerm) {
         andConditions.push({

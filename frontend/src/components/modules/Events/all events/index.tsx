@@ -1,120 +1,157 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { getAllEvents } from "@/service/Events";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Event } from "@/types/eventType";
-import { FilterSidebar } from "./filter-sidebar";
-import { EventSkeleton } from "./event-skeleton";
-import { EventCard } from "./event-card";
-import { Pagination } from "./pagination";
+import { useEffect, useState } from "react"
+import { getAllEvents } from "@/service/Events"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search, Filter } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import type { Event } from "@/types/eventType"
+import { FilterSidebar } from "./filter-sidebar"
+import { EventSkeleton } from "./event-skeleton"
+import { EventCard } from "./event-card"
+import { Pagination } from "./pagination"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function AllEvents() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [,setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams?.get("category")
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage] = useState(6);
+  const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
 
-  // Filter state
+  // Filter state that matches FilterSidebar expectations
   const [filters, setFilters] = useState({
     publicFree: false,
     publicPaid: false,
     privateFree: false,
     privatePaid: false,
-  });
+  })
+
+  // Additional filter states
+  const [categoryFilter, setCategoryFilter] = useState<string | null| undefined>(categoryParam || null)
+  const [sortField,] = useState("createdAt")
+  const [sortDirection,] = useState<"asc" | "desc">("desc")
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [eventsPerPage] = useState(6)
+  const [meta, setMeta] = useState<any>({})
 
   // Mobile filter drawer state
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  // Fetch all events on initial load
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Update category filter when URL param changes
+  useEffect(() => {
+    setCategoryFilter(categoryParam)
+  }, [categoryParam])
+
+  // Fetch events when filters change
   useEffect(() => {
     const fetchEvents = async () => {
-      setLoading(true);
-      setError("");
-
       try {
-        const res = await getAllEvents();
+        setLoading(true)
+        setError("")
 
-        if (res?.success) {
-          // Check if paginatedData exists and has items
-          if (
-            res.data?.paginatedData &&
-            Array.isArray(res.data.paginatedData)
-          ) {
-            setEvents(res.data.paginatedData);
-            setFilteredEvents(res.data.paginatedData);
-          } else if (res.data && Array.isArray(res.data)) {
-            // Alternative: check if data is directly an array
-            setEvents(res.data);
-            setFilteredEvents(res.data);
-          } else {
-            setError("No events found.");
+        const filterParams: {
+          page: number
+          limit: number
+          searchTerm?: string
+          sortBy: string
+          sortOrder: "asc" | "desc"
+          isPublic?: string
+          isPaid?: string
+          category?: string
+        } = {
+          page: currentPage,
+          limit: eventsPerPage,
+          sortBy: sortField,
+          sortOrder: sortDirection,
+        }
+
+        // Add search term if exists
+        if (debouncedSearchTerm) {
+          filterParams.searchTerm = debouncedSearchTerm
+        }
+
+        // Add category filter if exists
+        if (categoryFilter && categoryFilter !== "Category") {
+          filterParams.category = categoryFilter
+        }
+
+        // Convert filter checkboxes to API parameters
+        const activeFilters = Object.entries(filters).filter(([, value]) => value)
+
+        if (activeFilters.length > 0) {
+          // If specific filters are selected, apply them
+          const publicFilters = activeFilters.filter(([key]) => key.startsWith("public"))
+          const privateFilters = activeFilters.filter(([key]) => key.startsWith("private"))
+          const freeFilters = activeFilters.filter(([key]) => key.endsWith("Free"))
+          const paidFilters = activeFilters.filter(([key]) => key.endsWith("Paid"))
+
+          // Handle public/private filter
+          if (publicFilters.length > 0 && privateFilters.length === 0) {
+            filterParams.isPublic = "true"
+          } else if (privateFilters.length > 0 && publicFilters.length === 0) {
+            filterParams.isPublic = "false"
           }
+
+          // Handle free/paid filter
+          if (freeFilters.length > 0 && paidFilters.length === 0) {
+            filterParams.isPaid = "false"
+          } else if (paidFilters.length > 0 && freeFilters.length === 0) {
+            filterParams.isPaid = "true"
+          }
+        }
+
+        const response = await getAllEvents(filterParams)
+
+        if (response.success && response.data) {
+          setEvents(response.data.paginatedData || [])
+          setMeta(response.meta || {})
         } else {
-          setError("Failed to fetch events.");
+          setError("Failed to fetch events.")
+          setEvents([])
         }
       } catch (err: any) {
-        console.error("Error fetching events:", err);
-        setError(err.message || "Error fetching events.");
+        console.error("Fetch error:", err)
+        setError(err.message || "Error fetching events.")
+        setEvents([])
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
-    fetchEvents();
-  }, []);
-
-  // Apply filters when filter state or search term updates
-  useEffect(() => {
-    let result = [...events];
-
-    // Check if any filters are active
-    const hasActiveFilters = Object.values(filters).some((value) => value);
-
-
-    if (hasActiveFilters) {
-      result = result.filter((event) => {
-        if (filters.publicFree && event.isPublic && !event.isPaid) return true;
-        if (filters.publicPaid && event.isPublic && event.isPaid) return true;
-        if (filters.privateFree && !event.isPublic && !event.isPaid)
-          return true;
-        if (filters.privatePaid && !event.isPublic && event.isPaid) return true;
-        return false;
-      });
     }
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        (event) =>
-          event.title.toLowerCase().includes(term) ||
-          (event.creator?.name &&
-            event.creator.name.toLowerCase().includes(term)) ||
-          (event.description && event.description.toLowerCase().includes(term))
-      );
+    fetchEvents()
+  }, [currentPage, debouncedSearchTerm, categoryFilter, filters, sortField, sortDirection, eventsPerPage])
+
+  // Update URL when category changes
+  const updateCategoryFilter = (category: string | null) => {
+    setCategoryFilter(category)
+
+    const params = new URLSearchParams(searchParams?.toString())
+
+    if (!category || category === "Category") {
+      params.delete("category")
+    } else {
+      params.set("category", category)
     }
 
-    setFilteredEvents(result);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [filters, searchTerm, events]);
-
-  // Get current events for pagination
-  const indexOfLastEvent = currentPage * eventsPerPage;
-  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = filteredEvents.slice(
-    indexOfFirstEvent,
-    indexOfLastEvent
-  );
-  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+    router.replace(`/events?${params.toString()}`)
+  }
 
   // Clear all filters
   const clearFilters = () => {
@@ -123,30 +160,61 @@ export default function AllEvents() {
       publicPaid: false,
       privateFree: false,
       privatePaid: false,
-    });
-    setSearchTerm("");
-  };
+    })
+    setSearchTerm("")
+    updateCategoryFilter(null)
+    setCurrentPage(1)
+  }
+
+  // Calculate total pages
+  const totalPages = Math.ceil((meta.total || 0) / eventsPerPage)
+
+  // List of available categories
+  const categories = [
+    "Professional",
+    "Educational",
+    "Social",
+    "Business",
+    "Health",
+    "Sports",
+    "Tech",
+    "Sales",
+    "Community",
+    "Personal",
+  ]
 
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Discover Events</h1>
-        <p className="text-muted-foreground mt-1">
-          Find and join amazing events
-        </p>
+        <p className="text-muted-foreground mt-1">Find and join amazing events</p>
       </div>
+
+      {/* Category Filter Pills */}
+      {categoryFilter && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Category:</span>
+            <Button variant="secondary" size="sm" onClick={() => updateCategoryFilter(null)} className="h-7">
+              {categoryFilter} ×
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Mobile Filter Button */}
         <div className="lg:hidden mb-4">
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center"
-              >
+              <Button variant="outline" className="w-full flex items-center justify-center">
                 <Filter className="mr-2 h-4 w-4" />
                 Filters
+                {Object.values(filters).some(Boolean) && (
+                  <span className="ml-2 bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs">
+                    {Object.values(filters).filter(Boolean).length}
+                  </span>
+                )}
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
@@ -157,6 +225,9 @@ export default function AllEvents() {
                   setFilters={setFilters}
                   clearFilters={clearFilters}
                   searchTerm={searchTerm}
+                  categoryFilter={categoryFilter}
+                  setCategoryFilter={updateCategoryFilter}
+                  categories={categories}
                 />
               </div>
             </SheetContent>
@@ -170,6 +241,9 @@ export default function AllEvents() {
             setFilters={setFilters}
             clearFilters={clearFilters}
             searchTerm={searchTerm}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={updateCategoryFilter}
+            categories={categories}
           />
         </div>
 
@@ -186,6 +260,13 @@ export default function AllEvents() {
             />
           </div>
 
+          {/* Results Info */}
+          {!loading && (
+            <div className="mb-4 text-sm text-muted-foreground">
+              {meta.total ? `Showing ${events.length} of ${meta.total} events` : "No events found"}
+            </div>
+          )}
+
           {/* Events Grid */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -193,34 +274,40 @@ export default function AllEvents() {
                 <EventSkeleton key={i} />
               ))}
             </div>
-          ) : currentEvents.length > 0 ? (
+          ) : error ? (
+            <div className="text-center py-12 border rounded-lg">
+              <h3 className="text-xl font-semibold mb-2 text-red-500">Error</h3>
+              <p className="text-muted-foreground mb-6">{error}</p>
+              <Button onClick={() => window.location.reload()}>Try Again</Button>
+            </div>
+          ) : events.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {currentEvents.map((event) => (
+                {events.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
               </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={(page) => setCurrentPage(page)}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => setCurrentPage(page)}
+                  />
+                </div>
               )}
             </>
           ) : (
             <div className="text-center py-12 border rounded-lg">
               <h3 className="text-xl font-semibold mb-2">No events found</h3>
-              <p className="text-muted-foreground mb-6">
-                Try changing your filters or search term
-              </p>
+              <p className="text-muted-foreground mb-6">Try changing your filters or search term</p>
               <Button onClick={clearFilters}>Clear Filters</Button>
             </div>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

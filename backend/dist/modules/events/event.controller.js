@@ -81,6 +81,7 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
 // get all events - for user
 const getAllEventsByUserId = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
+    console.log(req.query);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
     const user = req.user;
     // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
@@ -95,6 +96,9 @@ const getAllEventsByUserId = (0, catchAsync_1.catchAsync)((req, res) => __awaite
             : rawFilters.isPaid === 'false'
                 ? false
                 : undefined,
+        category: typeof rawFilters.category === 'string'
+            ? rawFilters.category
+            : undefined,
         searchTerm: typeof rawFilters.searchTerm === 'string'
             ? rawFilters.searchTerm
             : undefined,
@@ -118,6 +122,7 @@ const getAllEventsByUserId = (0, catchAsync_1.catchAsync)((req, res) => __awaite
 // get all event -public
 const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
+    console.log(req.query);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
     // const user = req.user;
     // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
@@ -132,6 +137,9 @@ const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
             : rawFilters.isPaid === 'false'
                 ? false
                 : undefined,
+        category: typeof rawFilters.category === 'string'
+            ? rawFilters.category
+            : undefined,
         searchTerm: typeof rawFilters.searchTerm === 'string'
             ? rawFilters.searchTerm
             : undefined,
@@ -291,6 +299,9 @@ const getAllEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
             : rawFilters.isPaid === 'false'
                 ? false
                 : undefined,
+        category: typeof rawFilters.category === 'string'
+            ? rawFilters.category
+            : undefined,
         searchTerm: typeof rawFilters.searchTerm === 'string'
             ? rawFilters.searchTerm
             : undefined,

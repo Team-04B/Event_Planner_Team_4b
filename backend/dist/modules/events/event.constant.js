@@ -6,5 +6,6 @@ exports.eventFilterableFields = [
     'isPublic',
     'isPaid',
     'fee',
+    'category',
     'searchTerm',
 ];

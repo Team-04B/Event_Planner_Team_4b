@@ -1,4 +1,5 @@
 
+import EventCategorySection from "@/components/sections/category-section";
 import CtaSection from "@/components/sections/cta-section";
 import EventTypesSection from "@/components/sections/event-types-section";
 import FaqSection from "@/components/sections/faq-section";
@@ -20,6 +21,10 @@ console.log(events)
       <main>
         <Suspense fallback={<Loader2 />}>
           <HeroSection />
+        </Suspense>
+
+        <Suspense fallback={<Loader2/>}>
+          <EventCategorySection/>
         </Suspense>
 
         <Suspense fallback={<Loader2 />}>
