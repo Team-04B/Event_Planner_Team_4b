@@ -40,7 +40,7 @@ const SummaryCard = ({
   color,
 }: {
   title: string;
-  value: any;
+  value: number | string;
   color: keyof typeof borderColors;
 }) => (
   <div
@@ -59,7 +59,7 @@ const ChartCard = ({
   title: string;
   children: React.ReactNode;
 }) => (
-  <div className="bg-white shadow-lg rounded-lg p-6">
+  <div className="bg-white shadow-lg rounded-xl p-6">
     <h2 className="text-xl font-semibold text-gray-700 mb-4">{title}</h2>
     {children}
   </div>
@@ -127,20 +127,9 @@ const AdminOverview = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* <ChartCard title="Monthly Revenue">
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={monthlyRevenue}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="revenue" fill="#6366f1" />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard> */}
-
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-white p-6 rounded-2xl shadow-lg">
           <h2 className="text-lg font-semibold text-gray-700 mb-4">
-            Monthly Events
+            Monthly Events & Revenue
           </h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={combinedMonthlyStats}>
@@ -155,7 +144,11 @@ const AdminOverview = ({
         </div>
 
         <ChartCard title="New User Growth">
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer
+            style={{ borderRadius: "16px" }}
+            width="100%"
+            height={250}
+          >
             <LineChart data={monthlyNewUsers}>
               <XAxis dataKey="month" />
               <YAxis />
@@ -185,7 +178,7 @@ const AdminOverview = ({
         </ResponsiveContainer>
       </ChartCard>
 
-      <div className="bg-white shadow-lg rounded-lg p-6 mt-8">
+      <div className="bg-white shadow-lg rounded-xl p-6 mt-8">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">
           Recent Activities
         </h2>

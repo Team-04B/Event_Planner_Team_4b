@@ -137,13 +137,12 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
               </div>
             </Link>
             {user?.role === "USER" && (
-              <SidebarMenuButton>
+              <SidebarMenuButton className="mx-auto w-full px-8 flex">
                 <Link href="/dashboard/create-event">
-                  <h2 className="flex items-center gap-1">
-                    <Plus fontSize={700} size={20} /> Create Event.
+                  <h2 className="flex text-center gap-1">
+                    <Plus fontSize={700} size={20} /> Create Event
                   </h2>
                 </Link>
-                ;
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>
