@@ -16,15 +16,24 @@ import {
 } from "recharts";
 import React from "react";
 import { Activity } from "@/types/activity";
-
-const eventDistribution = [
-  { name: "Public Free", value: 10 },
-  { name: "Public Paid", value: 20 },
-  { name: "Private Free", value: 5 },
-  { name: "Private Paid", value: 15 },
-];
+import { EventDistributionItem } from "@/service/RecentActivity";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+
+const borderColors = {
+  blue: "border-blue-500",
+  green: "border-green-500",
+  purple: "border-purple-500",
+  yellow: "border-yellow-500",
+};
+
+const textColors = {
+  blue: "text-blue-600",
+  green: "text-green-600",
+  purple: "text-purple-600",
+  yellow: "text-yellow-600",
+};
 
 const SummaryCard = ({
   title,
@@ -33,16 +42,17 @@ const SummaryCard = ({
 }: {
   title: string;
   value: any;
-  color: string;
+  color: keyof typeof borderColors;
 }) => (
   <div
-    className={`bg-white shadow-lg rounded-lg p-6 border-l-4 border-${color}-500`}
+    className={`bg-white shadow-lg rounded-lg p-6 ${borderColors[color]} border-l-4`}
   >
     <h2 className="text-md font-semibold text-gray-600">{title}</h2>
-    <p className={`text-2xl font-bold text-${color}-600 mt-2`}>{value}</p>
+    <p className={`${textColors[color]} text-2xl font-bold mt-2`}>{value}</p>
     <p className="text-gray-400 text-sm">Last 30 days</p>
   </div>
 );
+
 
 const ChartCard = ({
   title,
@@ -71,6 +81,7 @@ type Props = {
   monthlyNewUsers: MonthlyStat[];
   monthlyRevenue: MonthlyStat[];
   recentActivities?: Activity[];
+  eventDistribution: EventDistributionItem[];
 };
 
 const AdminOverview = ({
@@ -81,6 +92,7 @@ const AdminOverview = ({
   monthlyNewUsers,
   monthlyRevenue,
   recentActivities = [],
+  eventDistribution = []
 }: Props) => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">

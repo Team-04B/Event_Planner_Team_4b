@@ -1,6 +1,5 @@
 import { Activity } from "@/types/activity";
 
-
 export const getRecentActivities = async (
   limit: number = 5
 ): Promise<Activity[]> => {
@@ -19,3 +18,21 @@ export const getRecentActivities = async (
   const data = await res.json();
   return data.data as Activity[];
 };
+
+export type EventDistributionItem = {
+  name: string;
+  value: number;
+};
+
+export async function getEventDistribution(): Promise<EventDistributionItem[]> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_API}/admin/event-distribution`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch event distribution");
+  }
+
+  const data: EventDistributionItem[] = await response.json();
+  return data;
+}

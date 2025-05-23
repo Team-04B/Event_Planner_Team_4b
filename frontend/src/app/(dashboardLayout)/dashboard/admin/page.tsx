@@ -3,7 +3,7 @@
 import AdminOverview from "@/components/modules/dashboard/Admin/overview";
 import { getAllEvents } from "@/service/Events";
 import { getDashboardOverview } from "@/service/payment";
-import { getRecentActivities } from "@/service/RecentActivity";
+import { getEventDistribution, getRecentActivities } from "@/service/RecentActivity";
 import { getAllUser } from "@/service/user";
 
 const AdminOverviewPage = async () => {
@@ -11,6 +11,7 @@ const AdminOverviewPage = async () => {
   const { meta: eventMeta } = await getAllEvents();
   const paymentOverview = await getDashboardOverview();
   const recentActivities = await getRecentActivities(5); // fetch last 5 activities
+  const eventDistribution = await getEventDistribution();
 
   if (!paymentOverview || !paymentOverview.data) {
     return (
@@ -39,7 +40,8 @@ const AdminOverviewPage = async () => {
         totalPayments={totalPayments}
         monthlyRevenue={monthlyRevenue}
         monthlyNewUsers={monthlyNewUsers}
-        recentActivities={recentActivities} // pass recent activities here
+        recentActivities={recentActivities} 
+        eventDistribution={eventDistribution}
       />
     </div>
   );
