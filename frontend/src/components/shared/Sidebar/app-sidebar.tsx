@@ -25,6 +25,7 @@ import { useAppSelector } from "@/redux/hook";
 import { currentUser } from "@/redux/userSlice/userSlice";
 import Image from "next/image";
 import { LogoutModal } from "@/components/modules/Login/LogoutModal";
+import logo from "../../../../public/images/logo.png";
 
 // This is sample data.
 const data = {
@@ -111,14 +112,28 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
           <SidebarMenuItem>
             <Link href="/dashboard/profile">
               <div className=" mb-3 pl-2 flex items-center gap-3">
-                <Image
+                {/* <Image
                   className="rounded-lg"
                   src="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
                   width={35}
                   height={25}
                   alt="profile image"
-                />
-                <h2 className="font-medium">{name || "Not found"}</h2>
+                /> */}
+                {/* <h2 className="font-medium">{name || "Not found"}</h2> */}
+                <Link className="mx-auto" href={"/"}>
+                  <div className="flex gap-2 mx-auto items-center">
+                    <Image
+                      className="rounded-full"
+                      height={40}
+                      width={40}
+                      alt="website_logo"
+                      src={logo}
+                    />
+                    <h2 className="font-bold text-2xl mx-auto text-center">
+                      EvenT<span className="text-orange-600">ora</span>
+                    </h2>
+                  </div>
+                </Link>
               </div>
             </Link>
             {user?.role === "USER" && (
@@ -135,7 +150,7 @@ export function AppSidebar({ name, ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="mx-auto">
         <NavMain items={sidebarItem} />
       </SidebarContent>
       <SidebarFooter>

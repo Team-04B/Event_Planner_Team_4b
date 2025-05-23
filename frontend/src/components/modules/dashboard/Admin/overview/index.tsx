@@ -37,6 +37,15 @@ const AdminOverview = ({
             </p>
             <p className={`text-gray-500`}>Last 30 days</p>
           </div>
+          <div className={`bg-white shadow-lg rounded-lg p-6`}>
+            <h2 className={`text-xl font-semibold text-gray-700`}>
+              Total Revenue
+            </h2>
+            <p className={`text-2xl font-bold text-green-600 mt-2`}>
+              {totalEvents || 0}
+            </p>
+            <p className={`text-gray-500`}>Last 30 days</p>
+          </div>
         </div>
 
         <div className={`mt-8 bg-white shadow-lg rounded-lg p-6`}>
