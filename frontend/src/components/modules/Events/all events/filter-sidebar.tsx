@@ -1,30 +1,34 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-import { Filter } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Separator } from "@/components/ui/separator"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Filter } from "lucide-react"
 
 interface FilterSidebarProps {
   filters: {
-    publicFree: boolean;
-    publicPaid: boolean;
-    privateFree: boolean;
-    privatePaid: boolean;
-  };
+    publicFree: boolean
+    publicPaid: boolean
+    privateFree: boolean
+    privatePaid: boolean
+  }
   setFilters: React.Dispatch<
     React.SetStateAction<{
-      publicFree: boolean;
-      publicPaid: boolean;
-      privateFree: boolean;
-      privatePaid: boolean;
+      publicFree: boolean
+      publicPaid: boolean
+      privateFree: boolean
+      privatePaid: boolean
     }>
-  >;
-  clearFilters: () => void;
-  searchTerm: string;
+  >
+  clearFilters: () => void
+  searchTerm: string
+  categoryFilter?: string | null
+  setCategoryFilter?: (category: string | null) => void
+  categories?: string[]
 }
 
 export function FilterSidebar({
@@ -32,28 +36,57 @@ export function FilterSidebar({
   setFilters,
   clearFilters,
   searchTerm,
+  categoryFilter,
+  setCategoryFilter,
+  categories = [],
 }: FilterSidebarProps) {
   // Handle filter changes
   const handleFilterChange = (filterName: keyof typeof filters) => {
     setFilters((prev) => ({
       ...prev,
       [filterName]: !prev[filterName],
-    }));
-  };
+    }))
+  }
+
+  // Count active filters
+  const activeFilterCount = Object.values(filters).filter(Boolean).length
 
   return (
     <div className="space-y-6 p-1">
       <div>
         <h3 className="text-xl font-semibold mb-2">Filters</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Refine your event search
-        </p>
+        <p className="text-sm text-muted-foreground mb-6">Refine your event search</p>
 
         <div className="space-y-5">
+          {/* Category Filter */}
+          {setCategoryFilter && categories.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium mb-3">Category</h4>
+              <Select
+                value={categoryFilter || "all"}
+                onValueChange={(value) => setCategoryFilter(value === "all" ? null : value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <Separator className="my-4" />
+
           <div>
             <h4 className="text-sm font-medium mb-3 flex items-center">
               <Badge variant="outline" className="mr-2 py-0 px-1.5">
-                {Object.values(filters).filter(Boolean).length}
+                {activeFilterCount}
               </Badge>
               Event Type
             </h4>
@@ -91,10 +124,7 @@ export function FilterSidebar({
                   htmlFor="publicPaid"
                   className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 group-hover:text-blue-600 cursor-pointer flex items-center"
                 >
-                  <Badge
-                    variant="outline"
-                    className="mr-2 bg-blue-50 text-blue-600 hover:bg-blue-50 border-blue-100"
-                  >
+                  <Badge variant="outline" className="mr-2 bg-blue-50 text-blue-600 hover:bg-blue-50 border-blue-100">
                     Paid
                   </Badge>
                   Public Events
@@ -151,11 +181,7 @@ export function FilterSidebar({
             <h4 className="text-sm font-medium mb-3">Quick Filters</h4>
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={
-                  Object.values(filters).every((v) => !v)
-                    ? "default"
-                    : "outline"
-                }
+                variant={Object.values(filters).every((v) => !v) ? "default" : "outline"}
                 size="sm"
                 onClick={() => {
                   setFilters({
@@ -163,7 +189,7 @@ export function FilterSidebar({
                     publicPaid: false,
                     privateFree: false,
                     privatePaid: false,
-                  });
+                  })
                 }}
                 className="rounded-full"
               >
@@ -172,10 +198,7 @@ export function FilterSidebar({
 
               <Button
                 variant={
-                  filters.publicFree &&
-                  filters.publicPaid &&
-                  !filters.privateFree &&
-                  !filters.privatePaid
+                  filters.publicFree && filters.publicPaid && !filters.privateFree && !filters.privatePaid
                     ? "default"
                     : "outline"
                 }
@@ -186,7 +209,7 @@ export function FilterSidebar({
                     publicPaid: true,
                     privateFree: false,
                     privatePaid: false,
-                  });
+                  })
                 }}
                 className="rounded-full"
               >
@@ -195,10 +218,7 @@ export function FilterSidebar({
 
               <Button
                 variant={
-                  !filters.publicFree &&
-                  !filters.publicPaid &&
-                  filters.privateFree &&
-                  filters.privatePaid
+                  !filters.publicFree && !filters.publicPaid && filters.privateFree && filters.privatePaid
                     ? "default"
                     : "outline"
                 }
@@ -209,7 +229,7 @@ export function FilterSidebar({
                     publicPaid: false,
                     privateFree: true,
                     privatePaid: true,
-                  });
+                  })
                 }}
                 className="rounded-full"
               >
@@ -218,10 +238,7 @@ export function FilterSidebar({
 
               <Button
                 variant={
-                  filters.publicFree &&
-                  !filters.publicPaid &&
-                  filters.privateFree &&
-                  !filters.privatePaid
+                  filters.publicFree && !filters.publicPaid && filters.privateFree && !filters.privatePaid
                     ? "default"
                     : "outline"
                 }
@@ -232,7 +249,7 @@ export function FilterSidebar({
                     publicPaid: false,
                     privateFree: true,
                     privatePaid: false,
-                  });
+                  })
                 }}
                 className="rounded-full"
               >
@@ -241,10 +258,7 @@ export function FilterSidebar({
 
               <Button
                 variant={
-                  !filters.publicFree &&
-                  filters.publicPaid &&
-                  !filters.privateFree &&
-                  filters.privatePaid
+                  !filters.publicFree && filters.publicPaid && !filters.privateFree && filters.privatePaid
                     ? "default"
                     : "outline"
                 }
@@ -255,7 +269,7 @@ export function FilterSidebar({
                     publicPaid: true,
                     privateFree: false,
                     privatePaid: true,
-                  });
+                  })
                 }}
                 className="rounded-full"
               >
@@ -271,12 +285,12 @@ export function FilterSidebar({
           variant="outline"
           className="w-full flex items-center justify-center"
           onClick={clearFilters}
-          disabled={!Object.values(filters).some((v) => v) && !searchTerm}
+          disabled={!Object.values(filters).some((v) => v) && !searchTerm && !categoryFilter}
         >
           <Filter className="mr-2 h-4 w-4" />
           Clear All Filters
         </Button>
       </div>
     </div>
-  );
+  )
 }

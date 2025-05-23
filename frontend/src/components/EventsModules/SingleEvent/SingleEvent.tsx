@@ -9,18 +9,19 @@ import { IEvent } from "@/commonTypes/commonTypes"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useAppSelector } from "@/redux/hook"
-import { currentToken } from "@/redux/userSlice/userSlice"
+import { currentToken, currentUser } from "@/redux/userSlice/userSlice"
 import { joinPublicEvent, requestPrivateEvent } from "@/service/Events";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation"
+// import { getCurrentUser } from "@/service/AuthService"
 
 type SingleEvent = {
 event:IEvent;
-currentUser:any;
 }
-export default function SingleEvent({event,currentUser}:SingleEvent) {
-  // const router = useRouter()
+export default function SingleEvent({event}:SingleEvent) {
+  const router = useRouter()
   const token = useAppSelector(currentToken)
-
+  const user = useAppSelector(currentUser)
 
   const [loading, setLoading] = useState(false);
 
@@ -28,21 +29,26 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
   const isPublic = event.isPublic;
   const isPaid = event.isPaid;
 
-  if (!currentUser?.id) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-red-500">
-          You are not authorized!!
-        </h2>
-        <p className="mt-2 text-gray-600">Please login to view this event.</p>
-      </div>
-    );
-  }
+  // if (!currentUser?.id) {
+  //   return (
+  //     <div className="text-center py-12">
+  //       <h2 className="text-2xl font-bold text-red-500">
+  //         You are not authorized!!
+  //       </h2>
+  //       <p className="mt-2 text-gray-600">Please login to view this event.</p>
+  //     </div>
+  //   );
+  // }
 
   const handleJoin = async () => {
-    setLoading(true);
+    // setLoading(true);
+    // const currentUser = await getCurrentUser();
 
     try {
+
+        if (!token) {
+        return router.push(`/login?redirectPath=/events/${eventId}`)
+      }
       const res = await joinPublicEvent(eventId);
       if (res.success) {
         toast.success(res.message || "Joined successfully!");
@@ -217,9 +223,12 @@ export default function SingleEvent({event,currentUser}:SingleEvent) {
           {/* ✅ Conditional action buttons */}
           {/* {renderActionButton()} */}
 
-          <div className="mt-6 sm:mt-8">
-            <EventReviewSection eventId={event.id} userId={currentUser.id} />
+        {
+          user && <div className="mt-6 sm:mt-8">
+            <EventReviewSection eventId={event.id} userId={user.id} />
           </div>
+        }
+          
         </div>
 
         <div className="order-first md:order-last">

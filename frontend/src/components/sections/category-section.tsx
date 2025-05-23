@@ -38,7 +38,7 @@ const EventCategorySection=()=> {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {eventCategories.map((category) => (
-            <Link href={`/events/category/${category.name.toLowerCase()}`} key={category.name} className="block">
+            <Link href={`/events?category=${category.name}`} key={category.name} className="block">
               <Card className="h-full transition-all duration-200 hover:shadow-md hover:-translate-y-1">
                 <CardContent className="flex flex-col items-center justify-center p-6 text-center h-full">
                   <div className="rounded-full bg-primary/10 p-3 mb-4">{category.icon}</div>
