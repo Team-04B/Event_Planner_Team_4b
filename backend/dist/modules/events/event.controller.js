@@ -37,6 +37,44 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+// const createEvent = catchAsync(async (req, res) => {
+//   const file = req.file;
+//   if (!file) {
+//     throw new Error('Image file is required');
+//   }
+//   const creatorId = req.user.id;
+//   // Extract and convert fields from req.body
+//   const {
+//     title,
+//     description,
+//     dateTime,
+//     venue,
+//     category,
+//     isPublic,
+//     isPaid,
+//     fee,
+//   } = req.body;
+//   // Construct event payload with proper types
+//   const eventData: Prisma.EventUncheckedCreateInput = {
+//     title,
+//     description,
+//     dateTime: new Date(dateTime),
+//     venue,
+//     category: category as Prisma.EventCategory,
+//     isPublic: isPublic === 'true',
+//     isPaid: isPaid === 'true',
+//     fee: fee ? parseFloat(fee) : null,
+//     eventImgUrl: file.path,
+//     creatorId,
+//   };
+//   const result = await EventService.createEventIntoDB(eventData);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: httpStatus.CREATED,
+//     message: 'Event created successfully',
+//     data: result,
+//   });
+// });
 // // get all events - public
 // const getAllEvents = catchAsync(async (req, res) => {
 //   const rawFilters = pick(req.query, eventFilterableFields);
@@ -81,6 +119,7 @@ const createEvent = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
 // get all events - for user
 const getAllEventsByUserId = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
+    console.log(req.query);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
     const user = req.user;
     // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
@@ -95,6 +134,9 @@ const getAllEventsByUserId = (0, catchAsync_1.catchAsync)((req, res) => __awaite
             : rawFilters.isPaid === 'false'
                 ? false
                 : undefined,
+        category: typeof rawFilters.category === 'string'
+            ? rawFilters.category
+            : undefined,
         searchTerm: typeof rawFilters.searchTerm === 'string'
             ? rawFilters.searchTerm
             : undefined,
@@ -118,6 +160,7 @@ const getAllEventsByUserId = (0, catchAsync_1.catchAsync)((req, res) => __awaite
 // get all event -public
 const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
+    console.log(req.query);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
     // const user = req.user;
     // Handle boolean conversion for 'isPublic' and 'isPaid' and ensure other filters are correctly handled
@@ -132,6 +175,9 @@ const getEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
             : rawFilters.isPaid === 'false'
                 ? false
                 : undefined,
+        category: typeof rawFilters.category === 'string'
+            ? rawFilters.category
+            : undefined,
         searchTerm: typeof rawFilters.searchTerm === 'string'
             ? rawFilters.searchTerm
             : undefined,
@@ -185,6 +231,18 @@ const deleteFromDB = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0
         statusCode: http_status_1.default.OK,
         success: true,
         message: 'Event deleted successfully',
+        data: result,
+    });
+}));
+// update Participant Status
+const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { participantId } = req.params;
+    // console.log(req.body);
+    const result = yield event_service_1.EventService.updateParticipantStatus(participantId, req.body);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_1.default.OK,
+        message: `Participation ${req.body.status.toLowerCase()} successfully`,
         data: result,
     });
 }));
@@ -264,18 +322,6 @@ const getParticipationStatus = (0, catchAsync_1.catchAsync)((req, res) => __awai
         data: result,
     });
 }));
-// update Participant Status
-const updateParticipantStatus = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { participantId } = req.params;
-    // console.log(req.body);
-    const result = yield event_service_1.EventService.updateParticipantStatus(participantId, req.body);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        statusCode: http_status_1.default.OK,
-        message: `Participation ${req.body.status.toLowerCase()} successfully`,
-        data: result,
-    });
-}));
 const getAllEvents = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const rawFilters = (0, pick_1.default)(req.query, event_constant_1.eventFilterableFields);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -340,8 +386,8 @@ exports.EventController = {
     handleJoinEvent,
     handleRequestEvent,
     getParticipationStatus,
-    updateParticipantStatus,
     getAllEventsByUserId,
     adminDeleteEvent,
+    updateParticipantStatus,
     dataNeedForDashboard,
 };

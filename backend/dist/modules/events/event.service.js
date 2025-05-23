@@ -24,17 +24,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventService = void 0;
+const client_1 = require("@prisma/client");
 const prisma_1 = __importDefault(require("../../app/shared/prisma"));
 const paginationHelper_1 = require("../../app/helper/paginationHelper");
 const event_constant_1 = require("./event.constant");
 const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
 const http_status_1 = __importDefault(require("http-status"));
+const logActivity_1 = require("../logActivity");
 // create event into db
 const createEventIntoDB = (payload, creatorId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.event.create({
         data: Object.assign(Object.assign({}, payload), { creatorId }),
     });
-    return result;
+    yield (0, logActivity_1.logActivity)({
+        type: client_1.ActivityType.EVENT,
+        action: client_1.ActivityAction.CREATED,
+        description: `Event "${result.title}" created`,
+        userId: creatorId,
+        relatedEntityId: result.id,
+    });
 });
 // getAll events from db
 const getAllEventsFromDB = (filters, options) => __awaiter(void 0, void 0, void 0, function* () {
@@ -473,11 +481,11 @@ exports.EventService = {
     getAllEventsFromDB,
     getEventByIdFromDB,
     updateEventIntoDB,
+    updateParticipantStatus,
     deleteEventFromDB,
     joinToPublicEvent,
     requestToPaidEvent,
     getParticipationStatus,
-    updateParticipantStatus,
     adminDeletedEventFromDB,
     dataNeedForDashboardInToDb,
 };

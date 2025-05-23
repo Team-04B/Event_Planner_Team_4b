@@ -18,6 +18,7 @@ const sendResponse_1 = require("../../app/shared/sendResponse");
 const http_status_1 = __importDefault(require("http-status"));
 const payments_service_1 = require("./payments.service");
 const config_1 = __importDefault(require("../../app/config"));
+const users_service_1 = require("../users/users.service");
 const initPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = req.body;
     const user = req.user;
@@ -26,8 +27,8 @@ const initPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Payment Initate successfully",
-        data: result
+        message: 'Payment Initate successfully',
+        data: result,
     });
 }));
 const validationPayment = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,12 +48,39 @@ const paymentSuccess = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void
     (0, sendResponse_1.sendResponse)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Payment Validate successfully",
-        data: result
+        message: 'Payment Validate successfully',
+        data: result,
+    });
+}));
+// Controller to get admin dashboard payment stats
+const getDashboardOverview = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const [totalRevenue, totalPayments, latestPayments, revenueByProvider, monthlyRevenue, monthlyNewUsers, monthlyEvents] = yield Promise.all([
+        payments_service_1.PaymentService.getTotalRevenue(),
+        payments_service_1.PaymentService.getTotalPayments(),
+        payments_service_1.PaymentService.getLatestPayments(5),
+        payments_service_1.PaymentService.getRevenueByProvider(),
+        payments_service_1.PaymentService.getMonthlyRevenue(),
+        users_service_1.userServices.getMonthlyNewUsers(),
+        payments_service_1.PaymentService.getMonthlyEvents(),
+    ]);
+    (0, sendResponse_1.sendResponse)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Dashboard overview fetched successfully',
+        data: {
+            totalRevenue,
+            totalPayments,
+            latestPayments,
+            revenueByProvider,
+            monthlyRevenue,
+            monthlyNewUsers,
+            monthlyEvents,
+        },
     });
 }));
 exports.PaymentController = {
     initPayment,
     validationPayment,
-    paymentSuccess
+    paymentSuccess,
+    getDashboardOverview,
 };

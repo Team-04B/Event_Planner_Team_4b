@@ -25,13 +25,13 @@ const initPayment = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
         const event = yield prisma_1.default.event.findFirstOrThrow({
             where: {
                 id: eventId,
-                isPaid: true
+                isPaid: true,
             },
         });
         const customer = yield prisma_1.default.user.findUniqueOrThrow({
             where: {
-                id: userId
-            }
+                id: userId,
+            },
         });
         const data = {
             store_id: config_1.default.ssl.storeId,
@@ -66,33 +66,33 @@ const initPayment = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
             ship_country: 'Bangladesh',
         };
         const response = yield (0, axios_1.default)({
-            method: "POST",
+            method: 'POST',
             url: config_1.default.ssl.sslPaymentApi,
             data,
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
         });
         const paymentInitData = yield response.data;
         if ((event === null || event === void 0 ? void 0 : event.fee) == null) {
-            throw new Error("Event fee is missing.");
+            throw new Error('Event fee is missing.');
         }
         const isPaymentInitExist = yield prisma_1.default.payment.findFirst({
             where: {
-                transactionId: userId + event.id
-            }
+                transactionId: userId + event.id,
+            },
         });
         if (isPaymentInitExist) {
-            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, "Already Payment Inted Created!");
+            throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Already Payment Inted Created!');
         }
         yield prisma_1.default.payment.create({
             data: {
                 userId,
                 eventId: payload.eventId,
-                provider: "SSL Commerz",
+                provider: 'SSL Commerz',
                 amount: Number(event === null || event === void 0 ? void 0 : event.fee),
-                transactionId: userId + event.id
-            }
+                transactionId: userId + event.id,
+            },
         });
         console.log(paymentInitData === null || paymentInitData === void 0 ? void 0 : paymentInitData.GatewayPageURL, '1');
         const paymentUrl = paymentInitData === null || paymentInitData === void 0 ? void 0 : paymentInitData.GatewayPageURL;
@@ -127,12 +127,12 @@ const validationPayment = (query) => __awaiter(void 0, void 0, void 0, function*
     // }
     const payment = yield prisma_1.default.payment.findFirst({
         where: {
-            transactionId: query.tran_id
+            transactionId: query.tran_id,
         },
         include: {
             user: true,
-            event: true
-        }
+            event: true,
+        },
     });
     if (!payment) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'Payment not found!');
@@ -146,16 +146,16 @@ const validationPayment = (query) => __awaiter(void 0, void 0, void 0, function*
             data: {
                 status: client_1.PaymentStatus.SUCCESS,
                 paidAt: new Date(),
-            }
+            },
         });
         yield tx.invitation.updateMany({
             where: {
                 userEmail: (_a = payment === null || payment === void 0 ? void 0 : payment.user) === null || _a === void 0 ? void 0 : _a.email,
-                eventId: payment.event.id
+                eventId: payment.event.id,
             },
             data: {
-                paid: true
-            }
+                paid: true,
+            },
         });
         // return {
         //     message: "Payment success!"
@@ -167,8 +167,77 @@ const paymentSuccess = (tran_id) => __awaiter(void 0, void 0, void 0, function* 
     console.log(tran_id, 'helloasdfasdfasdfsadfs');
     return tran_id;
 });
+// Get total revenue from successful payments
+const getTotalRevenue = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'SUCCESS' },
+    });
+    return result._sum.amount || 0;
+});
+// Get total number of payments
+const getTotalPayments = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.default.payment.count();
+});
+// Get the latest N payments with user and event info
+const getLatestPayments = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (limit = 5) {
+    return yield prisma_1.default.payment.findMany({
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+            user: true,
+            event: true,
+        },
+    });
+});
+// Get total revenue grouped by payment provider
+const getRevenueByProvider = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.payment.groupBy({
+        by: ['provider'],
+        _sum: { amount: true },
+        where: { status: 'SUCCESS' },
+    });
+    return result.map((item) => ({
+        provider: item.provider,
+        revenue: item._sum.amount || 0,
+    }));
+});
+//  Get monthly revenue (for charts)
+const getMonthlyRevenue = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.$queryRaw `SELECT DATE_TRUNC('month', "createdAt") AS month, SUM(amount) as revenue
+    FROM "Payment"
+    WHERE status = 'SUCCESS'
+    GROUP BY month
+    ORDER BY month ASC;`;
+    return result.map((entry) => {
+        const date = new Date(entry.month);
+        const monthName = date.toLocaleString('default', { month: 'short' });
+        return {
+            month: monthName,
+            revenue: Number(entry.revenue),
+        };
+    });
+});
+// Get monthly events (for charts)
+const getMonthlyEvents = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.$queryRaw `SELECT DATE_TRUNC('month', "createdAt") AS month, COUNT(*) as count
+    FROM "Event"
+    WHERE "createdAt" IS NOT NULL
+    GROUP BY month
+    ORDER BY month ASC;`;
+    return result.map((entry) => ({
+        month: entry.month.toLocaleString('en-US', { month: 'short' }),
+        events: Number(entry.count),
+    }));
+});
 exports.PaymentService = {
     initPayment,
     validationPayment,
-    paymentSuccess
+    paymentSuccess,
+    getTotalRevenue,
+    getTotalPayments,
+    getLatestPayments,
+    getRevenueByProvider,
+    getMonthlyRevenue,
+    getMonthlyEvents,
 };

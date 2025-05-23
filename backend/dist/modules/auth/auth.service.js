@@ -16,10 +16,12 @@ exports.AuthService = void 0;
 const prisma_1 = __importDefault(require("../../app/shared/prisma"));
 const ApiError_1 = __importDefault(require("../../app/error/ApiError"));
 const http_status_1 = __importDefault(require("http-status"));
+const client_1 = require("@prisma/client");
 const createToken_1 = require("../../app/shared/createToken");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const config_1 = __importDefault(require("../../app/config"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const logActivity_1 = require("../logActivity");
 const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password } = payload;
     // console.log(payload);
@@ -46,6 +48,13 @@ const authRegisterInToDB = (payload) => __awaiter(void 0, void 0, void 0, functi
             email,
             password: hasPassword,
         },
+    });
+    // user logactivity
+    yield (0, logActivity_1.logActivity)({
+        type: client_1.ActivityType.USER,
+        action: client_1.ActivityAction.CREATED,
+        description: `User ${registeredUser.name} signed up`,
+        userId: registeredUser.id,
     });
     if (!registeredUser.id) {
         throw new ApiError_1.default(http_status_1.default.BAD_REQUEST, 'user create problem');

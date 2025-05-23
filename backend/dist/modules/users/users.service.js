@@ -90,9 +90,23 @@ const deleteUserInToDb = (id) => __awaiter(void 0, void 0, void 0, function* () 
     const result = yield prisma_1.default.user.delete({ where: { id: id } });
     return result;
 });
+// get new users from user model
+const getMonthlyNewUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.$queryRaw `
+    SELECT DATE_TRUNC('month', "createdAt") AS month, COUNT(*) AS "newUsers"
+    FROM "User"
+    GROUP BY month
+    ORDER BY month ASC;
+  `;
+    return result.map((entry) => ({
+        month: entry.month.toISOString().slice(0, 7), // e.g., "2025-05"
+        users: Number(entry.newUsers),
+    }));
+});
 exports.userServices = {
     getAllUsersInToDb,
     getSingleUsersInToDb,
     updateUserInToDb,
     deleteUserInToDb,
+    getMonthlyNewUsers,
 };

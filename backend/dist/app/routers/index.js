@@ -11,45 +11,50 @@ const participation_routes_1 = require("../../modules/participation/participatio
 const invitations_routes_1 = require("../../modules/invitations/invitations.routes");
 const payments_routes_1 = require("../../modules/payments/payments.routes");
 const reviews_routes_1 = require("../../modules/reviews/reviews.routes");
-const admin_routes_1 = require("../../modules/admin/admin.routes");
 const contact_route_1 = require("../../modules/contact/contact.route");
+const activity_route_1 = require("../../modules/logActivity/activity.route");
+const admin_routes_1 = require("../../modules/admin/admin.routes");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
         path: '/auth',
-        route: auth_routes_1.AuthRoutes
+        route: auth_routes_1.AuthRoutes,
     },
     {
         path: '/users',
-        route: users_routes_1.UsersRoutes
+        route: users_routes_1.UsersRoutes,
     },
     {
         path: '/events',
-        route: event_routes_1.EventRoutes
+        route: event_routes_1.EventRoutes,
     },
     {
         path: '/participants',
-        route: participation_routes_1.ParticipationRoutes
+        route: participation_routes_1.ParticipationRoutes,
     },
     {
         path: '/invitations',
-        route: invitations_routes_1.InvitationRoutes
+        route: invitations_routes_1.InvitationRoutes,
     },
     {
         path: '/payment',
-        route: payments_routes_1.PaymentRoutes
+        route: payments_routes_1.PaymentRoutes,
     },
     {
         path: '/reviews',
-        route: reviews_routes_1.ReviewsRoutes
+        route: reviews_routes_1.ReviewsRoutes,
     },
     {
         path: '/admin',
-        route: admin_routes_1.AdminRoutes
+        route: admin_routes_1.AdminRoutes,
     },
     {
         path: '/sendMail',
         route: contact_route_1.MailRoutes,
+    },
+    {
+        path: '/activities',
+        route: activity_route_1.ActivityRoutes,
     },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
