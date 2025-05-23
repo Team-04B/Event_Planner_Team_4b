@@ -4,8 +4,6 @@ import httpStatus from 'http-status';
 import { PaymentService } from './payments.service';
 import config from '../../app/config';
 
-
-
 const initPayment = catchAsync(async (req, res) => {
   const payload = req.body;
 
@@ -49,16 +47,21 @@ const paymentSuccess = catchAsync(async (req, res) => {
   });
 });
 
-
 // Controller to get admin dashboard payment stats
 const getDashboardOverview = catchAsync(async (req, res) => {
-  const [totalRevenue, totalPayments, latestPayments, revenueByProvider] =
-    await Promise.all([
-      PaymentService.getTotalRevenue(),
-      PaymentService.getTotalPayments(),
-      PaymentService.getLatestPayments(5),
-      PaymentService.getRevenueByProvider(),
-    ]);
+  const [
+    totalRevenue,
+    totalPayments,
+    latestPayments,
+    revenueByProvider,
+    monthlyRevenue,
+  ] = await Promise.all([
+    PaymentService.getTotalRevenue(),
+    PaymentService.getTotalPayments(),
+    PaymentService.getLatestPayments(5),
+    PaymentService.getRevenueByProvider(),
+    PaymentService.getMonthlyRevenue(),
+  ]);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -69,6 +72,7 @@ const getDashboardOverview = catchAsync(async (req, res) => {
       totalPayments,
       latestPayments,
       revenueByProvider,
+      monthlyRevenue,
     },
   });
 });
